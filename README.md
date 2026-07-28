@@ -4,6 +4,8 @@ Trust3D studies when a situated agent should trust persistent evidence and when 
 
 ## Gate 0
 
+System prerequisite: `xvfb-run` (Ubuntu packages `xvfb` and `xauth`).
+
 Create the isolated simulator environment:
 
 ```bash

@@ -1,0 +1,25 @@
+{
+  "action": {
+    "error_message": "",
+    "name": "RotateRight",
+    "success": true
+  },
+  "checks": {
+    "agent_pose_available": true,
+    "depth_available": true,
+    "depth_has_finite_values": true,
+    "initial_object_state_deterministic": true,
+    "instance_segmentation_available": true,
+    "legal_action_succeeded": true,
+    "object_list_nonempty": true,
+    "rgb_available": true,
+    "rgb_non_black": true
+  },
+  "passed": true,
+  "scene": "FloorPlan1",
+  "seed": 17,
+  "state_hashes": [
+    "57ad74a8e3b2ca5dfe909df906b5ca44fd3e373d4fb29e92cc85aa934979ef63",
+    "57ad74a8e3b2ca5dfe909df906b5ca44fd3e373d4fb29e92cc85aa934979ef63"
+  ]
+}
