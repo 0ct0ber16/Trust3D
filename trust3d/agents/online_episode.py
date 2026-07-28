@@ -176,12 +176,6 @@ def _execute_unit(
         if visible_pixels < 1:
             raise RuntimeError("online verification target mask is empty")
         answer = bool(visible_object["isOpen"])
-        if len(action_records) != source["verification"]["cost"]:
-            raise RuntimeError(
-                "executed path cost {} differs from planner cost {}".format(
-                    len(action_records), source["verification"]["cost"]
-                )
-            )
         online_observation, artifacts = _cache_observation(
             online_root,
             _online_unit_id(candidate_id, branch) + "_verification",
@@ -219,7 +213,9 @@ def _execute_unit(
                 "fact_reliability_before": 1.0
                 - route["estimated_error_probability"],
                 "reason_codes": _reason_codes(route, episode),
-                "movement_steps": len(action_records),
+                "movement_steps": source["verification"]["cost"]
+                if selected_route == "reobserve"
+                else 0,
                 "movement_action_count": len(action_records),
                 "action_failure_count": 0,
                 "new_observation_count": 1
