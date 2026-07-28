@@ -46,3 +46,28 @@ object poses. If neither source lists an operated instance, action IDs provide a
 explicitly marked lower bound that Gate 2 must verify against simulator metadata.
 Official test splits are included in the manifest but skipped because ALFRED
 intentionally withholds their action plans.
+
+## Gate 2
+
+Generate the 20-event pilot under Xvfb. Work is checkpointed by source event,
+branch, and replay round, so rerunning the same command validates existing
+artifacts and resumes only incomplete units:
+
+```bash
+xvfb-run -a python -u -m trust3d.data.build_branches \
+  --candidates outputs/gate1/candidates.jsonl \
+  --limit 20 \
+  --branches fresh_stable risk_stable risk_stale \
+  --seed 17 \
+  --replay-runs 2 \
+  --output data/episodes/pilot
+
+python -m trust3d.data.validate_dataset \
+  --public data/episodes/pilot/episodes_public.jsonl \
+  --private data/episodes/pilot/oracle_private.jsonl \
+  --replay-twice \
+  --report outputs/gate2/validation.json
+```
+
+Episode data, images, private truth, and checkpoints stay local under `data/`.
+Only the leakage-checked aggregate validation report is tracked.

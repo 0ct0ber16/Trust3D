@@ -21,6 +21,9 @@ outputs/gate0/*
 outputs/gate1/*
 !outputs/gate1/candidates.jsonl
 !outputs/gate1/stats.json
+!outputs/gate2/
+outputs/gate2/*
+!outputs/gate2/validation.json
 
 **/__pycache__/
 *.py[cod]
