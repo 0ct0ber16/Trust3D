@@ -34,6 +34,7 @@ prepare_display() {
   export LD_LIBRARY_PATH="${LOCAL_XVFB_LIB}${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
   export LIBGL_DRIVERS_PATH="${LOCAL_DRI_ROOT}"
   export LIBGL_ALWAYS_SOFTWARE=1
+  export LP_NUM_THREADS=${LP_NUM_THREADS:-16}
   export TMPDIR=/224010104/Jerry/.tmp
   mkdir -p "${TMPDIR}"
   XVFB_RUN=(
@@ -42,6 +43,7 @@ prepare_display() {
   )
   printf 'display_backend=workspace-xvfb\n'
   printf 'opengl_backend=llvmpipe\n'
+  printf 'llvmpipe_threads=%s\n' "${LP_NUM_THREADS}"
 }
 
 run() {
