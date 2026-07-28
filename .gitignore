@@ -11,6 +11,8 @@
 !trust3d/**
 !tests/
 !tests/**
+!scripts/
+!scripts/**
 !outputs/
 outputs/*
 !outputs/gate0/
