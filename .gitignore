@@ -17,6 +17,10 @@ outputs/*
 outputs/gate0/*
 !outputs/gate0/env.json
 !outputs/gate0/report.json
+!outputs/gate1/
+outputs/gate1/*
+!outputs/gate1/candidates.jsonl
+!outputs/gate1/stats.json
 
 **/__pycache__/
 *.py[cod]

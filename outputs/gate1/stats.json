@@ -1,0 +1,80 @@
+{
+  "acceptance": {
+    "all_candidates_traceable": true,
+    "candidate_count_at_least_100": true,
+    "gate1_pass": true,
+    "parse_error_rate_below_1_percent": true,
+    "valid_unseen_count_at_least_20": true
+  },
+  "action_validation_error_count": 0,
+  "action_validation_error_examples": [],
+  "all_counted_action_counts": {
+    "CloseObject": 7190,
+    "OpenObject": 7116,
+    "PickupObject": 13245,
+    "PutObject": 12411,
+    "ToggleObjectOff": 1962,
+    "ToggleObjectOn": 2756
+  },
+  "candidate_count": 14306,
+  "candidates_by_action": {
+    "CloseObject": 7190,
+    "OpenObject": 7116
+  },
+  "candidates_by_object_type": {
+    "Box": 9,
+    "Cabinet": 1984,
+    "Drawer": 982,
+    "Fridge": 5951,
+    "Laptop": 85,
+    "Microwave": 5173,
+    "Safe": 122
+  },
+  "candidates_by_split": {
+    "train": 13205,
+    "valid_seen": 516,
+    "valid_unseen": 585
+  },
+  "dataset_manifest": {
+    "algorithm": "sha256(relative_path + NUL + sha256(file_bytes) + LF)",
+    "sha256": "a2546fc364e3d88f418f0ead85ebe73c0f19a21b1fed9877bfe8ed18dac29874"
+  },
+  "distinct_candidate_scenes": 95,
+  "distinct_candidate_trajectories": 3420,
+  "mvp_actions": [
+    "CloseObject",
+    "OpenObject"
+  ],
+  "mvp_object_types": [
+    "Cabinet",
+    "Drawer",
+    "Fridge",
+    "Microwave",
+    "Safe"
+  ],
+  "mvp_whitelist_count": 14212,
+  "parse_error_count": 0,
+  "parse_error_examples": [],
+  "parse_error_rate": 0.0,
+  "processable_trajectory_count": 7080,
+  "requested_events": [
+    "CloseObject",
+    "OpenObject"
+  ],
+  "schema_version": 1,
+  "skipped_unannotated_by_split": {
+    "tests_seen": 483,
+    "tests_unseen": 488
+  },
+  "skipped_unannotated_count": 971,
+  "split_trajectory_counts": {
+    "tests_seen": 483,
+    "tests_unseen": 488,
+    "train": 6574,
+    "valid_seen": 251,
+    "valid_unseen": 255
+  },
+  "trajectories_parsed": 7080,
+  "trajectory_file_count": 8051,
+  "trajectory_json_bytes": 1401308505
+}
