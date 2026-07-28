@@ -7,6 +7,8 @@
 !pyproject.toml
 !environment/
 !environment/**
+!configs/
+!configs/**
 !trust3d/
 !trust3d/**
 !tests/
@@ -29,6 +31,16 @@ outputs/gate2/*
 !outputs/gate3/
 outputs/gate3/*
 !outputs/gate3/validation.json
+!outputs/gate3/risk_frame_audit.json
+!outputs/gate3/checkpoint_recovery.json
+!outputs/gate4/
+outputs/gate4/*
+!outputs/gate4/metrics.json
+!outputs/gate4/plots/
+outputs/gate4/plots/*
+!outputs/gate4/plots/accuracy_cost_pareto.png
+!outputs/gate4/plots/risk_tradeoff.png
+!outputs/gate4/plots/manifest.json
 
 **/__pycache__/
 *.py[cod]

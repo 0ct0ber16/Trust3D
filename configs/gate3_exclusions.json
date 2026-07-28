@@ -1,0 +1,7 @@
+{
+  "reason": "Risk-Stable/Risk-Stale 查询观测的 RGB、深度或实例分割存在超出量化抖动范围的差异",
+  "group_ids": [
+    "g_825f57c8eda6aeb251dde586",
+    "g_98838a5cdb6e9cba58d3e87d"
+  ]
+}

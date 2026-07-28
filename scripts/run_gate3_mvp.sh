@@ -56,7 +56,7 @@ run() {
     --format=csv,noheader
   prepare_display || return $?
   printf 'timeout_seconds=%s\n' "${TIMEOUT_SECONDS}"
-  printf '%s\n' 'command=xvfb-run -a python -m trust3d.data.build_branches --num-source-events 100 --branches fresh_stable risk_stable risk_stale --questions-per-branch 2 --replay-runs 2 --seed 20260728 --output data/episodes/mvp'
+  printf '%s\n' 'command=xvfb-run -a python -m trust3d.data.build_branches --num-source-events 100 --branches fresh_stable risk_stable risk_stale --questions-per-branch 2 --replay-runs 2 --seed 20260728 --exclude-groups configs/gate3_exclusions.json --output data/episodes/mvp'
 
   timeout "${TIMEOUT_SECONDS}s" "${XVFB_RUN[@]}" "${PYTHON}" -u \
     -m trust3d.data.build_branches \
@@ -66,6 +66,7 @@ run() {
     --questions-per-branch 2 \
     --replay-runs 2 \
     --seed 20260728 \
+    --exclude-groups configs/gate3_exclusions.json \
     --output data/episodes/mvp
   build_rc=$?
   if [[ ${build_rc} -ne 0 ]]; then

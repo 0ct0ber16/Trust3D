@@ -32,6 +32,7 @@ def _fixture(tmp_path):
                 "query_frame": query_frame,
                 "query_pose": query_pose,
                 "elapsed_steps": 0 if branch == "fresh_stable" else 30,
+                "verification_cost": 3,
                 "public_context": {
                     "intervention_window": branch != "fresh_stable",
                     "scope": "room",
@@ -189,3 +190,15 @@ def test_gate3_two_question_fixture_passes_full_data_checks(tmp_path):
     assert report["public_episode_count"] == 6
     assert report["public_full_observation_count"] == 6
     assert min(report["answer_fractions"].values()) >= 0.30
+
+
+def test_gate3_rejects_branch_dependent_public_verification_cost(tmp_path):
+    paths = _fixture(tmp_path)
+    public = [json.loads(line) for line in paths[0].read_text().splitlines()]
+    public[0]["verification_cost"] = 4
+    _jsonl(paths[0], public)
+
+    report = validate(*paths, minimum_source_events=1, gate=3)
+
+    assert report["acceptance"]["public_verification_cost_group_invariant"] is False
+    assert report["acceptance"]["gate3_pass"] is False

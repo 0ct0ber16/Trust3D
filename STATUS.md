@@ -186,3 +186,69 @@ Git 跟踪报告：
 - 恢复哈希审计：`/224010104/Jerry/logs/gate2/checkpoint-resume.log`
 - 最终测试：`/224010104/Jerry/logs/gate2/tests-final.log`
 - 最终验收：`/224010104/Jerry/logs/gate2/validation-final.log`
+
+## Gate 3：100 个候选事件的 TrustEQA-Dynamic-MVP
+
+状态：通过
+
+结论：进入 Gate 4 离线二路路由验证。
+
+生成与筛选情况：
+
+- 初始 source events：100 个，全部完成 context 和分支 checkpoint
+- 数据质量排除：2 个 source events；原始 checkpoint 保留且未删除
+- 最终有效 source events：98 个
+- 分支：Fresh-Stable、Risk-Stable、Risk-Stale 各 196 个 episode
+- 输出：588 个 public episodes、588 个 private oracle records、1176 个独立 replay records
+- 问题模板：每个分支 2 个中性模板
+- 模态：历史、query 和验证观测均包含 RGB、depth、instance segmentation
+
+执行命令：
+
+```bash
+scripts/run_gate3_mvp.sh
+
+scripts/verify_gate3_mvp.sh
+```
+
+2026-07-28 验收结果：
+
+- 单元测试：28 项通过
+- 有效 source events：98/100；最低要求为 90
+- 重放成功率：98%；98 个有效 group 均包含完整三分支和两个问题模板
+- 重放状态哈希一致性：588/588 episodes，即 100%
+- 分支比例：Fresh-Stable : Risk-Stable : Risk-Stale = 1:1:1
+- 答案平衡：open 294 个、closed 294 个，各占 50%
+- Query 时目标隐藏：588/588
+- 可达验证视角：588/588；最短验证成本范围 2-42，均值 19.24
+- Public/private 泄漏：0；episode ID 一一对应
+- Public 路由成本：全部存在，并在同一 group 的所有分支间保持一致
+- RGB、depth、instance 和验证观测产物：全部存在且 manifest SHA256 匹配
+- 最终验证结果：`gate3_pass=true`
+
+视觉泄漏审计：
+
+1. 初次审计发现 2/100 个 group 的风险分支 query 观测存在真实差异，而非普通量化抖动。最大 RGB 变化比例为 0.0104%，但最大强度差为 94，同时 depth 最大差为 20.01，instance mask 也有像素变化。
+2. 这两个 group 已通过 `configs/gate3_exclusions.json` 明确记录并从最终聚合数据中排除；未删除其原始 checkpoint，也未用静默丢弃掩盖问题。
+3. 最终 98 个 group 的 196 对 Risk-Stable/Risk-Stale query 观测逐像素一致：RGB、depth 和 instance 的最大差异均为 0。
+4. 所有公开风险对的其余字段保持一致，隐藏干预、当前答案、陈旧标签和分支名称均不进入 public 文件。
+
+断点恢复与服务器安全检查：
+
+1. Gate 3 使用用户态 Xvfb 和 CPU llvmpipe，线程上限为 16；未使用、停止或修改两张 GPU 上已有的 VLLM 任务。
+2. 最终恢复测试直接读取 checkpoint 聚合，不启动 Xvfb 或 Unity。恢复前后比较本地 2906 个文件，SHA256 全部一致。
+3. 恢复测试前后新增模拟器进程数为 0，证明服务器重启后可从原子 checkpoint 恢复而不重复运行已完成单元。
+4. 原始长任务日志、失败原因、状态审计和恢复哈希均保存在 `/224010104/Jerry/logs/gate3/`。
+
+Git 跟踪报告：
+
+- `outputs/gate3/validation.json`
+- `outputs/gate3/risk_frame_audit.json`
+- `outputs/gate3/checkpoint_recovery.json`
+
+仅本地保存的产物与日志：
+
+- 数据集、模态缓存和原子 checkpoint：`data/episodes/mvp/`
+- 生成日志：`/224010104/Jerry/logs/gate3/mvp.log`
+- 正式验收：`/224010104/Jerry/logs/gate3/verify.log`
+- 全量恢复哈希：`/224010104/Jerry/logs/gate3/recovery-before.sha256` 和 `/224010104/Jerry/logs/gate3/recovery-after.sha256`

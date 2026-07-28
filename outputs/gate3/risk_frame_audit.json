@@ -1,0 +1,22 @@
+{
+  "errors": [],
+  "failed_pair_count": 0,
+  "failed_pairs": [],
+  "limits": {
+    "depth_changed_fraction": 0.0,
+    "depth_max_absolute_difference": 0.0,
+    "instance_changed_fraction": 0.0,
+    "rgb_changed_fraction": 0.001,
+    "rgb_max_absolute_difference": 2.0
+  },
+  "maxima": {
+    "depth_changed_fraction": 0.0,
+    "depth_max_absolute_difference": 0.0,
+    "instance_changed_fraction": 0.0,
+    "rgb_changed_fraction": 0.0,
+    "rgb_max_absolute_difference": 0.0
+  },
+  "pair_count": 196,
+  "risk_frame_audit_pass": true,
+  "schema_version": 1
+}

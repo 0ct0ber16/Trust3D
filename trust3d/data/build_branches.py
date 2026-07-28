@@ -484,6 +484,8 @@ def _public_record(
         "query_frame": query_observation["rgb"],
         "query_pose": context["query_pose"],
         "elapsed_steps": 0 if branch == "fresh_stable" else 30,
+        # 只公开历史状态下计算的组内固定成本，避免分支状态泄漏。
+        "verification_cost": context["stable_verification"]["cost"],
         "public_context": {
             "intervention_window": branch != "fresh_stable",
             "scope": "room",
@@ -573,15 +575,19 @@ def _aggregate(
     seed,
     questions_per_branch,
     modalities,
+    excluded_group_ids=(),
 ):
     public = []
     private = []
     replay_records = []
     complete_groups = 0
+    excluded_group_ids = set(excluded_group_ids)
     for candidate in selected:
         candidate_id = candidate["candidate_id"]
         context = contexts.get(candidate_id)
         if context is None:
+            continue
+        if _group_id(candidate_id) in excluded_group_ids:
             continue
         branch_rounds = {}
         for branch in branches:
@@ -648,6 +654,8 @@ def _aggregate(
         "replay_record_count": len(replay_records),
         "branches": list(branches),
         "replay_runs": replay_runs,
+        "excluded_source_event_count": len(excluded_group_ids),
+        "excluded_group_ids": sorted(excluded_group_ids),
         "files": {
             name: _sha256_file(output / name)
             for name in (
@@ -681,10 +689,22 @@ def build(args):
     modalities = (
         ("rgb", "depth", "instance") if cache_mode == "full" else ("rgb",)
     )
+    excluded_group_ids = set()
+    if args.exclude_groups is not None:
+        exclusions = json.loads(args.exclude_groups.read_text(encoding="utf-8"))
+        excluded_group_ids = set(exclusions.get("group_ids", []))
     selection_path = output / "selection.json"
     candidates = read_jsonl(args.candidates)
     selected = select_candidates(candidates, args.limit, args.seed)
     summary = selection_summary(selected, args.seed)
+    selected_group_ids = {_group_id(item["candidate_id"]) for item in selected}
+    unknown_exclusions = sorted(excluded_group_ids - selected_group_ids)
+    if unknown_exclusions:
+        raise ValueError(
+            "excluded group_id is not selected: {}".format(
+                ", ".join(unknown_exclusions)
+            )
+        )
     if selection_path.exists():
         existing = json.loads(selection_path.read_text(encoding="utf-8"))
         if existing.get("summary", {}).get("all_candidate_ids") != summary[
@@ -841,6 +861,7 @@ def build(args):
         args.seed,
         args.questions_per_branch,
         modalities,
+        excluded_group_ids,
     )
     print("[gate2] manifest " + json.dumps(manifest, sort_keys=True), flush=True)
     return manifest
@@ -867,6 +888,7 @@ def build_parser():
         default="auto",
     )
     parser.add_argument("--max-units", type=int)
+    parser.add_argument("--exclude-groups", type=Path)
     parser.add_argument("--output", required=True, type=Path)
     return parser
 

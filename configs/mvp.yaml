@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "global_ttl_steps": 15,
+  "fact_ttl_steps": {
+    "articulated_state": 10
+  },
+  "trust3d": {
+    "fresh_error_probability": 0.0,
+    "risk_error_probability": 0.5,
+    "max_error_probability": 0.1,
+    "error_penalty": 1.0,
+    "primary_cost_weight": 0.01,
+    "route_cost_weights": [0.001, 0.005, 0.01, 0.02, 0.05]
+  },
+  "utility_cost_weights": [0.001, 0.005, 0.01, 0.02, 0.05],
+  "bootstrap_seed": 20260728
+}

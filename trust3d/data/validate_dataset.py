@@ -142,6 +142,8 @@ def validate(
     query_pose_errors = []
     risk_public_errors = []
     risk_query_frame_errors = []
+    verification_cost_errors = []
+    verification_cost_group_errors = []
     symbol_errors = []
     branch_question_errors = []
     verification_available = 0
@@ -180,6 +182,22 @@ def validate(
         }
         if len(poses) != 1:
             query_pose_errors.append(group_id)
+
+        public_records = [
+            public_by_id[item["episode_id"]]
+            for item in records
+            if item["episode_id"] in public_by_id
+        ]
+        public_costs = [item.get("verification_cost") for item in public_records]
+        if len(public_records) != len(records) or any(
+            isinstance(cost, bool)
+            or not isinstance(cost, (int, float))
+            or cost < 0
+            for cost in public_costs
+        ):
+            verification_cost_errors.append(group_id)
+        elif len(set(public_costs)) != 1:
+            verification_cost_group_errors.append(group_id)
 
         for question_index, by_branch in by_question.items():
             fresh = by_branch["fresh_stable"]
@@ -319,6 +337,10 @@ def validate(
                     public_full_observations == len(public)
                     and private_full_observations == len(private)
                 ),
+                "public_verification_cost_available": not verification_cost_errors,
+                "public_verification_cost_group_invariant": (
+                    not verification_cost_group_errors
+                ),
             }
         )
         acceptance["gate3_pass"] = all(acceptance.values())
@@ -373,6 +395,10 @@ def validate(
         "query_pose_error_groups": query_pose_errors[:20],
         "risk_public_error_groups": risk_public_errors[:20],
         "risk_query_frame_difference_groups": risk_query_frame_errors[:20],
+        "verification_cost_error_groups": verification_cost_errors[:20],
+        "verification_cost_group_error_groups": (
+            verification_cost_group_errors[:20]
+        ),
         "symbol_error_episodes": symbol_errors[:20],
         "input_sha256": {
             "public": _sha256_file(public_path),
