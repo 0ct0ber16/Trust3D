@@ -1,18 +1,18 @@
 # Trust3D
 
-Trust3D studies when a situated agent should trust persistent evidence and when it should reobserve the environment. Implementation follows the gates in `Trust3D_服务器最小可执行实验方案.md`; a gate must pass before work starts on the next one.
+Trust3D 研究具身智能体应在何时信任持久化证据，以及何时应重新观察环境。项目按照 `Trust3D_服务器最小可执行实验方案.md` 中的验收门逐步实现；当前阶段未通过验收前，不进入下一阶段。
 
-## Gate 0
+## Gate 0：模拟器冒烟测试
 
-System prerequisite: `xvfb-run` (Ubuntu packages `xvfb` and `xauth`).
+系统前置依赖：`xvfb-run`（Ubuntu 软件包 `xvfb` 和 `xauth`）。
 
-Create the isolated simulator environment:
+创建隔离的模拟器环境：
 
 ```bash
 conda env create -f environment/trust3d-sim.yml
 ```
 
-Run unit tests and the simulator smoke test:
+运行单元测试和模拟器冒烟测试：
 
 ```bash
 conda run -n trust3d-sim pytest -q
@@ -22,12 +22,11 @@ xvfb-run -a conda run -n trust3d-sim python -m trust3d.sim.controller \
   --output outputs/gate0
 ```
 
-The smoke test launches two fresh simulator processes and fails unless their initial object-state hashes match. Generated RGB, depth, segmentation, and full metadata stay local; only the sanitized environment and validation reports are tracked.
+冒烟测试会启动两个全新的模拟器进程；如果两次初始对象状态哈希不一致，测试即失败。生成的 RGB、深度图、分割图和完整 metadata 仅保存在本地，Git 只跟踪脱敏后的环境报告和验收报告。
 
-## Gate 1
+## Gate 1：ALFRED 候选事件扫描
 
-Place the pinned ALFRED checkout at `external/alfred`, then scan its trajectory JSON
-without starting AI2-THOR:
+将固定版本的 ALFRED 仓库放在 `external/alfred`，然后在不启动 AI2-THOR 的情况下扫描轨迹 JSON：
 
 ```bash
 python -m trust3d.data.scan_alfred \
@@ -39,19 +38,11 @@ python -m trust3d.data.scan_alfred \
 pytest -q tests/test_scan_alfred.py
 ```
 
-The scanner derives pre-action open state from preceding low-level actions and the
-first open/close action's precondition. Scene-level counts come from ALFRED's pinned
-`gen/layouts/*-openable.json` files, with movable openables counted from trajectory
-object poses. If neither source lists an operated instance, action IDs provide an
-explicitly marked lower bound that Gate 2 must verify against simulator metadata.
-Official test splits are included in the manifest but skipped because ALFRED
-intentionally withholds their action plans.
+扫描器根据前序低层动作和第一次开关动作的前置状态推导动作前的开闭状态。场景级对象数量来自固定版本 ALFRED 的 `gen/layouts/*-openable.json`，可移动且可开闭的对象则根据轨迹中的 object poses 计数。如果两个来源都没有列出被操作实例，扫描器会根据 action ID 给出明确标注的数量下界，并由 Gate 2 使用模拟器 metadata 进一步核验。官方测试 split 仍纳入 manifest，但由于 ALFRED 有意隐藏其动作计划，扫描时会跳过这些轨迹。
 
-## Gate 2
+## Gate 2：20 事件可复现重放
 
-Generate the 20-event pilot under Xvfb. Work is checkpointed by source event,
-branch, and replay round, so rerunning the same command validates existing
-artifacts and resumes only incomplete units:
+在 Xvfb 下生成包含 20 个事件的 pilot。任务按 source event、branch 和 replay round 保存 checkpoint；重复运行相同命令时会先验证已有产物，只恢复未完成单元：
 
 ```bash
 xvfb-run -a python -u -m trust3d.data.build_branches \
@@ -69,5 +60,14 @@ python -m trust3d.data.validate_dataset \
   --report outputs/gate2/validation.json
 ```
 
-Episode data, images, private truth, and checkpoints stay local under `data/`.
-Only the leakage-checked aggregate validation report is tracked.
+episode 数据、图像、private 真值和 checkpoint 均保存在本地 `data/` 目录中；Git 只跟踪完成泄漏检查后的聚合验收报告。
+
+## Gate 3：100 事件 MVP 数据集
+
+完整构建必须在 tmux 中通过可恢复脚本运行：
+
+```bash
+scripts/run_gate3_mvp.sh
+```
+
+脚本会在启动时记录服务器资源和完整命令，校验已有 checkpoint，并继续生成 100 个 source events、三种 branch、每个 branch 两个中性问题模板的 MVP 数据。构建完成后会自动运行 Gate 3 验收；日志和退出码分别保存在 `/224010104/Jerry/logs/gate3/mvp.log` 与 `/224010104/Jerry/logs/gate3/mvp.exit`。
