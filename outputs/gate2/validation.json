@@ -1,0 +1,50 @@
+{
+  "acceptance": {
+    "all_branch_query_poses_identical": true,
+    "all_episodes_replayed_twice": true,
+    "episode_ids_match": true,
+    "gate2_pass": true,
+    "manifest_hashes_match": true,
+    "public_artifacts_exist": true,
+    "public_private_separation": true,
+    "replay_state_hash_rate_at_least_95_percent": true,
+    "risk_pair_public_metadata_equal": true,
+    "risk_stale_answer_changes": true,
+    "source_events_at_least_minimum": true,
+    "stable_answers_unchanged": true,
+    "symbolic_answers_match_metadata": true,
+    "verification_pose_rate_at_least_90_percent": true
+  },
+  "branch_counts": {
+    "fresh_stable": 20,
+    "risk_stable": 20,
+    "risk_stale": 20
+  },
+  "branch_relation_errors": [],
+  "complete_source_events": 20,
+  "deterministic_episodes": 60,
+  "input_sha256": {
+    "manifest": "f53392c68544edadd6d19741d5874817d5e10187246b491f93b532b74baf8771",
+    "private": "86d839af42be37dcc8f64bab5e508ea43da74f384bd3b3d8db062045b57a6aca",
+    "public": "a29a3039b9417baccf51fbbaa5b354e2a2de05bc6ec491bf8738fd4d8d5c64f5",
+    "replay_records": "6d63d0e772c1b4d497df04727d4906de318e2c25422a4acf04891050fd840ec7"
+  },
+  "minimum_source_events": 19,
+  "missing_public_artifact_count": 0,
+  "private_episode_count": 60,
+  "public_episode_count": 60,
+  "public_leak_episode_count": 0,
+  "query_pose_error_groups": [],
+  "replay_complete_episodes": 60,
+  "replay_record_count": 120,
+  "replay_state_hash_match_rate": 1.0,
+  "risk_public_error_groups": [],
+  "risk_query_frame_difference_groups": [
+    "g_98838a5cdb6e9cba58d3e87d"
+  ],
+  "schema_version": 1,
+  "symbol_error_episodes": [],
+  "target_hidden_at_query_count": 60,
+  "verification_pose_available": 60,
+  "verification_pose_rate": 1.0
+}

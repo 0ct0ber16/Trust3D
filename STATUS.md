@@ -116,3 +116,73 @@ Interpretation notes:
 2. Openable instance counts use `gen/layouts/*-openable.json`, then trajectory object poses for movable openables. For 250 Cabinet/Drawer candidates whose operated ID is missing from the layout table, the reported count is explicitly marked as a lower bound from observed action IDs.
 3. `mvp_whitelist` means only that action and target type are in the Gate 1 whitelist. Visibility, exact same-type counts, state change, and replay success remain Gate 2 simulator checks.
 4. Initial open state is derived from preceding low-level actions, or from the first successful OpenObject/CloseObject action precondition when the object has not appeared earlier.
+
+## Gate 2: Reproducible 20-event branch replay
+
+Status: PASS
+
+Decision: GO to Gate 3 when simulator resources are available.
+
+Selection and generation:
+
+- Source events: 20 from 20 trajectories and 14 FloorPlans
+- Splits: 10 valid_unseen, 5 valid_seen, 5 train
+- Actions: 10 OpenObject, 10 CloseObject
+- Object types: 4 each Cabinet, Drawer, Fridge, Microwave, and Safe
+- Branches: 20 each Fresh-Stable, Risk-Stable, and Risk-Stale
+- Outputs: 60 public episodes, 60 private oracle records, and 120 independent replay records
+- Checkpoints: one atomic context plus two atomic branch-round records per branch and source event
+
+Commands:
+
+```bash
+/224010104/miniconda3/envs/trust3d-sim/bin/python -m pytest -q
+
+/224010104/miniconda3/envs/trust3d-sim/bin/python \
+  -m trust3d.data.build_branches \
+  --candidates outputs/gate1/candidates.jsonl \
+  --limit 20 \
+  --branches fresh_stable risk_stable risk_stale \
+  --seed 17 \
+  --replay-runs 2 \
+  --output data/episodes/pilot
+
+/224010104/miniconda3/envs/trust3d-sim/bin/python \
+  -m trust3d.data.validate_dataset \
+  --public data/episodes/pilot/episodes_public.jsonl \
+  --private data/episodes/pilot/oracle_private.jsonl \
+  --replay-twice \
+  --report outputs/gate2/validation.json
+```
+
+Acceptance results on 2026-07-28:
+
+- Unit tests: 20 passed
+- Complete source events: 20/20; required minimum: 19/20
+- Replay state-hash consistency: 60/60 episodes (100%); required minimum: 95%
+- Query pose consistency: all three branches agree in every group
+- Answer relations: all Fresh/Risk-Stable answers unchanged and all Risk-Stale answers changed
+- Symbolic answer versus simulator metadata: 60/60
+- Reachable verification pose: 60/60 (100%); required minimum: 90%
+- Query target hidden: 60/60
+- Public/private leaks: 0; public/private episode IDs match one-to-one
+- Manifest artifact hashes: all match
+- Validation result: `gate2_pass=true`
+
+Reproducibility and safety checks:
+
+1. Two contexts initially failed because AI2-THOR rejected `TeleportFull` while the Agent held an object. Query teleport now uses `forceAction=True`; resume rebuilt only the two failed units and retained every validated checkpoint.
+2. One Risk-Stable/Risk-Stale query-frame pair had different raw hashes. Direct pixel audit found only 6 of 90,000 pixels changed (0.0067%), each by exactly one intensity level; the target is hidden and all public metadata is identical. This is quantization-level renderer drift, not an observable intervention cue.
+3. A checkpoint-only full resume finished without starting Unity or Xvfb. SHA256 comparison of all 247 local pilot files before and after resume was byte-identical.
+4. Existing VLLM jobs occupied both GPUs during the final audit. No GPU process was stopped or modified, and the checkpoint-only validation used CPU resources only.
+
+Tracked report:
+
+- `outputs/gate2/validation.json`: `659a39e13dac4a477b2f55bd72a6be7bfe138786c4985ba82efb2cccf5fe0c83`
+
+Local-only artifacts and logs:
+
+- Dataset and atomic checkpoints: `data/episodes/pilot/`
+- Resume hash audit: `/224010104/Jerry/logs/gate2/checkpoint-resume.log`
+- Final tests: `/224010104/Jerry/logs/gate2/tests-final.log`
+- Final validation: `/224010104/Jerry/logs/gate2/validation-final.log`

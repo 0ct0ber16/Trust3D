@@ -51,6 +51,7 @@ def teleport_to_pose(controller, pose):
             "z": pose["z"],
             "rotation": pose["rotation_y"],
             "horizon": pose["horizon"],
+            "forceAction": True,
         }
     )
     if not event.metadata.get("lastActionSuccess", False):

@@ -6,7 +6,7 @@ from trust3d.data.select_events import select_candidates, selection_summary
 from trust3d.sim.replay_prefix import ReplayError, replay_prefix
 from trust3d.sim.restore_scene import restore_scene
 from trust3d.sim.state_hash import canonical_pose, state_hash
-from trust3d.sim.visibility_oracle import shortest_grid_distances
+from trust3d.sim.visibility_oracle import shortest_grid_distances, teleport_to_pose
 
 
 class Event:
@@ -206,3 +206,13 @@ def test_grid_distances_follow_reachable_adjacency():
 
     assert distances[(0, 0)] == 0
     assert distances[(2, 1)] == 3
+
+
+def test_query_teleport_forces_past_held_object_collision_checks():
+    controller = FakeController()
+    pose = {"x": 1, "y": 0.9, "z": 2, "rotation_y": 90, "horizon": 30}
+
+    teleport_to_pose(controller, pose)
+
+    assert controller.actions[-1]["action"] == "TeleportFull"
+    assert controller.actions[-1]["forceAction"] is True
