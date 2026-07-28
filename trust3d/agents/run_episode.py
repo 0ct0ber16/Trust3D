@@ -148,6 +148,16 @@ def _route_trust3d(episode, config, cost_weight):
     return route
 
 
+def route_public_episode(episode, method, config, cost_weight=None):
+    """对单个公开 episode 路由，不接收任何 private oracle 参数。"""
+    _validate_public_episode(episode)
+    if method == "trust3d":
+        if cost_weight is None:
+            cost_weight = config["trust3d"]["primary_cost_weight"]
+        return _route_trust3d(episode, config, cost_weight)
+    return _route_baseline(episode, method, config)
+
+
 def run(episodes_path, methods, config_path, output_path):
     config = _load_config(config_path)
     unsupported = sorted(set(methods) - SUPPORTED_METHODS)
@@ -159,13 +169,16 @@ def run(episodes_path, methods, config_path, output_path):
         raise ValueError("公开 episode_id 必须唯一")
     routes = []
     for episode in episodes:
-        _validate_public_episode(episode)
         for method in methods:
             if method == "trust3d":
                 for weight in config["trust3d"]["route_cost_weights"]:
-                    routes.append(_route_trust3d(episode, config, weight))
+                    routes.append(
+                        route_public_episode(
+                            episode, method, config, cost_weight=weight
+                        )
+                    )
             else:
-                routes.append(_route_baseline(episode, method, config))
+                routes.append(route_public_episode(episode, method, config))
 
     routes.sort(key=lambda item: (item["policy_id"], item["episode_id"]))
     _atomic_jsonl(output_path, routes)
@@ -178,16 +191,66 @@ def run(episodes_path, methods, config_path, output_path):
 
 def build_parser():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--online", action="store_true")
     parser.add_argument("--episodes", required=True, type=Path)
-    parser.add_argument("--methods", nargs="+", required=True)
+    parser.add_argument("--methods", nargs="+")
+    parser.add_argument("--method")
+    parser.add_argument("--planner", default="shortest_visible_pose")
     parser.add_argument("--config", required=True, type=Path)
+    parser.add_argument(
+        "--selection",
+        type=Path,
+        default=Path("data/episodes/mvp/selection.json"),
+    )
+    parser.add_argument(
+        "--source-checkpoints",
+        type=Path,
+        default=Path("data/episodes/mvp"),
+    )
+    parser.add_argument(
+        "--online-checkpoints",
+        type=Path,
+        default=Path("data/episodes/online"),
+    )
+    parser.add_argument(
+        "--alfred-json",
+        type=Path,
+        default=Path("external/alfred/data/json_2.1.0"),
+    )
+    parser.add_argument(
+        "--exclude-groups",
+        type=Path,
+        default=Path("configs/gate3_exclusions.json"),
+    )
+    parser.add_argument("--max-units", type=int)
     parser.add_argument("--output", required=True, type=Path)
     return parser
 
 
 def main(argv=None):
     args = build_parser().parse_args(argv)
-    report = run(args.episodes, args.methods, args.config, args.output)
+    if args.online:
+        if args.method != "trust3d" or args.methods:
+            raise ValueError("在线模式当前只支持 --method trust3d")
+        if args.planner != "shortest_visible_pose":
+            raise ValueError("在线模式当前只支持 shortest_visible_pose")
+        from trust3d.agents.online_episode import run_online
+
+        report = run_online(
+            args.episodes,
+            args.config,
+            args.selection,
+            args.source_checkpoints,
+            args.online_checkpoints,
+            args.alfred_json,
+            args.exclude_groups,
+            args.output,
+            max_units=args.max_units,
+        )
+    else:
+        if not args.methods or args.method:
+            raise ValueError("离线模式需要 --methods")
+        report = run(args.episodes, args.methods, args.config, args.output)
     print(json.dumps(report, sort_keys=True))
 
 

@@ -42,6 +42,51 @@ def shortest_grid_distances(positions, start, grid_size=0.25):
     return {key: distances[key] for key in distances}
 
 
+def shortest_grid_path(positions, start, goal, grid_size=0.25):
+    """返回包含起点和终点的确定性最短可达网格路径。"""
+    by_key = {_position_key(position, grid_size): position for position in positions}
+    if not by_key:
+        raise VisibilityError("reachable positions are empty")
+
+    def nearest(value):
+        key = _position_key(value, grid_size) if isinstance(value, dict) else value
+        return min(
+            by_key,
+            key=lambda candidate: (
+                (candidate[0] - key[0]) ** 2,
+                (candidate[1] - key[1]) ** 2,
+                candidate,
+            ),
+        )
+
+    start_key = nearest(start)
+    goal_key = nearest(goal)
+    parents = {start_key: None}
+    queue = deque([start_key])
+    while queue and goal_key not in parents:
+        key = queue.popleft()
+        for neighbor in sorted(
+            (
+                (key[0] - 1, key[1]),
+                (key[0] + 1, key[1]),
+                (key[0], key[1] - 1),
+                (key[0], key[1] + 1),
+            )
+        ):
+            if neighbor in by_key and neighbor not in parents:
+                parents[neighbor] = key
+                queue.append(neighbor)
+    if goal_key not in parents:
+        raise VisibilityError("verification pose is unreachable from query pose")
+
+    keys = []
+    current = goal_key
+    while current is not None:
+        keys.append(current)
+        current = parents[current]
+    return [by_key[key] for key in reversed(keys)]
+
+
 def teleport_to_pose(controller, pose):
     event = controller.step(
         {
@@ -200,3 +245,64 @@ def verify_cached_pose(controller, target_object_id, query_pose, oracle):
     finally:
         teleport_to_pose(controller, query_pose)
     return oracle
+
+
+def execute_verification_path(controller, query_pose, verification_pose):
+    """沿最短网格路径执行可审计的 Oracle TeleportFull 动作序列。"""
+    event = teleport_to_pose(controller, query_pose)
+    positions = _reachable_positions(controller)
+    path = shortest_grid_path(positions, query_pose, verification_pose)
+    actions = []
+    current = dict(query_pose)
+
+    def execute(pose, action_kind):
+        nonlocal event, current
+        event = teleport_to_pose(controller, pose)
+        current = canonical_pose(event.metadata)
+        actions.append(
+            {
+                "action": "TeleportFull",
+                "kind": action_kind,
+                "pose": current,
+                "success": True,
+            }
+        )
+
+    for position in path[1:]:
+        execute(
+            {
+                "x": position["x"],
+                "y": position["y"],
+                "z": position["z"],
+                "rotation_y": current["rotation_y"],
+                "horizon": current["horizon"],
+            },
+            "move",
+        )
+
+    target_rotation = verification_pose["rotation_y"]
+    difference = (target_rotation - current["rotation_y"] + 180.0) % 360.0 - 180.0
+    rotation_steps = _angle_steps(current["rotation_y"], target_rotation, 90.0)
+    for step in range(rotation_steps):
+        remaining = rotation_steps - step
+        next_rotation = current["rotation_y"] + difference / remaining
+        execute(
+            dict(current, rotation_y=next_rotation % 360.0),
+            "rotate",
+        )
+        difference = (
+            target_rotation - current["rotation_y"] + 180.0
+        ) % 360.0 - 180.0
+
+    target_horizon = verification_pose["horizon"]
+    horizon_steps = int(
+        math.ceil(abs(target_horizon - current["horizon"]) / 15.0 - 1e-8)
+    )
+    for step in range(horizon_steps):
+        remaining = horizon_steps - step
+        next_horizon = current["horizon"] + (
+            target_horizon - current["horizon"]
+        ) / remaining
+        execute(dict(current, horizon=next_horizon), "look")
+
+    return event, actions

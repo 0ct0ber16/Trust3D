@@ -7,7 +7,11 @@ from trust3d.data.select_events import select_candidates, selection_summary
 from trust3d.sim.replay_prefix import ReplayError, replay_prefix
 from trust3d.sim.restore_scene import restore_scene
 from trust3d.sim.state_hash import canonical_pose, state_hash
-from trust3d.sim.visibility_oracle import shortest_grid_distances, teleport_to_pose
+from trust3d.sim.visibility_oracle import (
+    shortest_grid_distances,
+    shortest_grid_path,
+    teleport_to_pose,
+)
 
 
 class Event:
@@ -207,6 +211,27 @@ def test_grid_distances_follow_reachable_adjacency():
 
     assert distances[(0, 0)] == 0
     assert distances[(2, 1)] == 3
+
+
+def test_shortest_grid_path_is_deterministic_and_includes_endpoints():
+    positions = [
+        {"x": 0.0, "y": 0.9, "z": 0.0},
+        {"x": 0.25, "y": 0.9, "z": 0.0},
+        {"x": 0.0, "y": 0.9, "z": 0.25},
+        {"x": 0.25, "y": 0.9, "z": 0.25},
+    ]
+
+    path = shortest_grid_path(
+        list(reversed(positions)), positions[0], positions[-1]
+    )
+
+    assert path[0] == positions[0]
+    assert path[-1] == positions[-1]
+    assert [(item["x"], item["z"]) for item in path] == [
+        (0.0, 0.0),
+        (0.0, 0.25),
+        (0.25, 0.25),
+    ]
 
 
 def test_query_teleport_forces_past_held_object_collision_checks():

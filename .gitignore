@@ -41,6 +41,10 @@ outputs/gate4/plots/*
 !outputs/gate4/plots/accuracy_cost_pareto.png
 !outputs/gate4/plots/risk_tradeoff.png
 !outputs/gate4/plots/manifest.json
+!outputs/gate5/
+outputs/gate5/*
+!outputs/gate5/traces.jsonl
+!outputs/gate5/validation.json
 
 **/__pycache__/
 *.py[cod]
