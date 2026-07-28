@@ -59,3 +59,60 @@ Issues and resolutions:
 2. Unpinned Flask/Werkzeug 2.2.x deadlocked the AI2-THOR multipart image response. The fixed ALFRED commit officially pins Flask and Werkzeug 2.0.3, which resolved the deadlock.
 3. A plain scene reset allowed movable objects to settle differently. `InitialRandomSpawn` now receives seed 17 with `placeStationary=true`; repeated full object-state hashes are stable.
 4. Headless Unity reports missing audio and optional `ScreenSelector.so`. RGB, depth, segmentation, metadata, and actions are unaffected.
+
+## Gate 1: ALFRED JSON candidate scan
+
+Status: PASS
+
+Decision: GO to Gate 2.
+
+Data audit:
+
+- ALFRED commit: `f91f4c0c96c7a29f33d0557f86b0a21035379b3b`
+- Dataset: ALFRED `data/json_2.1.0`
+- JSON files in manifest: 8,051 (1,401,308,505 bytes)
+- Public trajectories with action plans: 7,080
+- Hidden test trajectories without action plans: 971 (483 seen, 488 unseen)
+- Dataset manifest SHA256: `a2546fc364e3d88f418f0ead85ebe73c0f19a21b1fed9877bfe8ed18dac29874`
+
+Commands:
+
+```bash
+/224010104/miniconda3/envs/trust3d-sim/bin/python -m pytest -q
+
+/224010104/miniconda3/envs/trust3d-sim/bin/python \
+  -m trust3d.data.scan_alfred \
+  --alfred-json external/alfred/data/json_2.1.0 \
+  --events OpenObject CloseObject \
+  --output outputs/gate1/candidates.jsonl \
+  --stats outputs/gate1/stats.json
+```
+
+Acceptance results on 2026-07-28:
+
+- Unit tests: 11 passed overall, including 7 Gate 1 scanner tests
+- Final code commit under test: `9c2a12f`
+- Candidate events: 14,306 (7,116 OpenObject, 7,190 CloseObject)
+- Candidate splits: 13,205 train, 516 valid_seen, 585 valid_unseen
+- MVP action/object whitelist matches: 14,212
+- Distinct candidate trajectories/scenes: 3,420 / 95
+- Parse errors: 0 of 7,080 processable trajectories (0.00%)
+- Action validation errors: 0
+- Traceability: all candidate records include source JSON, action index, and target instance ID
+- Manual audit: 10 of 10 records matched the original action and target ID
+- Manual audit coverage: 4 train, 3 valid_seen, 3 valid_unseen; both OpenObject and CloseObject
+- Reproducibility: two complete scans produced byte-identical outputs
+- Candidate output SHA256: `1e9c4544cd30f273fce9acfc404618e8871c5b5a4ffef7a4c0a917991fab734a`
+- Statistics output SHA256: `7b79cd25bb9c53717c60927e1e936881ce0d9045ddb9fcd789b08333b9aaf12e`
+
+Tracked reports:
+
+- `outputs/gate1/candidates.jsonl`
+- `outputs/gate1/stats.json`
+
+Interpretation notes:
+
+1. ALFRED intentionally withholds `plan` from tests_seen and tests_unseen. These 971 files remain covered by the dataset manifest but are reported as unannotated skips, not parser failures.
+2. Openable instance counts use `gen/layouts/*-openable.json`, then trajectory object poses for movable openables. For 250 Cabinet/Drawer candidates whose operated ID is missing from the layout table, the reported count is explicitly marked as a lower bound from observed action IDs.
+3. `mvp_whitelist` means only that action and target type are in the Gate 1 whitelist. Visibility, exact same-type counts, state change, and replay success remain Gate 2 simulator checks.
+4. Initial open state is derived from preceding low-level actions, or from the first successful OpenObject/CloseObject action precondition when the object has not appeared earlier.
