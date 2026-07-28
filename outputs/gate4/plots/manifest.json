@@ -1,0 +1,7 @@
+{
+  "plots": [
+    "accuracy_cost_pareto.png",
+    "risk_tradeoff.png"
+  ],
+  "primary_policy": "trust3d_lambda_0.01"
+}

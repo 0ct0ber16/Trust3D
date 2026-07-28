@@ -76,7 +76,7 @@ def _axes(draw, x_label, y_label, x_max):
         fill="#1D2428",
         font=_font(20),
     )
-    draw.text((18, y1 - 8), y_label, fill="#1D2428", font=_font(20))
+    draw.text((18, y1 - 42), y_label, fill="#1D2428", font=_font(20))
     return x0, x1, y0, y1
 
 
@@ -149,15 +149,42 @@ def _risk_plot(report, output):
     selected = [item for item in selected if item in metrics]
     image, draw = _new_canvas("Gate 4: Stale error and unnecessary reobserve")
     x0, x1, y0, y1 = _axes(draw, "Stale-memory error rate", "URR", 1.0)
+    positions = {}
     for policy_id in selected:
         values = metrics[policy_id]
         x = x0 + values["stale_memory_error_rate"] * (x1 - x0)
         y = y0 - values["unnecessary_reobserve_rate"] * (y0 - y1)
         kind = _policy_kind(policy_id)
-        color = COLORS.get(kind, "#666666")
-        draw.ellipse((x - 10, y - 10, x + 10, y + 10), fill=color)
-        label = "Trust3D primary" if policy_id == report["primary_policy"] else kind
-        draw.text((x + 14, y - 10), label, fill="#1D2428", font=_font(16))
+        positions.setdefault((x, y), []).append((policy_id, kind))
+
+    for (x, y), policies in positions.items():
+        if len(policies) == 1:
+            color = COLORS.get(policies[0][1], "#666666")
+            draw.ellipse((x - 10, y - 10, x + 10, y + 10), fill=color)
+            continue
+        for index, (_, kind) in enumerate(policies):
+            radius = 5 + index * 4
+            draw.ellipse(
+                (x - radius, y - radius, x + radius, y + radius),
+                outline=COLORS.get(kind, "#666666"),
+                width=3,
+            )
+
+    legend_y = MARGIN["top"] + 12
+    for policy_id in selected:
+        kind = _policy_kind(policy_id)
+        label = "trust3d_primary" if policy_id == report["primary_policy"] else kind
+        draw.rectangle(
+            (WIDTH - 300, legend_y, WIDTH - 278, legend_y + 16),
+            fill=COLORS.get(kind, "#666666"),
+        )
+        draw.text(
+            (WIDTH - 268, legend_y - 4),
+            label,
+            fill="#1D2428",
+            font=_font(16),
+        )
+        legend_y += 27
     _save(image, Path(output) / "risk_tradeoff.png")
 
 

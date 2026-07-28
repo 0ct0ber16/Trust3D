@@ -252,3 +252,65 @@ Git 跟踪报告：
 - 生成日志：`/224010104/Jerry/logs/gate3/mvp.log`
 - 正式验收：`/224010104/Jerry/logs/gate3/verify.log`
 - 全量恢复哈希：`/224010104/Jerry/logs/gate3/recovery-before.sha256` 和 `/224010104/Jerry/logs/gate3/recovery-after.sha256`
+
+## Gate 4：离线二路证据路由
+
+状态：通过
+
+结论：核心的“准确率与重新观察成本折中”假设成立，可以进入 Gate 5 在线执行；但当前结果不能证明复杂控制器优于简单 TTL/事实时效规则。
+
+实验设置：
+
+- 输入：Gate 3 的 588 个 public episodes；路由阶段无法读取 private oracle
+- 方法：Always-Trust、Always-Reobserve、Global-TTL、Fact-Freshness、5 个预先固定成本权重的 Trust3D-Controller
+- 诊断上界：Clairvoyant-Oracle，仅在隔离评测阶段读取隐藏真值
+- 主策略：`trust3d_lambda_0.01`
+- 统计：按 98 个 `group_id` 配对 bootstrap 10,000 次，seed 为 20260728
+- 配置 `configs/mvp.yaml` 已在运行真实 Gate 4 前随 Gate 3 阶段提交固定并推送
+
+执行命令：
+
+```bash
+scripts/run_gate4_offline.sh
+```
+
+2026-07-28 核心结果：
+
+| 方法 | 准确率 | Stale-memory error | 不必要重观察率 | 重观察比例 | 平均验证成本 |
+|---|---:|---:|---:|---:|---:|
+| Always-Trust | 66.67% | 100.00% | 0.00% | 0.00% | 0.00 |
+| Always-Reobserve | 100.00% | 0.00% | 100.00% | 100.00% | 19.24 |
+| Global-TTL | 100.00% | 0.00% | 50.00% | 66.67% | 12.84 |
+| Fact-Freshness | 100.00% | 0.00% | 50.00% | 66.67% | 12.84 |
+| Trust3D 主策略 | 100.00% | 0.00% | 50.00% | 66.67% | 12.84 |
+| Clairvoyant-Oracle | 100.00% | 0.00% | 0.00% | 33.33% | 6.43 |
+
+相对于两个极端基线：
+
+- 相对 Always-Trust，主策略 stale-memory error 下降 100 个百分点；95% group-bootstrap CI 为 `[100, 100]` 个百分点
+- 相对 Always-Reobserve，主策略准确率差为 0 个百分点；95% CI 为 `[0, 0]`
+- 相对 Always-Reobserve，新观察比例下降 33.33%；95% CI 为 `[33.33, 33.33]` 个百分点
+- 5 个预先指定成本权重 `0.001/0.005/0.01/0.02/0.05` 的 expected utility 均高于两个极端策略中的较优者，95% CI 下界均大于 0
+- 成本敏感 Pareto 路径有效：`lambda=0.02` 时准确率 90.48%、重观察 47.62%；`lambda=0.05` 时准确率 72.79%、重观察 12.24%
+- Gate 4 所有验收项通过：`gate4_pass=true`
+
+结论边界：
+
+1. 当前 public cue 只区分 Fresh 与 Risk，Risk-Stable/Risk-Stale 对 Agent 完全不可区分。主策略因此在 `lambda=0.01` 下选择“Fresh 信任、Risk 全部重观察”。
+2. Global-TTL、Fact-Freshness 和 Trust3D 主策略在当前数据上得到完全相同的路由，Gate 4 只支持相对于两个极端策略的核心折中，不支持“复杂成本控制器已经优于简单时效规则”的更强结论。
+3. 成本权重增大时 Trust3D 会放弃高成本重观察并形成有效 Pareto 曲线，说明成本项确实参与决策，但进一步区分简单规则需要 Gate 5 在线证据或后续更多风险条件。
+4. 路由文件只包含公开字段；答案、分支、陈旧标签和最短真实成本仅由隔离的 `evaluate_routes` 阶段读取。相关泄漏测试已通过。
+
+Git 跟踪报告：
+
+- `outputs/gate4/metrics.json`
+- `outputs/gate4/plots/accuracy_cost_pareto.png`
+- `outputs/gate4/plots/risk_tradeoff.png`
+- `outputs/gate4/plots/manifest.json`
+
+仅本地保存的产物与日志：
+
+- 5292 条路由：`outputs/gate4/routes.jsonl`
+- 5880 条隔离评测记录：`outputs/gate4/predictions.jsonl`
+- 完整运行日志：`/224010104/Jerry/logs/gate4/offline.log`
+- 结果审计：`/224010104/Jerry/logs/gate4/final-summary.log`

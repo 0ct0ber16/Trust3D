@@ -1,0 +1,564 @@
+{
+  "acceptance": {
+    "accuracy_within_5_points_of_always_reobserve": true,
+    "bootstrap_accuracy_gap_within_5_points": true,
+    "bootstrap_observation_reduction_above_zero": true,
+    "bootstrap_stale_reduction_above_zero": true,
+    "bootstrap_utility_improves_at_three_or_more_weights": true,
+    "gate4_pass": true,
+    "new_observation_reduction_at_least_25_percent": true,
+    "stale_error_reduction_at_least_30_points": true,
+    "utility_improves_at_three_or_more_weights": true
+  },
+  "bootstrap": {
+    "accuracy_gap_vs_always_reobserve": {
+      "lower": 0.0,
+      "median": 0.0,
+      "upper": 0.0
+    },
+    "group_count": 98,
+    "observation_reduction_vs_always_reobserve": {
+      "lower": 0.33333333333333337,
+      "median": 0.33333333333333337,
+      "upper": 0.33333333333333337
+    },
+    "samples": 10000,
+    "seed": 20260728,
+    "stale_error_reduction": {
+      "lower": 1.0,
+      "median": 1.0,
+      "upper": 1.0
+    },
+    "utility_improvement_vs_best_extreme": {
+      "0.001": {
+        "lower": 0.005874149659862882,
+        "median": 0.006411564625849131,
+        "upper": 0.006942176870747952
+      },
+      "0.005": {
+        "lower": 0.029370748299319512,
+        "median": 0.032057823129251095,
+        "upper": 0.0347108843537407
+      },
+      "0.01": {
+        "lower": 0.05874149659863936,
+        "median": 0.06411564625850308,
+        "upper": 0.06942176870748275
+      },
+      "0.02": {
+        "lower": 0.0708826530612245,
+        "median": 0.08863945578231314,
+        "upper": 0.10727891156462588
+      },
+      "0.05": {
+        "lower": 0.013775510204081742,
+        "median": 0.024659863945578286,
+        "upper": 0.03758503401360547
+      }
+    }
+  },
+  "comparisons": {
+    "accuracy_gap_vs_always_reobserve": 0.0,
+    "bootstrap_confident_utility_weights": [
+      "0.001",
+      "0.005",
+      "0.01",
+      "0.02",
+      "0.05"
+    ],
+    "new_observation_reduction_vs_always_reobserve": 0.33333333333333337,
+    "stale_error_reduction": 1.0,
+    "utility_improved_weights": [
+      "0.001",
+      "0.005",
+      "0.01",
+      "0.02",
+      "0.05"
+    ],
+    "utility_improvement_vs_best_extreme": {
+      "0.001": 0.006408163265306577,
+      "0.005": 0.032040816326530996,
+      "0.01": 0.06408163265306133,
+      "0.02": 0.0887074829931973,
+      "0.05": 0.025000000000000355
+    }
+  },
+  "episode_count": 588,
+  "group_count": 98,
+  "pareto_points": [
+    {
+      "answer_accuracy": 1.0,
+      "average_new_observation_count": 1.0,
+      "average_verification_cost": 19.244897959183675,
+      "policy_id": "always_reobserve"
+    },
+    {
+      "answer_accuracy": 0.6666666666666666,
+      "average_new_observation_count": 0.0,
+      "average_verification_cost": 0.0,
+      "policy_id": "always_trust"
+    },
+    {
+      "answer_accuracy": 1.0,
+      "average_new_observation_count": 0.3333333333333333,
+      "average_verification_cost": 6.428571428571429,
+      "policy_id": "clairvoyant_oracle"
+    },
+    {
+      "answer_accuracy": 1.0,
+      "average_new_observation_count": 0.6666666666666666,
+      "average_verification_cost": 12.83673469387755,
+      "policy_id": "fact_freshness"
+    },
+    {
+      "answer_accuracy": 1.0,
+      "average_new_observation_count": 0.6666666666666666,
+      "average_verification_cost": 12.83673469387755,
+      "policy_id": "global_ttl"
+    },
+    {
+      "answer_accuracy": 1.0,
+      "average_new_observation_count": 0.6666666666666666,
+      "average_verification_cost": 12.83673469387755,
+      "policy_id": "trust3d_lambda_0.001"
+    },
+    {
+      "answer_accuracy": 1.0,
+      "average_new_observation_count": 0.6666666666666666,
+      "average_verification_cost": 12.83673469387755,
+      "policy_id": "trust3d_lambda_0.005"
+    },
+    {
+      "answer_accuracy": 1.0,
+      "average_new_observation_count": 0.6666666666666666,
+      "average_verification_cost": 12.83673469387755,
+      "policy_id": "trust3d_lambda_0.01"
+    },
+    {
+      "answer_accuracy": 0.9047619047619048,
+      "average_new_observation_count": 0.47619047619047616,
+      "average_verification_cost": 7.469387755102041,
+      "policy_id": "trust3d_lambda_0.02"
+    },
+    {
+      "answer_accuracy": 0.7278911564625851,
+      "average_new_observation_count": 0.12244897959183673,
+      "average_verification_cost": 0.7244897959183674,
+      "policy_id": "trust3d_lambda_0.05"
+    }
+  ],
+  "policy_metrics": {
+    "always_reobserve": {
+      "abstention_rate": 0.0,
+      "answer_accuracy": 1.0,
+      "average_move_steps": 19.244897959183675,
+      "average_new_observation_count": 1.0,
+      "average_verification_cost": 19.244897959183675,
+      "by_branch": {
+        "fresh_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 19.224489795918366,
+          "episode_count": 196,
+          "reobserve_rate": 1.0
+        },
+        "risk_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 19.224489795918366,
+          "episode_count": 196,
+          "reobserve_rate": 1.0
+        },
+        "risk_stale": {
+          "accuracy": 1.0,
+          "average_verification_cost": 19.285714285714285,
+          "episode_count": 196,
+          "reobserve_rate": 1.0
+        }
+      },
+      "episode_count": 588,
+      "expected_utility": {
+        "0.001": 0.9807551020408158,
+        "0.005": 0.9037755102040804,
+        "0.01": 0.8075510204081624,
+        "0.02": 0.6151020408163261,
+        "0.05": 0.03775510204081634
+      },
+      "move_steps": 11316,
+      "new_observation_count": 588,
+      "reobserve_rate": 1.0,
+      "reobserve_recall_on_risk_stale": 1.0,
+      "stale_memory_error_rate": 0.0,
+      "unnecessary_reobserve_rate": 1.0
+    },
+    "always_trust": {
+      "abstention_rate": 0.0,
+      "answer_accuracy": 0.6666666666666666,
+      "average_move_steps": 0.0,
+      "average_new_observation_count": 0.0,
+      "average_verification_cost": 0.0,
+      "by_branch": {
+        "fresh_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 0.0,
+          "episode_count": 196,
+          "reobserve_rate": 0.0
+        },
+        "risk_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 0.0,
+          "episode_count": 196,
+          "reobserve_rate": 0.0
+        },
+        "risk_stale": {
+          "accuracy": 0.0,
+          "average_verification_cost": 0.0,
+          "episode_count": 196,
+          "reobserve_rate": 0.0
+        }
+      },
+      "episode_count": 588,
+      "expected_utility": {
+        "0.001": 0.6666666666666666,
+        "0.005": 0.6666666666666666,
+        "0.01": 0.6666666666666666,
+        "0.02": 0.6666666666666666,
+        "0.05": 0.6666666666666666
+      },
+      "move_steps": 0,
+      "new_observation_count": 0,
+      "reobserve_rate": 0.0,
+      "reobserve_recall_on_risk_stale": 0.0,
+      "stale_memory_error_rate": 1.0,
+      "unnecessary_reobserve_rate": 0.0
+    },
+    "clairvoyant_oracle": {
+      "abstention_rate": 0.0,
+      "answer_accuracy": 1.0,
+      "average_move_steps": 6.428571428571429,
+      "average_new_observation_count": 0.3333333333333333,
+      "average_verification_cost": 6.428571428571429,
+      "by_branch": {
+        "fresh_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 0.0,
+          "episode_count": 196,
+          "reobserve_rate": 0.0
+        },
+        "risk_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 0.0,
+          "episode_count": 196,
+          "reobserve_rate": 0.0
+        },
+        "risk_stale": {
+          "accuracy": 1.0,
+          "average_verification_cost": 19.285714285714285,
+          "episode_count": 196,
+          "reobserve_rate": 1.0
+        }
+      },
+      "episode_count": 588,
+      "expected_utility": {
+        "0.001": 0.9935714285714287,
+        "0.005": 0.9678571428571423,
+        "0.01": 0.9357142857142852,
+        "0.02": 0.8714285714285716,
+        "0.05": 0.6785714285714289
+      },
+      "move_steps": 3780,
+      "new_observation_count": 196,
+      "reobserve_rate": 0.3333333333333333,
+      "reobserve_recall_on_risk_stale": 1.0,
+      "stale_memory_error_rate": 0.0,
+      "unnecessary_reobserve_rate": 0.0
+    },
+    "fact_freshness": {
+      "abstention_rate": 0.0,
+      "answer_accuracy": 1.0,
+      "average_move_steps": 12.83673469387755,
+      "average_new_observation_count": 0.6666666666666666,
+      "average_verification_cost": 12.83673469387755,
+      "by_branch": {
+        "fresh_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 0.0,
+          "episode_count": 196,
+          "reobserve_rate": 0.0
+        },
+        "risk_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 19.224489795918366,
+          "episode_count": 196,
+          "reobserve_rate": 1.0
+        },
+        "risk_stale": {
+          "accuracy": 1.0,
+          "average_verification_cost": 19.285714285714285,
+          "episode_count": 196,
+          "reobserve_rate": 1.0
+        }
+      },
+      "episode_count": 588,
+      "expected_utility": {
+        "0.001": 0.9871632653061224,
+        "0.005": 0.9358163265306114,
+        "0.01": 0.8716326530612237,
+        "0.02": 0.7432653061224487,
+        "0.05": 0.35816326530612264
+      },
+      "move_steps": 7548,
+      "new_observation_count": 392,
+      "reobserve_rate": 0.6666666666666666,
+      "reobserve_recall_on_risk_stale": 1.0,
+      "stale_memory_error_rate": 0.0,
+      "unnecessary_reobserve_rate": 0.5
+    },
+    "global_ttl": {
+      "abstention_rate": 0.0,
+      "answer_accuracy": 1.0,
+      "average_move_steps": 12.83673469387755,
+      "average_new_observation_count": 0.6666666666666666,
+      "average_verification_cost": 12.83673469387755,
+      "by_branch": {
+        "fresh_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 0.0,
+          "episode_count": 196,
+          "reobserve_rate": 0.0
+        },
+        "risk_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 19.224489795918366,
+          "episode_count": 196,
+          "reobserve_rate": 1.0
+        },
+        "risk_stale": {
+          "accuracy": 1.0,
+          "average_verification_cost": 19.285714285714285,
+          "episode_count": 196,
+          "reobserve_rate": 1.0
+        }
+      },
+      "episode_count": 588,
+      "expected_utility": {
+        "0.001": 0.9871632653061224,
+        "0.005": 0.9358163265306114,
+        "0.01": 0.8716326530612237,
+        "0.02": 0.7432653061224487,
+        "0.05": 0.35816326530612264
+      },
+      "move_steps": 7548,
+      "new_observation_count": 392,
+      "reobserve_rate": 0.6666666666666666,
+      "reobserve_recall_on_risk_stale": 1.0,
+      "stale_memory_error_rate": 0.0,
+      "unnecessary_reobserve_rate": 0.5
+    },
+    "trust3d_lambda_0.001": {
+      "abstention_rate": 0.0,
+      "answer_accuracy": 1.0,
+      "average_move_steps": 12.83673469387755,
+      "average_new_observation_count": 0.6666666666666666,
+      "average_verification_cost": 12.83673469387755,
+      "by_branch": {
+        "fresh_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 0.0,
+          "episode_count": 196,
+          "reobserve_rate": 0.0
+        },
+        "risk_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 19.224489795918366,
+          "episode_count": 196,
+          "reobserve_rate": 1.0
+        },
+        "risk_stale": {
+          "accuracy": 1.0,
+          "average_verification_cost": 19.285714285714285,
+          "episode_count": 196,
+          "reobserve_rate": 1.0
+        }
+      },
+      "episode_count": 588,
+      "expected_utility": {
+        "0.001": 0.9871632653061224,
+        "0.005": 0.9358163265306114,
+        "0.01": 0.8716326530612237,
+        "0.02": 0.7432653061224487,
+        "0.05": 0.35816326530612264
+      },
+      "move_steps": 7548,
+      "new_observation_count": 392,
+      "reobserve_rate": 0.6666666666666666,
+      "reobserve_recall_on_risk_stale": 1.0,
+      "stale_memory_error_rate": 0.0,
+      "unnecessary_reobserve_rate": 0.5
+    },
+    "trust3d_lambda_0.005": {
+      "abstention_rate": 0.0,
+      "answer_accuracy": 1.0,
+      "average_move_steps": 12.83673469387755,
+      "average_new_observation_count": 0.6666666666666666,
+      "average_verification_cost": 12.83673469387755,
+      "by_branch": {
+        "fresh_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 0.0,
+          "episode_count": 196,
+          "reobserve_rate": 0.0
+        },
+        "risk_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 19.224489795918366,
+          "episode_count": 196,
+          "reobserve_rate": 1.0
+        },
+        "risk_stale": {
+          "accuracy": 1.0,
+          "average_verification_cost": 19.285714285714285,
+          "episode_count": 196,
+          "reobserve_rate": 1.0
+        }
+      },
+      "episode_count": 588,
+      "expected_utility": {
+        "0.001": 0.9871632653061224,
+        "0.005": 0.9358163265306114,
+        "0.01": 0.8716326530612237,
+        "0.02": 0.7432653061224487,
+        "0.05": 0.35816326530612264
+      },
+      "move_steps": 7548,
+      "new_observation_count": 392,
+      "reobserve_rate": 0.6666666666666666,
+      "reobserve_recall_on_risk_stale": 1.0,
+      "stale_memory_error_rate": 0.0,
+      "unnecessary_reobserve_rate": 0.5
+    },
+    "trust3d_lambda_0.01": {
+      "abstention_rate": 0.0,
+      "answer_accuracy": 1.0,
+      "average_move_steps": 12.83673469387755,
+      "average_new_observation_count": 0.6666666666666666,
+      "average_verification_cost": 12.83673469387755,
+      "by_branch": {
+        "fresh_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 0.0,
+          "episode_count": 196,
+          "reobserve_rate": 0.0
+        },
+        "risk_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 19.224489795918366,
+          "episode_count": 196,
+          "reobserve_rate": 1.0
+        },
+        "risk_stale": {
+          "accuracy": 1.0,
+          "average_verification_cost": 19.285714285714285,
+          "episode_count": 196,
+          "reobserve_rate": 1.0
+        }
+      },
+      "episode_count": 588,
+      "expected_utility": {
+        "0.001": 0.9871632653061224,
+        "0.005": 0.9358163265306114,
+        "0.01": 0.8716326530612237,
+        "0.02": 0.7432653061224487,
+        "0.05": 0.35816326530612264
+      },
+      "move_steps": 7548,
+      "new_observation_count": 392,
+      "reobserve_rate": 0.6666666666666666,
+      "reobserve_recall_on_risk_stale": 1.0,
+      "stale_memory_error_rate": 0.0,
+      "unnecessary_reobserve_rate": 0.5
+    },
+    "trust3d_lambda_0.02": {
+      "abstention_rate": 0.0,
+      "answer_accuracy": 0.9047619047619048,
+      "average_move_steps": 7.469387755102041,
+      "average_new_observation_count": 0.47619047619047616,
+      "average_verification_cost": 7.469387755102041,
+      "by_branch": {
+        "fresh_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 0.0,
+          "episode_count": 196,
+          "reobserve_rate": 0.0
+        },
+        "risk_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 11.173469387755102,
+          "episode_count": 196,
+          "reobserve_rate": 0.7142857142857143
+        },
+        "risk_stale": {
+          "accuracy": 0.7142857142857143,
+          "average_verification_cost": 11.23469387755102,
+          "episode_count": 196,
+          "reobserve_rate": 0.7142857142857143
+        }
+      },
+      "episode_count": 588,
+      "expected_utility": {
+        "0.001": 0.8972925170068022,
+        "0.005": 0.867414965986393,
+        "0.01": 0.8300680272108838,
+        "0.02": 0.7553741496598639,
+        "0.05": 0.5312925170068035
+      },
+      "move_steps": 4392,
+      "new_observation_count": 280,
+      "reobserve_rate": 0.47619047619047616,
+      "reobserve_recall_on_risk_stale": 0.7142857142857143,
+      "stale_memory_error_rate": 0.2857142857142857,
+      "unnecessary_reobserve_rate": 0.35714285714285715
+    },
+    "trust3d_lambda_0.05": {
+      "abstention_rate": 0.0,
+      "answer_accuracy": 0.7278911564625851,
+      "average_move_steps": 0.7244897959183674,
+      "average_new_observation_count": 0.12244897959183673,
+      "average_verification_cost": 0.7244897959183674,
+      "by_branch": {
+        "fresh_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 0.0,
+          "episode_count": 196,
+          "reobserve_rate": 0.0
+        },
+        "risk_stable": {
+          "accuracy": 1.0,
+          "average_verification_cost": 1.0714285714285714,
+          "episode_count": 196,
+          "reobserve_rate": 0.1836734693877551
+        },
+        "risk_stale": {
+          "accuracy": 0.1836734693877551,
+          "average_verification_cost": 1.1020408163265305,
+          "episode_count": 196,
+          "reobserve_rate": 0.1836734693877551
+        }
+      },
+      "episode_count": 588,
+      "expected_utility": {
+        "0.001": 0.7271666666666667,
+        "0.005": 0.7242687074829935,
+        "0.01": 0.7206462585034012,
+        "0.02": 0.7134013605442178,
+        "0.05": 0.691666666666667
+      },
+      "move_steps": 426,
+      "new_observation_count": 72,
+      "reobserve_rate": 0.12244897959183673,
+      "reobserve_recall_on_risk_stale": 0.1836734693877551,
+      "stale_memory_error_rate": 0.8163265306122449,
+      "unnecessary_reobserve_rate": 0.09183673469387756
+    }
+  },
+  "primary_policy": "trust3d_lambda_0.01",
+  "schema_version": 1
+}
