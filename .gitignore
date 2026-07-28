@@ -24,6 +24,9 @@ outputs/gate1/*
 !outputs/gate2/
 outputs/gate2/*
 !outputs/gate2/validation.json
+!outputs/gate3/
+outputs/gate3/*
+!outputs/gate3/validation.json
 
 **/__pycache__/
 *.py[cod]

@@ -9,6 +9,7 @@ import traceback
 from datetime import datetime
 from pathlib import Path
 
+import numpy as np
 from PIL import Image
 
 from trust3d.data.select_events import (
@@ -30,6 +31,10 @@ from trust3d.sim.visibility_oracle import (
 
 BUILD_VERSION = 1
 BRANCHES = ("fresh_stable", "risk_stable", "risk_stale")
+QUESTION_TEMPLATES = (
+    "Is the {object_type} currently open?",
+    "Is the {object_type} open at this moment?",
+)
 
 
 def _canonical_bytes(value):
@@ -82,6 +87,51 @@ def _atomic_png(path, frame):
     return _sha256_file(path)
 
 
+def _atomic_npy(path, array):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    with temporary.open("wb") as handle:
+        np.save(handle, array, allow_pickle=False)
+        handle.flush()
+        os.fsync(handle.fileno())
+    temporary.replace(path)
+    return _sha256_file(path)
+
+
+def _cache_observation(output, stem, event, modalities):
+    paths = {}
+    artifacts = []
+    if "rgb" in modalities:
+        path = output / "cache" / "rgb" / (stem + ".png")
+        digest = _atomic_png(path, event.frame)
+        paths["rgb"] = _relative(path, output)
+        artifacts.append({"path": paths["rgb"], "sha256": digest})
+    if "depth" in modalities:
+        if event.depth_frame is None:
+            raise RuntimeError("depth frame is unavailable")
+        path = output / "cache" / "depth" / (stem + ".npy")
+        digest = _atomic_npy(path, np.asarray(event.depth_frame))
+        paths["depth"] = _relative(path, output)
+        artifacts.append({"path": paths["depth"], "sha256": digest})
+    if "instance" in modalities:
+        if event.instance_segmentation_frame is None:
+            raise RuntimeError("instance segmentation frame is unavailable")
+        path = output / "cache" / "instance" / (stem + ".png")
+        digest = _atomic_png(path, event.instance_segmentation_frame)
+        paths["instance"] = _relative(path, output)
+        artifacts.append({"path": paths["instance"], "sha256": digest})
+    return paths, artifacts
+
+
+def _target_pixel_count(event, target_object_id):
+    masks = getattr(event, "instance_masks", None)
+    if not isinstance(masks, dict) or target_object_id not in masks:
+        raise RuntimeError("target instance mask is unavailable")
+    mask = np.asarray(masks[target_object_id])
+    return int(np.count_nonzero(mask)), int(mask.size)
+
+
 def _checkpoint_payload(value):
     payload = dict(value)
     payload.pop("checkpoint_sha256", None)
@@ -124,8 +174,11 @@ def _load_trajectory(alfred_json, candidate):
     return json.loads(raw.decode("utf-8")), _sha256_bytes(raw)
 
 
-def _episode_id(candidate_id, branch, seed):
-    raw = "{}|{}|{}".format(candidate_id, branch, seed).encode("ascii")
+def _episode_id(candidate_id, branch, seed, question_index=0):
+    value = "{}|{}|{}".format(candidate_id, branch, seed)
+    if question_index:
+        value += "|q{}".format(question_index)
+    raw = value.encode("ascii")
     return "e_" + hashlib.sha256(raw).hexdigest()[:24]
 
 
@@ -137,7 +190,9 @@ def _relative(path, root):
     return Path(path).relative_to(root).as_posix()
 
 
-def _build_context(controller, candidate, trajectory, trajectory_sha, output, seed):
+def _build_context(
+    controller, candidate, trajectory, trajectory_sha, output, seed, modalities
+):
     context_path = output / "checkpoints" / candidate["candidate_id"] / "context.json"
     expected = {
         "kind": "context",
@@ -146,6 +201,8 @@ def _build_context(controller, candidate, trajectory, trajectory_sha, output, se
         "trajectory_sha256": trajectory_sha,
         "seed": seed,
     }
+    if set(modalities) != {"rgb"}:
+        expected["cache_modalities"] = list(modalities)
     existing = _load_checkpoint(context_path, expected)
     if existing is not None:
         print("[gate2] resume context " + candidate["candidate_id"][:12], flush=True)
@@ -171,9 +228,20 @@ def _build_context(controller, candidate, trajectory, trajectory_sha, output, se
 
     group_id = _group_id(candidate["candidate_id"])
     actions_path = output / "cache" / "actions" / (group_id + "_prefix.json")
-    frame_path = output / "cache" / "rgb" / (group_id + "_history.png")
     _atomic_json(actions_path, prefix_commands)
-    frame_sha = _atomic_png(frame_path, history_frame)
+    if set(modalities) == {"rgb"}:
+        frame_path = output / "cache" / "rgb" / (group_id + "_history.png")
+        frame_sha = _atomic_png(frame_path, history_frame)
+        history_observation = {"rgb": _relative(frame_path, output)}
+        observation_artifacts = [
+            {"path": history_observation["rgb"], "sha256": frame_sha}
+        ]
+    else:
+        history_event = event
+        history_event.frame = history_frame
+        history_observation, observation_artifacts = _cache_observation(
+            output, group_id + "_history", history_event, modalities
+        )
     value = dict(expected)
     value.update(
         {
@@ -183,13 +251,14 @@ def _build_context(controller, candidate, trajectory, trajectory_sha, output, se
             "history_state_hash": history_state_hash,
             "query_pose": query_pose,
             "stable_verification": stable_oracle,
+            "history_observation": history_observation,
             "artifacts": [
                 {
                     "path": _relative(actions_path, output),
                     "sha256": _sha256_file(actions_path),
                 },
-                {"path": _relative(frame_path, output), "sha256": frame_sha},
-            ],
+            ]
+            + observation_artifacts,
         }
     )
     _write_checkpoint(context_path, value)
@@ -227,6 +296,7 @@ def _build_branch_round(
     replay_round,
     output,
     seed,
+    modalities,
 ):
     episode_id = _episode_id(candidate["candidate_id"], branch, seed)
     checkpoint_path = (
@@ -244,6 +314,8 @@ def _build_branch_round(
         "replay_round": replay_round,
         "seed": seed,
     }
+    if set(modalities) != {"rgb"}:
+        expected["cache_modalities"] = list(modalities)
     existing = _load_checkpoint(checkpoint_path, expected)
     if existing is not None:
         print(
@@ -279,6 +351,7 @@ def _build_branch_round(
         raise RuntimeError("target is visible from public query pose")
     query_frame = event.frame.copy()
     query_frame_sha = _sha256_bytes(query_frame.tobytes())
+    query_event = event
 
     if branch == "risk_stale" and replay_round > 0:
         first_path = checkpoint_path.with_name("risk_stale.round-0.json")
@@ -309,13 +382,51 @@ def _build_branch_round(
             context["stable_verification"],
         )
 
+    verification_observation = None
+    target_visible_pixel_count = None
+    target_mask_pixel_count = None
+    verification_event = None
+    if set(modalities) != {"rgb"}:
+        verification_event = teleport_to_pose(controller, oracle["pose"])
+        target_visible_pixel_count, target_mask_pixel_count = _target_pixel_count(
+            verification_event, target_id
+        )
+        if target_visible_pixel_count < 1:
+            raise RuntimeError("verification pose has an empty target mask")
+
     event = teleport_to_pose(controller, context["query_pose"])
     final_hash = state_hash(event.metadata, target_id)
     artifacts = []
+    query_observation = None
     if replay_round == 0:
-        query_path = output / "cache" / "rgb" / (episode_id + "_query.png")
-        png_sha = _atomic_png(query_path, query_frame)
-        artifacts.append({"path": _relative(query_path, output), "sha256": png_sha})
+        if set(modalities) == {"rgb"}:
+            query_path = output / "cache" / "rgb" / (episode_id + "_query.png")
+            png_sha = _atomic_png(query_path, query_frame)
+            query_observation = {"rgb": _relative(query_path, output)}
+            artifacts.append(
+                {"path": query_observation["rgb"], "sha256": png_sha}
+            )
+        else:
+            query_event.frame = query_frame
+            query_observation, query_artifacts = _cache_observation(
+                output, episode_id + "_query", query_event, modalities
+            )
+            verification_observation, verification_artifacts = _cache_observation(
+                output, episode_id + "_verification", verification_event, modalities
+            )
+            artifacts.extend(query_artifacts)
+            artifacts.extend(verification_artifacts)
+
+    verification = dict(oracle)
+    if target_visible_pixel_count is not None:
+        verification.update(
+            {
+                "target_visible_pixel_count": target_visible_pixel_count,
+                "frame_pixel_count": target_mask_pixel_count,
+                "target_visible_fraction": target_visible_pixel_count
+                / float(target_mask_pixel_count),
+            }
+        )
 
     value = dict(expected)
     value.update(
@@ -329,8 +440,10 @@ def _build_branch_round(
             "intervention_applied": applied_intervention,
             "query_pose": canonical_pose(event.metadata),
             "query_frame_raw_sha256": query_frame_sha,
+            "query_observation": query_observation,
             "target_visible_from_query": target_visible_from_query,
-            "verification": oracle,
+            "verification": verification,
+            "verification_observation": verification_observation,
             "state_hash": final_hash,
             "artifacts": artifacts,
         }
@@ -345,26 +458,39 @@ def _build_branch_round(
     return _load_checkpoint(checkpoint_path, expected)
 
 
-def _public_record(candidate, context, branch, checkpoint, output, seed):
-    episode_id = checkpoint["episode_id"]
+def _public_record(
+    candidate, context, branch, checkpoint, output, seed, question_index,
+    questions_per_branch
+):
+    episode_id = _episode_id(
+        candidate["candidate_id"], branch, seed, question_index
+    )
     group_id = checkpoint["group_id"]
     object_type = candidate["target_object_type"].lower()
-    return {
+    history_observation = context.get(
+        "history_observation", {"rgb": context["artifacts"][1]["path"]}
+    )
+    query_observation = checkpoint.get("query_observation") or {
+        "rgb": checkpoint["artifacts"][0]["path"]
+    }
+    record = {
         "episode_id": episode_id,
         "group_id": group_id,
         "split": candidate["split"],
         "scene": candidate["scene"],
         "seed": seed,
         "history_actions": context["artifacts"][0]["path"],
-        "history_frames": [context["artifacts"][1]["path"]],
-        "query_frame": "cache/rgb/{}_query.png".format(episode_id),
+        "history_frames": [history_observation["rgb"]],
+        "query_frame": query_observation["rgb"],
         "query_pose": context["query_pose"],
         "elapsed_steps": 0 if branch == "fresh_stable" else 30,
         "public_context": {
             "intervention_window": branch != "fresh_stable",
             "scope": "room",
         },
-        "question": "Is the {} currently open?".format(object_type),
+        "question": QUESTION_TEMPLATES[question_index].format(
+            object_type=object_type
+        ),
         "program": {
             "op": "GetState",
             "subject": candidate["target_object_id"],
@@ -372,11 +498,20 @@ def _public_record(candidate, context, branch, checkpoint, output, seed):
             "answer_type": "boolean",
         },
     }
+    if questions_per_branch > 1:
+        record["question_index"] = question_index
+        record["history_observation"] = history_observation
+        record["query_observation"] = query_observation
+    return record
 
 
-def _private_record(candidate, branch, checkpoint):
-    return {
-        "episode_id": checkpoint["episode_id"],
+def _private_record(
+    candidate, branch, checkpoint, seed, question_index, questions_per_branch
+):
+    record = {
+        "episode_id": _episode_id(
+            candidate["candidate_id"], branch, seed, question_index
+        ),
         "group_id": checkpoint["group_id"],
         "branch": branch,
         "source_candidate_id": candidate["candidate_id"],
@@ -398,9 +533,47 @@ def _private_record(candidate, branch, checkpoint):
         "verification_pose": checkpoint["verification"]["pose"],
         "state_hash": checkpoint["state_hash"],
     }
+    if questions_per_branch > 1:
+        record["question_index"] = question_index
+        record["target_visible_pixel_count"] = checkpoint["verification"].get(
+            "target_visible_pixel_count"
+        )
+        record["frame_pixel_count"] = checkpoint["verification"].get(
+            "frame_pixel_count"
+        )
+        record["target_visible_fraction"] = checkpoint["verification"].get(
+            "target_visible_fraction"
+        )
+        record["verification_observation"] = checkpoint.get(
+            "verification_observation"
+        )
+    return record
 
 
-def _aggregate(output, selected, contexts, checkpoints, branches, replay_runs, seed):
+def _replay_record(checkpoint, candidate, branch, seed, question_index):
+    if question_index == 0:
+        return checkpoint
+    value = dict(checkpoint)
+    value["source_checkpoint_sha256"] = value.pop("checkpoint_sha256")
+    value["branch_episode_id"] = value["episode_id"]
+    value["episode_id"] = _episode_id(
+        candidate["candidate_id"], branch, seed, question_index
+    )
+    value["question_index"] = question_index
+    return value
+
+
+def _aggregate(
+    output,
+    selected,
+    contexts,
+    checkpoints,
+    branches,
+    replay_runs,
+    seed,
+    questions_per_branch,
+    modalities,
+):
     public = []
     private = []
     replay_records = []
@@ -410,22 +583,52 @@ def _aggregate(output, selected, contexts, checkpoints, branches, replay_runs, s
         context = contexts.get(candidate_id)
         if context is None:
             continue
-        group_complete = True
+        branch_rounds = {}
         for branch in branches:
             rounds = [
                 checkpoints.get((candidate_id, branch, replay_round))
                 for replay_round in range(replay_runs)
             ]
-            if any(item is None for item in rounds):
-                group_complete = False
-                continue
-            public.append(
-                _public_record(candidate, context, branch, rounds[0], output, seed)
-            )
-            private.append(_private_record(candidate, branch, rounds[0]))
-            replay_records.extend(rounds)
-        if group_complete:
-            complete_groups += 1
+            if all(item is not None for item in rounds):
+                branch_rounds[branch] = rounds
+        if set(branch_rounds) != set(branches):
+            continue
+        complete_groups += 1
+        for branch in branches:
+            rounds = branch_rounds[branch]
+            for question_index in range(questions_per_branch):
+                public.append(
+                    _public_record(
+                        candidate,
+                        context,
+                        branch,
+                        rounds[0],
+                        output,
+                        seed,
+                        question_index,
+                        questions_per_branch,
+                    )
+                )
+                private.append(
+                    _private_record(
+                        candidate,
+                        branch,
+                        rounds[0],
+                        seed,
+                        question_index,
+                        questions_per_branch,
+                    )
+                )
+                replay_records.extend(
+                    _replay_record(
+                        checkpoint,
+                        candidate,
+                        branch,
+                        seed,
+                        question_index,
+                    )
+                    for checkpoint in rounds
+                )
 
     public.sort(key=lambda item: item["episode_id"])
     private.sort(key=lambda item: item["episode_id"])
@@ -454,6 +657,9 @@ def _aggregate(output, selected, contexts, checkpoints, branches, replay_runs, s
             )
         },
     }
+    if questions_per_branch > 1:
+        manifest["questions_per_branch"] = questions_per_branch
+        manifest["cache_modalities"] = list(modalities)
     _atomic_json(output / "manifest.json", manifest)
     return manifest
 
@@ -461,6 +667,20 @@ def _aggregate(output, selected, contexts, checkpoints, branches, replay_runs, s
 def build(args):
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
+    if args.questions_per_branch < 1 or args.questions_per_branch > len(
+        QUESTION_TEMPLATES
+    ):
+        raise ValueError(
+            "questions-per-branch must be between 1 and {}".format(
+                len(QUESTION_TEMPLATES)
+            )
+        )
+    cache_mode = args.cache_modalities
+    if cache_mode == "auto":
+        cache_mode = "full" if args.questions_per_branch > 1 else "rgb"
+    modalities = (
+        ("rgb", "depth", "instance") if cache_mode == "full" else ("rgb",)
+    )
     selection_path = output / "selection.json"
     candidates = read_jsonl(args.candidates)
     selected = select_candidates(candidates, args.limit, args.seed)
@@ -477,6 +697,26 @@ def build(args):
     branches = tuple(args.branches)
     if any(branch not in BRANCHES for branch in branches):
         raise ValueError("unsupported branch requested")
+    if args.questions_per_branch > 1:
+        build_config = {
+            "build_version": BUILD_VERSION,
+            "candidates_sha256": _sha256_file(args.candidates),
+            "selected_candidate_ids": summary["all_candidate_ids"],
+            "branches": list(branches),
+            "seed": args.seed,
+            "replay_runs": args.replay_runs,
+            "questions_per_branch": args.questions_per_branch,
+            "cache_modalities": list(modalities),
+        }
+        build_config_path = output / "build_config.json"
+        if build_config_path.exists():
+            existing_config = json.loads(
+                build_config_path.read_text(encoding="utf-8")
+            )
+            if existing_config != build_config:
+                raise RuntimeError("existing build config does not match inputs")
+        else:
+            _atomic_json(build_config_path, build_config)
     contexts = {}
     checkpoints = {}
     pending = []
@@ -553,6 +793,7 @@ def build(args):
                             trajectory_sha,
                             output,
                             args.seed,
+                            modalities,
                         )
                         completed_this_run += 1
                         if kind == "context":
@@ -567,6 +808,7 @@ def build(args):
                         replay_round,
                         output,
                         args.seed,
+                        modalities,
                     )
                     checkpoints[(candidate_id, branch, replay_round)] = checkpoint
                     completed_this_run += 1
@@ -597,6 +839,8 @@ def build(args):
         branches,
         args.replay_runs,
         args.seed,
+        args.questions_per_branch,
+        modalities,
     )
     print("[gate2] manifest " + json.dumps(manifest, sort_keys=True), flush=True)
     return manifest
@@ -610,10 +854,18 @@ def build_parser():
         type=Path,
         default=Path("external/alfred/data/json_2.1.0"),
     )
-    parser.add_argument("--limit", type=int, default=20)
+    parser.add_argument(
+        "--limit", "--num-source-events", dest="limit", type=int, default=20
+    )
     parser.add_argument("--branches", nargs="+", default=list(BRANCHES))
     parser.add_argument("--seed", type=int, default=17)
     parser.add_argument("--replay-runs", type=int, default=2)
+    parser.add_argument("--questions-per-branch", type=int, default=1)
+    parser.add_argument(
+        "--cache-modalities",
+        choices=("auto", "rgb", "full"),
+        default="auto",
+    )
     parser.add_argument("--max-units", type=int)
     parser.add_argument("--output", required=True, type=Path)
     return parser

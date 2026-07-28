@@ -2,6 +2,7 @@ import copy
 
 import pytest
 
+from trust3d.data.build_branches import QUESTION_TEMPLATES, _episode_id
 from trust3d.data.select_events import select_candidates, selection_summary
 from trust3d.sim.replay_prefix import ReplayError, replay_prefix
 from trust3d.sim.restore_scene import restore_scene
@@ -216,3 +217,15 @@ def test_query_teleport_forces_past_held_object_collision_checks():
 
     assert controller.actions[-1]["action"] == "TeleportFull"
     assert controller.actions[-1]["forceAction"] is True
+
+
+def test_question_episode_ids_preserve_gate2_and_separate_second_template():
+    candidate_id = "candidate"
+
+    first = _episode_id(candidate_id, "risk_stable", 17, question_index=0)
+    legacy = _episode_id(candidate_id, "risk_stable", 17)
+    second = _episode_id(candidate_id, "risk_stable", 17, question_index=1)
+
+    assert first == legacy
+    assert second != first
+    assert len(QUESTION_TEMPLATES) >= 2

@@ -102,3 +102,90 @@ def test_private_answer_in_public_record_fails_leak_check(tmp_path):
 
     assert report["acceptance"]["public_private_separation"] is False
     assert report["acceptance"]["gate2_pass"] is False
+
+
+def test_gate3_two_question_fixture_passes_full_data_checks(tmp_path):
+    paths = _fixture(tmp_path)
+    public = [json.loads(line) for line in paths[0].read_text().splitlines()]
+    private = [json.loads(line) for line in paths[1].read_text().splitlines()]
+    replays = [json.loads(line) for line in paths[2].read_text().splitlines()]
+
+    for name in (
+        "history_depth.npy",
+        "history_instance.png",
+        "verification.png",
+        "verification_depth.npy",
+        "verification_instance.png",
+    ):
+        (tmp_path / name).write_text("fixture")
+
+    expanded_public = []
+    expanded_private = []
+    expanded_replays = []
+    for question_index in (0, 1):
+        for record in public:
+            value = dict(record)
+            base_id = value["episode_id"]
+            value["episode_id"] = "{}_q{}".format(base_id, question_index)
+            value["question_index"] = question_index
+            value["question"] = (
+                "Is the cabinet currently open?"
+                if question_index == 0
+                else "Is the cabinet open at this moment?"
+            )
+            value["history_observation"] = {
+                "rgb": "history.png",
+                "depth": "history_depth.npy",
+                "instance": "history_instance.png",
+            }
+            value["query_observation"] = {
+                "rgb": value["query_frame"],
+                "depth": "history_depth.npy",
+                "instance": "history_instance.png",
+            }
+            expanded_public.append(value)
+
+        for record in private:
+            value = dict(record)
+            base_id = value["episode_id"]
+            value["episode_id"] = "{}_q{}".format(base_id, question_index)
+            value["question_index"] = question_index
+            value["target_visible_pixel_count"] = 100
+            value["verification_observation"] = {
+                "rgb": "verification.png",
+                "depth": "verification_depth.npy",
+                "instance": "verification_instance.png",
+            }
+            expanded_private.append(value)
+
+        for record in replays:
+            value = dict(record)
+            value["episode_id"] = "{}_q{}".format(
+                value["episode_id"], question_index
+            )
+            expanded_replays.append(value)
+
+    _jsonl(paths[0], expanded_public)
+    _jsonl(paths[1], expanded_private)
+    _jsonl(paths[2], expanded_replays)
+    paths[3].write_text(
+        json.dumps(
+            {
+                "selected_source_events": 1,
+                "questions_per_branch": 2,
+                "files": {},
+            }
+        )
+    )
+
+    report = validate(
+        *paths,
+        replay_twice=True,
+        minimum_source_events=1,
+        gate=3,
+    )
+
+    assert report["acceptance"]["gate3_pass"] is True
+    assert report["public_episode_count"] == 6
+    assert report["public_full_observation_count"] == 6
+    assert min(report["answer_fractions"].values()) >= 0.30
