@@ -123,7 +123,7 @@ def environment_record(args):
     }
 
 
-def _initialize_event(controller, scene):
+def _initialize_event(controller, scene, seed):
     _log("resetting scene " + scene)
     controller.reset(scene)
     _log("initializing RGB, depth, and instance rendering")
@@ -138,6 +138,18 @@ def _initialize_event(controller, scene):
         raise_for_failure=True,
     )
     _log("initialization frame received")
+    _log("applying deterministic InitialRandomSpawn seed " + str(seed))
+    event = controller.step(
+        {
+            "action": "InitialRandomSpawn",
+            "randomSeed": seed,
+            "forceVisible": False,
+            "numPlacementAttempts": 5,
+            "placeStationary": True,
+        },
+        raise_for_failure=True,
+    )
+    _log("deterministic scene initialization received")
     return event
 
 
@@ -156,7 +168,7 @@ def execute_once(scene, seed, width, height):
         )
         started = True
         _log("Unity process connected")
-        event = _initialize_event(controller, scene)
+        event = _initialize_event(controller, scene, seed)
         _log("copying initial observation and metadata")
         metadata = _json_safe(event.metadata)
         result = {
