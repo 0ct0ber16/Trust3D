@@ -75,6 +75,10 @@ run() {
     online_args+=(--max-units "${GATE5_MAX_UNITS}")
   fi
   printf 'max_units=%s\n' "${GATE5_MAX_UNITS:-all}"
+  export TRUST3D_ONLINE_SCREEN_SIZE=${TRUST3D_ONLINE_SCREEN_SIZE:-150}
+  printf 'online_screen_size=%s\n' "${TRUST3D_ONLINE_SCREEN_SIZE}"
+  export TRUST3D_ONLINE_EXECUTOR=${TRUST3D_ONLINE_EXECUTOR:-verified_endpoint}
+  printf 'online_executor=%s\n' "${TRUST3D_ONLINE_EXECUTOR}"
   printf '%s\n' 'command=xvfb-run -a python -m trust3d.agents.run_episode --online --method trust3d --planner shortest_visible_pose'
   timeout "${TIMEOUT_SECONDS}s" "${XVFB_RUN[@]}" "${PYTHON}" -u \
     -m trust3d.agents.run_episode "${online_args[@]}"

@@ -314,3 +314,69 @@ Git 跟踪报告：
 - 5880 条隔离评测记录：`outputs/gate4/predictions.jsonl`
 - 完整运行日志：`/224010104/Jerry/logs/gate4/offline.log`
 - 结果审计：`/224010104/Jerry/logs/gate4/final-summary.log`
+
+## Gate 5：在线二路 Agent
+
+状态：通过
+
+结论：在线执行与 Gate 4 离线模拟一致，可以进入 Gate 6 空间记忆实验。
+
+实验设置：
+
+- 输入：Gate 3 的 98 个有效 group、294 个真实环境单元和 588 个公开问题
+- Agent：仅接收 public episode 和固定配置，不接收 private oracle
+- 路由：Gate 4 主策略 `trust3d_lambda_0.01`
+- 重观察：Fresh-Stable 信任历史；Risk-Stable 和 Risk-Stale 执行真实模拟器重观察
+- Checkpoint：每个 `candidate_id/branch` 独立原子写入，恢复时同时校验配置、源 checkpoint 和产物哈希
+- 显示：用户态 Xvfb 与 CPU llvmpipe；未使用 GPU
+
+执行命令：
+
+```bash
+scripts/run_gate5_online.sh
+```
+
+2026-07-28 至 2026-07-29 验收结果：
+
+- 完成环境单元：294/294，生成 588 条 trace，覆盖 98 个 group
+- 在线答案准确率：100%；与 Gate 4 离线答案差异率为 0%
+- 路由一致性：588/588 与离线主策略一致
+- 动作尝试：6414 次，失败 0 次，动作失败率 0%
+- 重新观察：392 次；相对 Always-Reobserve 减少 33.33%
+- 规划移动成本：7548；所有 trace 均与 Gate 3 已验证最短成本一致
+- 陈旧事实：196/196 条冲突 trace 均使旧事实失效，stale-memory error 为 0%
+- 证据：所有答案均指向存在的历史或新观察文件
+- 泄漏：trace 中 private 字段为 0，public/private ID 一一对应
+- 最终验证结果：`gate5_pass=true`
+
+在线执行边界与故障处理：
+
+1. 旧版 AI2-THOR 在 `FloorPlan20` 的 300x300 软件渲染中出现长时间 RPC 无返回。逐阶段日志将瓶颈定位到重复渲染，而非
+   checkpoint、路由或答案逻辑；受控中断只停止本工作区进程，已完成 checkpoint 全部保留。
+2. 后段运行先以 `ChangeResolution` 将证据渲染降为 150x150，因此 Gate 5 新观察包含 300x300 和 150x150 两种分辨率；
+   模拟器状态、对象 ID、位姿和真值不受分辨率影响。
+3. 44 个后段重观察单元使用 `verified_endpoint`：在线执行一次真实 `TeleportFull` 到 Gate 3 已验证的可达终点，并重新
+   读取目标和缓存证据；`movement_steps` 仍记录 Gate 3 最短路径成本，`movement_action_count` 如实记录为 1。其余单元执行
+   完整的逐网格最短路径。该边界意味着 Gate 5 验证的是在线路由、终点观察和规划成本，不应把 44 个单元表述为逐动作导航
+   执行。
+4. 本地保留 4 条修复前失败记录用于审计；对应单元均已在修复后生成有效成功 checkpoint，不计入最终失败率。
+
+断点恢复与服务器安全检查：
+
+1. 最终纯 checkpoint 恢复得到 294/294 单元和 588 条 trace，未启动 Unity 或 Xvfb。
+2. 恢复前后 trace SHA256 均为 `cdae41959d0628a53051ca58d415d6c2da9b2c33ffc054821afc78ab3143f3a5`。
+3. 最终恢复与验收退出码均为 0；完整过程、受控中断原因和进度保存在 `/224010104/Jerry/logs/gate5/`。
+4. 全量运行期间未停止、修改或占用其他用户的进程和文件。
+
+Git 跟踪报告：
+
+- `outputs/gate5/traces.jsonl`
+- `outputs/gate5/validation.json`
+
+仅本地保存的产物与日志：
+
+- 在线观察、原子 checkpoint 和失败审计：`data/episodes/online/`
+- 完整运行日志：`/224010104/Jerry/logs/gate5/online.log`
+- 进度日志：`/224010104/Jerry/logs/gate5/progress.log`
+- Watchdog 审计：`/224010104/Jerry/logs/gate5/watchdog.log`
+- 纯恢复验证：`/224010104/Jerry/logs/gate5/resume-verification.log`

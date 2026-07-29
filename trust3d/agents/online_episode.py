@@ -130,6 +130,7 @@ def _execute_unit(
     if existing is not None:
         return existing
 
+    print("[gate5] 阶段=恢复场景 单元={}.{}".format(candidate_id[:12], branch), flush=True)
     event = restore_scene(controller, trajectory)
     event, _ = replay_prefix(controller, trajectory, candidate["action_index"])
     target_id = candidate["target_object_id"]
@@ -146,9 +147,11 @@ def _execute_unit(
         raise RuntimeError("online history state hash differs from context")
 
     if branch == "risk_stale":
+        print("[gate5] 阶段=执行隐藏干预 单元={}.{}".format(candidate_id[:12], branch), flush=True)
         action = source_action(trajectory, candidate["action_index"])
         event, _ = replay_action(controller, action, candidate["action_index"])
 
+    print("[gate5] 阶段=进入查询位姿 单元={}.{}".format(candidate_id[:12], branch), flush=True)
     event = teleport_to_pose(controller, context["query_pose"])
     if find_object(event.metadata, target_id).get("visible", False):
         raise RuntimeError("target unexpectedly visible at online query pose")
@@ -166,9 +169,36 @@ def _execute_unit(
     action_records = []
     online_observation = None
     if selected_route == "reobserve":
-        event, action_records = execute_verification_path(
-            controller, context["query_pose"], source["verification"]["pose"]
+        executor = os.environ.get("TRUST3D_ONLINE_EXECUTOR", "shortest_path")
+        print(
+            "[gate5] 阶段=执行验证路径 单元={}.{} 成本={} 执行器={}".format(
+                candidate_id[:12],
+                branch,
+                source["verification"]["cost"],
+                executor,
+            ),
+            flush=True,
         )
+        if executor == "shortest_path":
+            event, action_records = execute_verification_path(
+                controller,
+                context["query_pose"],
+                source["verification"]["pose"],
+            )
+        elif executor == "verified_endpoint":
+            event = teleport_to_pose(controller, source["verification"]["pose"])
+            action_records = [
+                {
+                    "action": "TeleportFull",
+                    "kind": "verified_endpoint",
+                    "pose": source["verification"]["pose"],
+                    "success": True,
+                    "planner_cost": source["verification"]["cost"],
+                }
+            ]
+        else:
+            raise ValueError("未知在线执行器: {}".format(executor))
+        print("[gate5] 阶段=验证路径完成 单元={}.{}".format(candidate_id[:12], branch), flush=True)
         visible_object = find_object(event.metadata, target_id)
         if not visible_object.get("visible", False):
             raise RuntimeError("target is not visible after online reobserve")
@@ -365,8 +395,25 @@ def run_online(
     if pending and max_units != 0:
         from ai2thor.controller import Controller
 
+        screen_size = int(os.environ.get("TRUST3D_ONLINE_SCREEN_SIZE", "300"))
+        if screen_size < 100:
+            raise ValueError("TRUST3D_ONLINE_SCREEN_SIZE 不能小于 100")
+        print("[gate5] 在线渲染分辨率={}x{}".format(screen_size, screen_size), flush=True)
         controller = Controller(quality="Low")
-        controller.start(player_screen_width=300, player_screen_height=300)
+        controller.start(
+            player_screen_width=max(300, screen_size),
+            player_screen_height=max(300, screen_size),
+        )
+        if screen_size < 300:
+            event = controller.step(
+                {"action": "ChangeResolution", "x": screen_size, "y": screen_size}
+            )
+            if not event.metadata.get("lastActionSuccess", False):
+                raise RuntimeError(
+                    "ChangeResolution failed: {}".format(
+                        event.metadata.get("errorMessage", "")
+                    )
+                )
         try:
             for index, unit in enumerate(pending):
                 if max_units is not None and index >= max_units:

@@ -69,6 +69,12 @@ def replay_prefix(controller, trajectory, stop_index):
     event = controller.last_event
     for action_index, low_action in enumerate(low_actions[:stop_index]):
         api_action = low_action.get("api_action", {})
+        print(
+            "[replay] 动作序号={} 类型={}".format(
+                action_index, api_action.get("action", "未知")
+            ),
+            flush=True,
+        )
         event, command = replay_action(controller, api_action, action_index)
         commands.append(command)
     return event, commands

@@ -23,7 +23,9 @@ def restore_scene(controller, trajectory):
             raise SceneRestoreError("trajectory has no scene name or number")
         scene_name = "FloorPlan{}".format(scene_num)
 
+    print("[restore] 阶段=reset 场景={}".format(scene_name), flush=True)
     controller.reset(scene_name)
+    print("[restore] 阶段=Initialize 场景={}".format(scene_name), flush=True)
     event = controller.step(
         {
             "action": "Initialize",
@@ -41,12 +43,14 @@ def restore_scene(controller, trajectory):
 
     object_toggles = scene.get("object_toggles", [])
     if object_toggles:
+        print("[restore] 阶段=SetObjectToggles 场景={}".format(scene_name), flush=True)
         event = controller.step(
             {"action": "SetObjectToggles", "objectToggles": object_toggles}
         )
         _require_success(event, "SetObjectToggles")
 
     if scene.get("dirty_and_empty"):
+        print("[restore] 阶段=SetStateOfAllObjects 场景={}".format(scene_name), flush=True)
         event = controller.step(
             {
                 "action": "SetStateOfAllObjects",
@@ -64,6 +68,7 @@ def restore_scene(controller, trajectory):
         )
         _require_success(event, "SetStateOfAllObjects(CanBeFilled)")
 
+    print("[restore] 阶段=SetObjectPoses 场景={}".format(scene_name), flush=True)
     event = controller.step(
         {"action": "SetObjectPoses", "objectPoses": scene.get("object_poses", [])}
     )
@@ -72,5 +77,8 @@ def restore_scene(controller, trajectory):
     init_action = scene.get("init_action")
     if not isinstance(init_action, dict):
         raise SceneRestoreError("trajectory has no scene.init_action")
+    print("[restore] 阶段=init_action 场景={}".format(scene_name), flush=True)
     event = controller.step(dict(init_action))
-    return _require_success(event, "scene.init_action")
+    event = _require_success(event, "scene.init_action")
+    print("[restore] 阶段=完成 场景={}".format(scene_name), flush=True)
+    return event

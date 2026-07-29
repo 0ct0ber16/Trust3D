@@ -257,6 +257,10 @@ def execute_verification_path(controller, query_pose, verification_pose):
 
     def execute(pose, action_kind):
         nonlocal event, current
+        print(
+            "[oracle] 动作={} 序号={}".format(action_kind, len(actions) + 1),
+            flush=True,
+        )
         event = teleport_to_pose(controller, pose)
         current = canonical_pose(event.metadata)
         actions.append(
