@@ -1,0 +1,15 @@
+{
+  "cuda_available": true,
+  "curope_importable": true,
+  "cut3r_commit": "8bc15dc92a6d7fd92920b4ec81540d3dec7d3ecf",
+  "environment_prefix": "/224010104/Jerry/.conda/envs/cut3r",
+  "gpu_count_visible_without_mask": 2,
+  "host": "5tclvt5rs8jd0-0",
+  "python_version": "3.11.9",
+  "requirements_sha256": "7456c2518ba753143403792ee9b9c08bb3fe1f49b1716af5ae51862e887b1368",
+  "schema_version": 1,
+  "torch_cuda_version": "12.1",
+  "torch_version": "2.4.1+cu121",
+  "torchvision_version": "0.19.1+cu121",
+  "transformers_version": "4.55.4"
+}

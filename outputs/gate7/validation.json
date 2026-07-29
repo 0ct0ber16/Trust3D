@@ -1,0 +1,156 @@
+{
+  "camera_geometry_group_failure_rate": 0.0,
+  "checkpoint_sha256": "45f7e98a0a64dbeb54901ae2b878cd8cd125f20a4497316483f0bd6f109f8103",
+  "criteria": {
+    "all_requested_groups_completed": true,
+    "geometry_group_failure_rate_zero": true,
+    "qa_drop_not_above_10pp": false
+  },
+  "cut3r_accuracy": 0.5611111111111111,
+  "cut3r_adapter_version": "gate7-cut3r-rgb-v1",
+  "episode_count": 360,
+  "frame_sampling": "\u6bcf\u7ec4\u5386\u53f2 target/donor\u3001\u67e5\u8be2\u5e27\u3001\u5f53\u524d target/donor\uff1b512 \u957f\u8fb9\uff1bRGB-only",
+  "gate7_pass": false,
+  "geometry_diagnostics": {
+    "diagnostic_failures": [],
+    "latency": {
+      "amortized_seconds_per_question": 0.06180252036348166,
+      "per_question_rerun_estimated_seconds": 146.1289149792865,
+      "stable_sequence_seconds": {
+        "count": 30,
+        "mean": 0.4761107137989408,
+        "median": 0.2525585980329197,
+        "p95": 1.106864437504551
+      },
+      "stale_sequence_seconds": {
+        "count": 30,
+        "mean": 0.26551953056283917,
+        "median": 0.2476496344897896,
+        "p95": 0.3281023164396174
+      },
+      "state_reuse_time_saving": 0.847744662074531,
+      "state_reuse_total_seconds": 22.2489073308534
+    },
+    "movable_object_revisit_error": {
+      "count": 120,
+      "mean": 0.36904885759255757,
+      "median": 0.09747522785678078,
+      "p95": 2.2204606730486383
+    },
+    "peak_allocated_bytes": 3722003968,
+    "static_structure_camera_revisit_error": {
+      "count": 120,
+      "mean": 0.46024923342163454,
+      "median": 0.13806613582087962,
+      "p95": 1.8203655640294554
+    }
+  },
+  "grounding_boundary": "\u9a8c\u8bc1\u5e27\u89d2\u8272\u548c\u76ee\u6807\u5c45\u4e2d\u5148\u9a8c\uff1b\u672a\u8bfb\u53d6 depth\u3001instance mask \u6216\u79c1\u6709\u7b54\u6848\u3002",
+  "group_count": 30,
+  "gt_3d_accuracy": 1.0,
+  "gt_to_cut3r_qa_drop": 0.4388888888888889,
+  "judgment": "\u4e3b\u56e0\u679c\u5b9e\u9a8c\u7ee7\u7eed\u4f7f\u7528 GT/RGB-D\uff0cCUT3R \u4ec5\u4f5c\u5931\u8d25\u5206\u6790",
+  "metrics": {
+    "always_reobserve_cut3r": {
+      "accuracy": 0.5444444444444444,
+      "episode_count": 360,
+      "geometry_failure_count": 0,
+      "movement_steps": 3724,
+      "new_observation_count": 540,
+      "stale_accuracy": 0.6166666666666667
+    },
+    "persistent_3d_cut3r": {
+      "accuracy": 0.4638888888888889,
+      "episode_count": 360,
+      "geometry_failure_count": 0,
+      "movement_steps": 0,
+      "new_observation_count": 0,
+      "stale_accuracy": 0.275
+    },
+    "trust3d_cut3r": {
+      "accuracy": 0.5611111111111111,
+      "episode_count": 360,
+      "geometry_failure_count": 0,
+      "movement_steps": 2422,
+      "new_observation_count": 360,
+      "stale_accuracy": 0.6166666666666667
+    },
+    "trust3d_gt_reference": {
+      "accuracy": 1.0,
+      "episode_count": 360,
+      "geometry_failure_count": 0,
+      "movement_steps": 2422,
+      "new_observation_count": 360,
+      "stale_accuracy": 1.0
+    },
+    "trust3d_rgbd_reference": {
+      "accuracy": 1.0,
+      "episode_count": 360,
+      "geometry_failure_count": 0,
+      "movement_steps": 2422,
+      "new_observation_count": 360,
+      "stale_accuracy": 1.0
+    }
+  },
+  "movable_object_error_by_type": {
+    "Box": {
+      "episode_count": 12,
+      "error_rate": 0.33333333333333337
+    },
+    "CellPhone": {
+      "episode_count": 60,
+      "error_rate": 0.4666666666666667
+    },
+    "CreditCard": {
+      "episode_count": 36,
+      "error_rate": 0.3055555555555556
+    },
+    "DishSponge": {
+      "episode_count": 12,
+      "error_rate": 0.41666666666666663
+    },
+    "Egg": {
+      "episode_count": 24,
+      "error_rate": 0.33333333333333337
+    },
+    "Glassbottle": {
+      "episode_count": 24,
+      "error_rate": 0.6666666666666667
+    },
+    "HandTowel": {
+      "episode_count": 12,
+      "error_rate": 0.0
+    },
+    "Newspaper": {
+      "episode_count": 12,
+      "error_rate": 0.8333333333333334
+    },
+    "PepperShaker": {
+      "episode_count": 12,
+      "error_rate": 0.9166666666666666
+    },
+    "SaltShaker": {
+      "episode_count": 12,
+      "error_rate": 0.0
+    },
+    "SoapBottle": {
+      "episode_count": 12,
+      "error_rate": 0.25
+    },
+    "SprayBottle": {
+      "episode_count": 12,
+      "error_rate": 0.6666666666666667
+    },
+    "Statue": {
+      "episode_count": 72,
+      "error_rate": 0.4722222222222222
+    },
+    "Vase": {
+      "episode_count": 48,
+      "error_rate": 0.41666666666666663
+    }
+  },
+  "query_geometry_failure_rate": 0.0,
+  "route_private_leak_count": 0,
+  "schema_version": 1
+}

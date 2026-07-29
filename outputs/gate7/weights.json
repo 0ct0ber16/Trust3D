@@ -1,0 +1,13 @@
+{
+  "bytes": 3173761006,
+  "checkpoint_name": "cut3r_512_dpt_4_64.pth",
+  "checkpoint_path": "/224010104/Jerry/trust3d/external/cut3r/src/cut3r_512_dpt_4_64.pth",
+  "google_drive_file_id": "1Asz-ZB3FfpzZYwunhQvNPZEUA8XUNAYD",
+  "model_spec": "ARCroco3DStereo(ARCroco3DStereoConfig(freeze='encoder', state_size=768, state_pe='2d', pos_embed='RoPE100', rgb_head=True, pose_head=True, patch_embed_cls='ManyAR_PatchEmbed', img_size=(512, 512), head_type='dpt', output_mode='pts3d+pose', depth_mode=('exp', -inf, inf), conf_mode=('exp', 1, inf), pose_mode=('exp', -inf, inf), enc_embed_dim=1024, enc_depth=24, enc_num_heads=16, dec_embed_dim=768, dec_depth=12, dec_num_heads=12, landscape_only=False))",
+  "model_tensor_count": 1248,
+  "schema_version": 1,
+  "sha256": "45f7e98a0a64dbeb54901ae2b878cd8cd125f20a4497316483f0bd6f109f8103",
+  "source_url": "https://drive.google.com/file/d/1Asz-ZB3FfpzZYwunhQvNPZEUA8XUNAYD/view?usp=drive_link",
+  "validated_at": "2026-07-29T10:19:27.316508+00:00",
+  "说明": "CUT3R 官方最终 checkpoint 的本地校验清单；权重文件本身不提交 Git。"
+}

@@ -454,3 +454,76 @@ Git 跟踪报告：
 - 完整生成与恢复日志：`/224010104/Jerry/logs/gate6/spatial.log`
 - 最终恢复审计：`/224010104/Jerry/logs/gate6/verify.log`
 - 本轮过程总记录：`/224010104/Jerry/logs/gate6/continue-audit.log`
+
+## Gate 7：CUT3R RGB-only 几何接入
+
+状态：实验已完成，未通过主结果门槛
+
+结论：30 个 group 的 CUT3R 推理全部成功且没有几何调用失败，但 Trust3D-CUT3R 相对 GT-3D 的 QA drop 为 43.89 个百分点，超过方案的 20 个百分点失败分析阈值。主因果实验继续使用 GT/RGB-D 几何，当前 CUT3R 结果只作为单目 backbone 与对象 grounding 的失败分析，不进入 Gate 8。
+
+实验设置：
+
+- 官方仓库提交：`8bc15dc92a6d7fd92920b4ec81540d3dec7d3ecf`
+- 官方最终 checkpoint SHA256：`45f7e98a0a64dbeb54901ae2b878cd8cd125f20a4497316483f0bd6f109f8103`
+- 独立环境：Python 3.11.9、PyTorch 2.4.1+cu121、torchvision 0.19.1+cu121、transformers 4.55.4
+- 输入：Gate 6 的 30 个 group；每个稳定/变化序列各包含历史 target、历史 donor、公开 query、当前 target 和当前 donor 五帧
+- 几何边界：推理只读取 RGB 和验证帧角色，使用目标水平居中先验的中心区域；不读取 depth、instance mask 或 private oracle 答案
+- Checkpoint：每个 group 独立原子写入，恢复时校验 adapter、模型、分辨率、中心裁剪和全部输入图像的 fingerprint
+
+执行命令：
+
+```bash
+scripts/bootstrap_gate7_cut3r.sh
+scripts/download_gate7_cut3r_weights.sh
+scripts/run_gate7_cut3r.sh pilot
+scripts/run_gate7_cut3r.sh full
+scripts/verify_gate7_cut3r.sh
+```
+
+2026-07-29 核心结果：
+
+| 方法 | 准确率 | Stale 子集准确率 | 新观察数 | 移动成本 |
+|---|---:|---:|---:|---:|
+| Persistent 3D（CUT3R） | 46.39% | 27.50% | 0 | 0 |
+| Always-Reobserve（CUT3R） | 54.44% | 61.67% | 540 | 3724 |
+| Trust3D（CUT3R） | 56.11% | 61.67% | 360 | 2422 |
+| Trust3D（GT/RGB-D 参考） | 100.00% | 100.00% | 360 | 2422 |
+
+- 完成 30/30 group 和 360 个问题，camera/geometry group failure rate 与 query geometry failure rate 均为 0%
+- GT-3D 到 CUT3R 的 QA drop 为 43.89 个百分点，`qa_drop_not_above_10pp=false`，最终 `gate7_pass=false`
+- 两段序列推理总计 22.25 秒；状态重用后每题摊销 0.0618 秒，按问题重跑估计 146.13 秒，节省 84.77%
+- 峰值已分配显存为 3,722,003,968 bytes，约 3.47 GiB
+- 归一化相机重访漂移中位数为 0.1381，p95 为 1.8204；可移动对象重访误差中位数为 0.0975，p95 为 2.2205
+- object type 分层错误率差异较大，例如 HandTowel/SaltShaker 为 0%，PepperShaker 为 91.67%；这支持将当前差距归因于单目几何与无 mask 的中心 grounding，而不是路由失败
+
+实现边界与失败解释：
+
+1. private branch 只在隔离 evaluator 中用于选择实际发生的当前观测；CUT3R adapter 不读取 private 答案、深度或实例分割，路由文件的 private 泄漏计数为 0。
+2. camera 与 object error 是 CUT3R 自身坐标系内、按序列基线归一化的重访一致性指标。由于单目尺度和不同序列坐标系不唯一，不能将其表述为绝对米制误差。
+3. Gate 7 的失败来自答案质量门槛，不是执行失败：全部 checkpoint 均为 `success`，模型 key 全匹配，所有答案和点坐标均为有限值。
+4. GPU 启动前要求至少 60,000 MiB 空闲显存。两张共享 A100 被其他 VLLM 服务占用时任务只轮询；服务短暂释放后才自动运行，没有停止或修改其他用户进程。
+5. 另以 8 CPU 线程和 224 分辨率完成单组 smoke，修复了官方 cuRoPE CPU kernel 仅支持 Float 而 attention 强制 Half 的兼容问题；该 smoke 不替代最终 CUDA 结果。
+
+断点恢复与服务器安全检查：
+
+1. 恢复审计重新计算模型和全部 RGB 输入 fingerprint，30/30 group 均跳过推理，`model_load_seconds_this_run=0.0`。
+2. 30 个 checkpoint、predictions 和 validation 共 32 个文件恢复前后 SHA256 全部一致，`checkpoint_recovery_pass=true`。
+3. 恢复命令显式设置 `CUDA_VISIBLE_DEVICES=''`，未加载 CUT3R 模型，也未占用 GPU。
+4. 环境、权重、资源等待、pilot、full、CPU smoke、失败 traceback 和恢复过程完整保存在 `/224010104/Jerry/logs/gate7/`。
+5. 五个 Gate 7 shell 脚本均通过 `bash -n`，完整回归为 48 项全部通过。
+
+Git 跟踪报告：
+
+- `outputs/gate7/environment.json`
+- `outputs/gate7/weights.json`
+- `outputs/gate7/predictions.jsonl`
+- `outputs/gate7/validation.json`
+- `outputs/gate7/checkpoint_recovery.json`
+- `outputs/gate7/cut3r_geometry/manifest.json` 与 30 个 group checkpoint
+
+仅本地保存的产物与日志：
+
+- CUT3R 官方仓库和 3.17 GB 权重：`external/cut3r/`
+- CUT3R 独立 Conda 环境：`/224010104/Jerry/.conda/envs/cut3r/`
+- CPU smoke checkpoint：`outputs/gate7/cpu_smoke/`
+- 完整日志：`/224010104/Jerry/logs/gate7/`

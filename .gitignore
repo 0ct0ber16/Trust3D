@@ -50,6 +50,17 @@ outputs/gate6/*
 !outputs/gate6/api_probe.json
 !outputs/gate6/validation.json
 !outputs/gate6/checkpoint_recovery.json
+!outputs/gate7/
+outputs/gate7/*
+!outputs/gate7/environment.json
+!outputs/gate7/weights.json
+!outputs/gate7/checkpoint_recovery.json
+!outputs/gate7/predictions.jsonl
+!outputs/gate7/validation.json
+!outputs/gate7/cut3r_geometry/
+!outputs/gate7/cut3r_geometry/manifest.json
+!outputs/gate7/cut3r_geometry/checkpoints/
+!outputs/gate7/cut3r_geometry/checkpoints/*.json
 
 **/__pycache__/
 *.py[cod]

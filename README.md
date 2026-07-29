@@ -71,3 +71,19 @@ scripts/run_gate3_mvp.sh
 ```
 
 脚本会在启动时记录服务器资源和完整命令，校验已有 checkpoint，并继续生成 100 个 source events、三种 branch、每个 branch 两个中性问题模板的 MVP 数据。构建完成后会自动运行 Gate 3 验收；日志和退出码分别保存在 `/224010104/Jerry/logs/gate3/mvp.log` 与 `/224010104/Jerry/logs/gate3/mvp.exit`。
+
+## Gate 7：CUT3R RGB-only 几何
+
+Gate 7 使用独立 Conda 环境和固定官方 checkpoint。所有命令必须在 tmux 中执行；GPU 不满足安全空闲阈值时，运行脚本只等待，不会抢占或终止其他任务：
+
+```bash
+scripts/bootstrap_gate7_cut3r.sh
+scripts/download_gate7_cut3r_weights.sh
+scripts/run_gate7_cut3r.sh pilot
+scripts/run_gate7_cut3r.sh full
+scripts/verify_gate7_cut3r.sh
+```
+
+adapter 对每个 group 分别运行稳定和变化后的五帧 RGB 序列，并原子保存包含输入 fingerprint 的 checkpoint。推理阶段不读取 depth、instance mask 或 private oracle 答案；private branch 只由隔离 evaluator 用于选择实际发生的观测。
+
+30 组最终实验全部成功运行，但 Trust3D-CUT3R 准确率为 56.11%，相对 GT-3D 的 QA drop 为 43.89 个百分点，因此按预设标准只保留为失败分析。完整结论、几何一致性、成本和恢复审计见 `STATUS.md` 与 `outputs/gate7/validation.json`。
