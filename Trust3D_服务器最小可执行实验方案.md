@@ -1255,7 +1255,7 @@ python -m pip install -r requirements.txt
 [ ] 六个最小 baseline
 [ ] Gate 4 离线路由结果
 [ ] Gate 5 在线执行 traces
-[ ] Gate 6 GT/RGB-D 3D 空间结果
+[x] Gate 6 GT/RGB-D 3D 空间结果
 [ ] Gate 7 CUT3R 小规模结果
 [ ] group-bootstrap 置信区间
 [ ] accuracy-cost Pareto 图

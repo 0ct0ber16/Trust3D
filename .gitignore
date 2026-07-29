@@ -45,6 +45,11 @@ outputs/gate4/plots/*
 outputs/gate5/*
 !outputs/gate5/traces.jsonl
 !outputs/gate5/validation.json
+!outputs/gate6/
+outputs/gate6/*
+!outputs/gate6/api_probe.json
+!outputs/gate6/validation.json
+!outputs/gate6/checkpoint_recovery.json
 
 **/__pycache__/
 *.py[cod]

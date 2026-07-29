@@ -1,0 +1,24 @@
+{
+  "after_sha256": {
+    "data/episodes/spatial30/episodes_public.jsonl": "9d5cd67479fb1e1c8291effb0d77ed876b0cc27d6b7f9cd02eb43045f3022263",
+    "data/episodes/spatial30/oracle_private.jsonl": "e81df1510a292be065dd8db93d155ee8afa798f435e6064f80ea08b2d484cf21",
+    "data/episodes/spatial30/selection.json": "41dca99c0ae6d02a2a06a0149e2719eba2cdf16bf1cb5582a2aeacde7a1511cf",
+    "outputs/gate6/validation.json": "95c3bc0c0e960cf36f8c2325d87730470d1e93d23ccdab426b7b9f19cadf5549"
+  },
+  "all_hashes_match": true,
+  "before_sha256": {
+    "data/episodes/spatial30/episodes_public.jsonl": "9d5cd67479fb1e1c8291effb0d77ed876b0cc27d6b7f9cd02eb43045f3022263",
+    "data/episodes/spatial30/oracle_private.jsonl": "e81df1510a292be065dd8db93d155ee8afa798f435e6064f80ea08b2d484cf21",
+    "data/episodes/spatial30/selection.json": "41dca99c0ae6d02a2a06a0149e2719eba2cdf16bf1cb5582a2aeacde7a1511cf",
+    "outputs/gate6/validation.json": "95c3bc0c0e960cf36f8c2325d87730470d1e93d23ccdab426b7b9f19cadf5549"
+  },
+  "checked_file_count": 4,
+  "checkpoint_recovery_pass": true,
+  "hash_command_exit_code": 0,
+  "manifest_complete": true,
+  "manifest_new_contexts_this_run": 0,
+  "manifest_simulator_started": false,
+  "new_simulator_process_count": 0,
+  "recovery_command_exit_code": 0,
+  "schema_version": 1
+}

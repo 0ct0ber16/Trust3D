@@ -1,0 +1,86 @@
+{
+  "criteria": {
+    "egocentric_tool_error_below_2pct": true,
+    "gt_gain_at_least_10pp": true,
+    "gt_stale_error_reduction_at_least_10pp": true,
+    "observation_saving_at_least_25pct": true,
+    "rgbd_gain_at_least_10pp": true,
+    "rgbd_stale_error_reduction_at_least_10pp": true
+  },
+  "egocentric_tool_error_rate": 0.0,
+  "episode_count": 360,
+  "gate6_pass": true,
+  "group_count": 30,
+  "gt_gain_over_current_rgb": 1.0,
+  "gt_stale_error_reduction": 0.75,
+  "metrics": {
+    "all_history_rgb": {
+      "accuracy": 0.0,
+      "episode_count": 360,
+      "movement_steps": 0,
+      "new_observation_count": 0,
+      "stale_accuracy": 0.0
+    },
+    "always_reobserve_gt": {
+      "accuracy": 1.0,
+      "episode_count": 360,
+      "movement_steps": 3724,
+      "new_observation_count": 540,
+      "stale_accuracy": 1.0
+    },
+    "always_reobserve_rgbd": {
+      "accuracy": 1.0,
+      "episode_count": 360,
+      "movement_steps": 3724,
+      "new_observation_count": 540,
+      "stale_accuracy": 1.0
+    },
+    "clairvoyant_oracle": {
+      "accuracy": 1.0,
+      "episode_count": 360,
+      "movement_steps": 0,
+      "new_observation_count": 0,
+      "stale_accuracy": 1.0
+    },
+    "current_rgb": {
+      "accuracy": 0.0,
+      "episode_count": 360,
+      "movement_steps": 0,
+      "new_observation_count": 0,
+      "stale_accuracy": 0.0
+    },
+    "persistent_3d_gt": {
+      "accuracy": 0.75,
+      "episode_count": 360,
+      "movement_steps": 0,
+      "new_observation_count": 0,
+      "stale_accuracy": 0.25
+    },
+    "persistent_3d_rgbd": {
+      "accuracy": 0.75,
+      "episode_count": 360,
+      "movement_steps": 0,
+      "new_observation_count": 0,
+      "stale_accuracy": 0.25
+    },
+    "trust3d_gt": {
+      "accuracy": 1.0,
+      "episode_count": 360,
+      "movement_steps": 2422,
+      "new_observation_count": 360,
+      "stale_accuracy": 1.0
+    },
+    "trust3d_rgbd": {
+      "accuracy": 1.0,
+      "episode_count": 360,
+      "movement_steps": 2422,
+      "new_observation_count": 360,
+      "stale_accuracy": 1.0
+    }
+  },
+  "observation_saving_vs_always_reobserve": 0.33333333333333337,
+  "rgbd_gain_over_current_rgb": 1.0,
+  "rgbd_stale_error_reduction": 0.75,
+  "route_private_leak_count": 0,
+  "schema_version": 1
+}

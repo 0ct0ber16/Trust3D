@@ -1,0 +1,31 @@
+{
+  "camera_position_available": true,
+  "candidate_id": "296a3a3a030619522f3f1a5680c02cd5c565331ef8ee2bd27becb150600f7088",
+  "captured_at_utc": "2026-07-29T04:36:27Z",
+  "depth": {
+    "dtype": "float32",
+    "maximum": 1672.6488037109375,
+    "median": 1099.2801513671875,
+    "minimum": 495.7699890136719,
+    "shape": [
+      300,
+      300
+    ]
+  },
+  "donor_object_id": "CellPhone|-04.83|+01.11|+04.39",
+  "donor_object_name": "CellPhone_b2fd26f3",
+  "donor_object_type": "CellPhone",
+  "donor_position_error_m": 0.0,
+  "failed_candidates_before_success": [],
+  "gate6_api_probe_pass": true,
+  "intervention_method": "TeleportObject",
+  "position_swap_distance_m": 5.84650277607461,
+  "schema_version": 6,
+  "selection_sha256": "81c3fe8cd02b784ec2d249094c35f0fa0f9c226943a2db3817e775b9ff22c9aa",
+  "status": "success",
+  "target_object_id": "CellPhone|-00.19|+01.10|+00.83",
+  "target_object_name": "CellPhone_b2fd26f3(Clone)_copy_2",
+  "target_object_type": "CellPhone",
+  "target_position_error_m": 0.0,
+  "trajectory_sha256": "cb7f116254760485488cd67eaae0acd44f34c8975dfbb180882efeafc453b6a5"
+}

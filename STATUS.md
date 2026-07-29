@@ -380,3 +380,77 @@ Git 跟踪报告：
 - 进度日志：`/224010104/Jerry/logs/gate5/progress.log`
 - Watchdog 审计：`/224010104/Jerry/logs/gate5/watchdog.log`
 - 纯恢复验证：`/224010104/Jerry/logs/gate5/resume-verification.log`
+
+## Gate 6：第一视角空间记忆与 freshness 路由
+
+状态：通过
+
+结论：GT-3D 与确定性 RGB-D 对象几何均证明了第一视角空间记忆和 freshness 路由的有效性，可以进入 Gate 7 的 CUT3R 小规模接入；当前结果不代表已经超过训练后的 RGB 检索模型。
+
+实验设置：
+
+- 输入：30 个锁定的 ALFRED source events，每个 event 包含 Fresh-Stable、Risk-Stable、Risk-Stale 三个分支和四类空间问题
+- 输出：30 个 group、360 个 public episodes 和 360 个隔离的 private oracle records
+- 问题：左右、前后、二者谁更近、目标是否更近
+- 几何：模拟器 GT 对象位置，以及从真实可见历史观测的 depth、instance mask 和相机位姿确定性反投影得到的 RGB-D 对象位置
+- 位置干预：旧版 AI2-THOR 的 `TeleportObject`，使用顶层 `x/y/z` 参数交换两个同类型对象
+- Checkpoint：每个 source event 独立原子写入，版本为 `spatial_build_version=6`
+- 显示：工作区内 Xvfb 与 CPU llvmpipe，线程上限为 16；不使用 GPU
+
+执行命令：
+
+```bash
+scripts/run_gate6_spatial.sh
+
+scripts/verify_gate6_spatial.sh
+```
+
+2026-07-29 核心结果：
+
+| 方法 | 准确率 | Stale 子集准确率 | 新观察数 | 移动成本 |
+|---|---:|---:|---:|---:|
+| Persistent 3D（GT） | 75.00% | 25.00% | 0 | 0 |
+| Persistent 3D（RGB-D） | 75.00% | 25.00% | 0 | 0 |
+| Always-Reobserve（GT/RGB-D） | 100.00% | 100.00% | 540 | 3724 |
+| Trust3D（GT） | 100.00% | 100.00% | 360 | 2422 |
+| Trust3D（RGB-D） | 100.00% | 100.00% | 360 | 2422 |
+
+- 相对 Always-Reobserve，Trust3D 减少 33.33% 新观察，并将移动成本从 3724 降至 2422
+- 相对无 freshness 的 Persistent 3D，Trust3D 将 stale 子集准确率从 25% 提升至 100%
+- 第一视角确定性工具与模拟器真值的答案误差率为 0%，低于 2% 门槛
+- 所有 6 项预设验收条件通过，最终结果为 `gate6_pass=true`
+- 路由输出没有 private 字段泄漏，`route_private_leak_count=0`
+
+数据与视觉泄漏审计：
+
+1. Risk-Stable 与 Risk-Stale 的公开 query RGB 使用同一个稳定分支文件，30/30 checkpoint 均逐路径一致；实际 stale query 只保存在私有审计观测中。
+2. 30 个最终 checkpoint 的实际 stale query 最大归一化 RGB 平均差异为 `0.0007164`，低于构造器的 1% 拒绝阈值；目标和参照物在 query 时均不可见。
+3. 构造器会逐一尝试同类型对象对，30 个成功 checkpoint 共保留 30 次不可达或不合格物体对拒绝记录，不会因第一对失败而丢弃整个 source event。
+4. Public/private episode ID 一一对应，公开路由阶段不读取当前对象位置、隐藏分支或 oracle 答案。
+
+实现边界与失败处理：
+
+1. 固定的 2019 AI2-THOR 在第二次调用 `SetObjectPoses` 时会报告成功但不移动对象；最小 API 探针确认顶层 `x/y/z` 的 `TeleportObject` 双向位置误差均为 0，因此正式构造使用后者。
+2. 原始 ALFRED 历史帧通常不能同时看见两个合格物体。Gate 6 改为在同一恢复场景中分别寻找真实可达位姿并采集两个对象的 RGB-D 历史证据，不伪造同帧可见性。
+3. 开发和早期 schema 尝试留下 28 条失败记录：11 条旧对象 ID 不再存在、10 条目标不可达、2 条无合格同类物体对、4 条 RGB 泄漏和 1 条 instance 泄漏。记录全部保留供审计；成功单元在版本 6 修复后重新验证。
+4. `Current-RGB` 与 `All-history RGB` 当前只返回 `unknown`，因此其 0% 准确率是诊断占位结果。Gate 6 证明的是确定性 GT/RGB-D 几何和 freshness 路由有效，不能据此声称优于训练后的 RGB 检索或视觉模型。
+
+断点恢复与服务器安全检查：
+
+1. 纯 checkpoint 恢复得到 30/30 group，`new_contexts_this_run=0` 且 `simulator_started=false`。
+2. 恢复期间每 0.1 秒监测 Unity/Xvfb，新增模拟器进程数为 0；没有停止、修改或占用其他用户的进程。
+3. 恢复前后 public、private、锁定 selection 和 validation 四个关键文件 SHA256 全部一致，`checkpoint_recovery_pass=true`。
+4. 最终测试为 44 项全部通过，数据和输出目录没有残留 `.tmp` 文件。
+
+Git 跟踪报告：
+
+- `outputs/gate6/api_probe.json`
+- `outputs/gate6/validation.json`
+- `outputs/gate6/checkpoint_recovery.json`
+
+仅本地保存的产物与日志：
+
+- RGB-D 数据、私有 oracle、模态缓存、失败审计和原子 checkpoint：`data/episodes/spatial30/`
+- 完整生成与恢复日志：`/224010104/Jerry/logs/gate6/spatial.log`
+- 最终恢复审计：`/224010104/Jerry/logs/gate6/verify.log`
+- 本轮过程总记录：`/224010104/Jerry/logs/gate6/continue-audit.log`
