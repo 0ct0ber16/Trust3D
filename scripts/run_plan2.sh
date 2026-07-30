@@ -192,7 +192,8 @@ download_weights() {
   if [[ -f ${MODEL_PART} ]] && (( $(stat -c %s "${MODEL_PART}") > expected_size )); then
     mv "${MODEL_PART}" "${MODEL_PART}.invalid.$(utc_stamp)"
   fi
-  curl -fL --retry 20 --retry-delay 10 --continue-at - \
+  curl -fL --retry 20 --retry-all-errors --retry-delay 10 \
+    --connect-timeout 30 --speed-limit 1048576 --speed-time 120 --continue-at - \
     --output "${MODEL_PART}" "${url}" || return $?
   [[ $(stat -c %s "${MODEL_PART}") -eq ${expected_size} ]] || return 1
   [[ $(sha256sum "${MODEL_PART}" | awk '{print $1}') == "${expected_sha}" ]] || return 1
