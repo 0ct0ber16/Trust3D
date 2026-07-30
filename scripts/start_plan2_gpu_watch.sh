@@ -23,7 +23,7 @@ if pgrep -af '[w]atch_plan2_gpu.sh' >/dev/null; then
   exit 0
 fi
 
-COMMAND="cd '${ROOT}' && printf 'window_start=%s tmux=%s command=scripts/watch_plan2_gpu.sh log=${LOG}\\n' \"\$(date -Is)\" \"\${TMUX:-unset}\" | tee -a '${LOG}' && scripts/watch_plan2_gpu.sh 2>&1 | tee -a '${LOG}'; rc=\${PIPESTATUS[0]}; printf 'window_exit_code=%s end=%s\\n' \"\${rc}\" \"\$(date -Is)\" | tee -a '${LOG}'; exit \"\${rc}\""
-"${TMUX_BIN}" new-window -d -t "${SESSION}" -n "${WINDOW}" "bash -lc \"${COMMAND}\""
+COMMAND="cd '${ROOT}' && exec scripts/watch_plan2_gpu.sh >> '${LOG}' 2>&1"
+"${TMUX_BIN}" new-window -d -t "${SESSION}" -n "${WINDOW}" "${COMMAND}"
 "${TMUX_BIN}" set-option -t "${SESSION}:${WINDOW}" remain-on-exit on
 printf '已启动 GPU 监测：session=%s window=%s log=%s\n' "${SESSION}" "${WINDOW}" "${LOG}"
