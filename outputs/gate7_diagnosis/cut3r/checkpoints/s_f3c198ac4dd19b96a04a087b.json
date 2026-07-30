@@ -1,0 +1,2198 @@
+{
+  "adapter_version": "gate7-cut3r-rgb-v1-diag-v1",
+  "baseline_reproduction_pass": true,
+  "camera_trajectories": {
+    "stable": [
+      [
+        [
+          1.0,
+          -3.106337317149155e-05,
+          -0.00024072409723885357,
+          0.00013800380111206323
+        ],
+        [
+          3.105655559920706e-05,
+          1.0,
+          -2.83321896858979e-05,
+          0.0003952029801439494
+        ],
+        [
+          0.00024072497035376728,
+          2.8324713639449328e-05,
+          1.0,
+          -0.00012963310291524976
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      [
+        [
+          0.9847920536994934,
+          0.03847317770123482,
+          -0.16942381858825684,
+          0.09572433680295944
+        ],
+        [
+          -0.024020032957196236,
+          0.9959582686424255,
+          0.086545929312706,
+          -0.3977711498737335
+        ],
+        [
+          0.1720687448978424,
+          -0.08116017282009125,
+          0.98173588514328,
+          0.5353316068649292
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      [
+        [
+          0.21532881259918213,
+          -0.4242742657661438,
+          0.8795594573020935,
+          0.1287120133638382
+        ],
+        [
+          0.4830605387687683,
+          0.8290510177612305,
+          0.2816503047943115,
+          -0.030679915100336075
+        ],
+        [
+          -0.8486966490745544,
+          0.36423301696777344,
+          0.38346874713897705,
+          -0.06472885608673096
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      [
+        [
+          0.9999992251396179,
+          0.0011865755077451468,
+          0.00042186639620922506,
+          0.001539065269753337
+        ],
+        [
+          -0.0011860516387969255,
+          0.9999985098838806,
+          -0.0012398047838360071,
+          0.002066596643999219
+        ],
+        [
+          -0.000423336896346882,
+          0.0012393034994602203,
+          0.9999991655349731,
+          0.000720179290510714
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      [
+        [
+          -0.9994165897369385,
+          0.03254221752285957,
+          -0.010362058877944946,
+          -0.35816437005996704
+        ],
+        [
+          0.007047408260405064,
+          0.49338996410369873,
+          0.869779646396637,
+          -0.18103665113449097
+        ],
+        [
+          0.033417098224163055,
+          0.8691992163658142,
+          -0.4933314323425293,
+          0.22074463963508606
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    ],
+    "stale": [
+      [
+        [
+          1.0,
+          -3.106337317149155e-05,
+          -0.00024072409723885357,
+          0.00013800380111206323
+        ],
+        [
+          3.105655559920706e-05,
+          1.0,
+          -2.83321896858979e-05,
+          0.0003952029801439494
+        ],
+        [
+          0.00024072497035376728,
+          2.8324713639449328e-05,
+          1.0,
+          -0.00012963310291524976
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      [
+        [
+          0.9847920536994934,
+          0.03847317770123482,
+          -0.16942381858825684,
+          0.09572433680295944
+        ],
+        [
+          -0.024020032957196236,
+          0.9959582686424255,
+          0.086545929312706,
+          -0.3977711498737335
+        ],
+        [
+          0.1720687448978424,
+          -0.08116017282009125,
+          0.98173588514328,
+          0.5353316068649292
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      [
+        [
+          0.21532881259918213,
+          -0.4242742657661438,
+          0.8795594573020935,
+          0.1287120133638382
+        ],
+        [
+          0.4830605387687683,
+          0.8290510177612305,
+          0.2816503047943115,
+          -0.030679915100336075
+        ],
+        [
+          -0.8486966490745544,
+          0.36423301696777344,
+          0.38346874713897705,
+          -0.06472885608673096
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      [
+        [
+          -0.9994337558746338,
+          0.03221684694290161,
+          -0.009691061452031136,
+          -0.23644104599952698
+        ],
+        [
+          0.007507325150072575,
+          0.4943618178367615,
+          0.8692237734794617,
+          -0.11252640932798386
+        ],
+        [
+          0.032794542610645294,
+          0.8686589598655701,
+          -0.49432373046875,
+          0.1586696058511734
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      [
+        [
+          0.9999986886978149,
+          0.0013853656128048897,
+          -0.000862238637637347,
+          0.00016036024317145348
+        ],
+        [
+          -0.0013863863423466682,
+          0.9999983310699463,
+          -0.001184262102469802,
+          0.0015914990799501538
+        ],
+        [
+          0.0008605965995229781,
+          0.0011854558251798153,
+          0.999998927116394,
+          -0.0008924440480768681
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    ]
+  },
+  "center_crop_fraction": 0.12,
+  "checkpoint_sha256": "45f7e98a0a64dbeb54901ae2b878cd8cd125f20a4497316483f0bd6f109f8103",
+  "completed_at": "2026-07-30T11:21:10.301659+00:00",
+  "diagnostic_config_sha256": "ad2c3128352b786b996eafd1045d5c62ebbc419a4ee9ec21c69f7dd49fc03620",
+  "diagnostic_only": true,
+  "diagnostic_selectors": {
+    "center_0.12": {
+      "historical": {
+        "answers": {
+          "front_behind": "front",
+          "left_right": "left",
+          "target_nearer": true,
+          "which_closer": "target"
+        },
+        "donor": {
+          "confidence_median": 1.5647459626197815,
+          "confidence_threshold": 1.4788956046104431,
+          "eligible_pixel_count": 2116,
+          "mad_xyz": [
+            0.019460946321487427,
+            0.03141775727272034,
+            0.011244773864746094
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_donor_donor.npy",
+          "mask_pixel_count": 635,
+          "mask_purity": 0.0,
+          "mask_recall": 0.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+          "query_camera": [
+            -1.8127484619316434,
+            0.602235636978945,
+            0.4689598388334342
+          ],
+          "region_pixel_count": 2116,
+          "selected_pixel_count": 1058,
+          "selection_xyxy": [
+            233,
+            169,
+            279,
+            215
+          ],
+          "selector": "center_0.12",
+          "world": [
+            -0.1046600267291069,
+            -0.2749803811311722,
+            1.8729302883148193
+          ]
+        },
+        "query_camera_to_world": [
+          [
+            0.21532881259918213,
+            -0.4242742657661438,
+            0.8795594573020935,
+            0.1287120133638382
+          ],
+          [
+            0.4830605387687683,
+            0.8290510177612305,
+            0.2816503047943115,
+            -0.030679915100336075
+          ],
+          [
+            -0.8486966490745544,
+            0.36423301696777344,
+            0.38346874713897705,
+            -0.06472885608673096
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "target": {
+          "confidence_median": 9.242753505706787,
+          "confidence_threshold": 8.944650650024414,
+          "eligible_pixel_count": 2116,
+          "mad_xyz": [
+            0.020631084451451898,
+            0.022783025866374373,
+            0.03882521390914917
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_target_target.npy",
+          "mask_pixel_count": 1609,
+          "mask_purity": 0.0,
+          "mask_recall": 0.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+          "query_camera": [
+            -1.122720335915039,
+            0.5791549439875936,
+            0.3917564111761847
+          ],
+          "region_pixel_count": 2116,
+          "selected_pixel_count": 1058,
+          "selection_xyxy": [
+            233,
+            169,
+            279,
+            215
+          ],
+          "selector": "center_0.12",
+          "world": [
+            -0.014189542271196842,
+            0.017465531826019287,
+            1.249293863773346
+          ]
+        }
+      },
+      "stable_reobserve": {
+        "answers": {
+          "front_behind": "front",
+          "left_right": "left",
+          "target_nearer": false,
+          "which_closer": "reference"
+        },
+        "donor": {
+          "confidence_median": 1.6472524404525757,
+          "confidence_threshold": 1.611450433731079,
+          "eligible_pixel_count": 2116,
+          "mad_xyz": [
+            0.02352142333984375,
+            0.022238969802856445,
+            0.015616968274116516
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_donor_donor.npy",
+          "mask_pixel_count": 635,
+          "mask_purity": 0.0,
+          "mask_recall": 0.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+          "query_camera": [
+            0.7926299812144844,
+            0.9599034180225852,
+            -0.32455623750564655
+          ],
+          "region_pixel_count": 2116,
+          "selected_pixel_count": 1058,
+          "selection_xyxy": [
+            233,
+            169,
+            279,
+            215
+          ],
+          "selector": "center_0.12",
+          "world": [
+            -0.3933407664299011,
+            1.0566059350967407,
+            -0.5122599005699158
+          ]
+        },
+        "query_camera_to_world": [
+          [
+            0.21532881259918213,
+            -0.4242742657661438,
+            0.8795594573020935,
+            0.1287120133638382
+          ],
+          [
+            0.4830605387687683,
+            0.8290510177612305,
+            0.2816503047943115,
+            -0.030679915100336075
+          ],
+          [
+            -0.8486966490745544,
+            0.36423301696777344,
+            0.38346874713897705,
+            -0.06472885608673096
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "target": {
+          "confidence_median": 7.866735219955444,
+          "confidence_threshold": 7.6072680950164795,
+          "eligible_pixel_count": 2116,
+          "mad_xyz": [
+            0.02172312280163169,
+            0.022925715427845716,
+            0.03636789321899414
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_target_target.npy",
+          "mask_pixel_count": 1609,
+          "mask_purity": 0.0,
+          "mask_recall": 0.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+          "query_camera": [
+            -1.1355171974304703,
+            0.5853640397793957,
+            0.39817835527891265
+          ],
+          "region_pixel_count": 2116,
+          "selected_pixel_count": 1058,
+          "selection_xyxy": [
+            233,
+            169,
+            279,
+            215
+          ],
+          "selector": "center_0.12",
+          "world": [
+            -0.013930953573435545,
+            0.018240272998809814,
+            1.2648786902427673
+          ]
+        }
+      },
+      "stale_reobserve": {
+        "answers": {
+          "front_behind": "behind",
+          "left_right": "right",
+          "target_nearer": false,
+          "which_closer": "reference"
+        },
+        "donor": {
+          "confidence_median": 6.4012956619262695,
+          "confidence_threshold": 6.1674816608428955,
+          "eligible_pixel_count": 2116,
+          "mad_xyz": [
+            0.021170679479837418,
+            0.02322098147124052,
+            0.03669005632400513
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_stale_donor_donor.npy",
+          "mask_pixel_count": 1609,
+          "mask_purity": 0.0,
+          "mask_recall": 0.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+          "query_camera": [
+            -1.1279579234283204,
+            0.581708979584622,
+            0.39773756300936913
+          ],
+          "region_pixel_count": 2116,
+          "selected_pixel_count": 1058,
+          "selection_xyxy": [
+            233,
+            169,
+            279,
+            215
+          ],
+          "selector": "center_0.12",
+          "world": [
+            -0.011140178889036179,
+            0.018737479113042355,
+            1.2569628357887268
+          ]
+        },
+        "query_camera_to_world": [
+          [
+            0.21532881259918213,
+            -0.4242742657661438,
+            0.8795594573020935,
+            0.1287120133638382
+          ],
+          [
+            0.4830605387687683,
+            0.8290510177612305,
+            0.2816503047943115,
+            -0.030679915100336075
+          ],
+          [
+            -0.8486966490745544,
+            0.36423301696777344,
+            0.38346874713897705,
+            -0.06472885608673096
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "target": {
+          "confidence_median": 1.8557053804397583,
+          "confidence_threshold": 1.8078478574752808,
+          "eligible_pixel_count": 2116,
+          "mad_xyz": [
+            0.02016530930995941,
+            0.02097851037979126,
+            0.01774844527244568
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_stale_target_target.npy",
+          "mask_pixel_count": 635,
+          "mask_purity": 0.0,
+          "mask_recall": 0.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+          "query_camera": [
+            0.9571528758325296,
+            0.9778257218238089,
+            -0.22258033890910145
+          ],
+          "region_pixel_count": 2116,
+          "selected_pixel_count": 1058,
+          "selection_xyxy": [
+            233,
+            169,
+            279,
+            215
+          ],
+          "selector": "center_0.12",
+          "world": [
+            -0.2758243530988693,
+            1.1796604990959167,
+            -0.6062574684619904
+          ]
+        }
+      },
+      "stale_sequence_historical": {
+        "answers": {
+          "front_behind": "front",
+          "left_right": "left",
+          "target_nearer": true,
+          "which_closer": "target"
+        },
+        "donor": {
+          "confidence_median": 1.5647459626197815,
+          "confidence_threshold": 1.4788956046104431,
+          "eligible_pixel_count": 2116,
+          "mad_xyz": [
+            0.019460946321487427,
+            0.03141775727272034,
+            0.011244773864746094
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_donor_donor.npy",
+          "mask_pixel_count": 635,
+          "mask_purity": 0.0,
+          "mask_recall": 0.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+          "query_camera": [
+            -1.8127484619316434,
+            0.602235636978945,
+            0.4689598388334342
+          ],
+          "region_pixel_count": 2116,
+          "selected_pixel_count": 1058,
+          "selection_xyxy": [
+            233,
+            169,
+            279,
+            215
+          ],
+          "selector": "center_0.12",
+          "world": [
+            -0.1046600267291069,
+            -0.2749803811311722,
+            1.8729302883148193
+          ]
+        },
+        "query_camera_to_world": [
+          [
+            0.21532881259918213,
+            -0.4242742657661438,
+            0.8795594573020935,
+            0.1287120133638382
+          ],
+          [
+            0.4830605387687683,
+            0.8290510177612305,
+            0.2816503047943115,
+            -0.030679915100336075
+          ],
+          [
+            -0.8486966490745544,
+            0.36423301696777344,
+            0.38346874713897705,
+            -0.06472885608673096
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "target": {
+          "confidence_median": 9.242753505706787,
+          "confidence_threshold": 8.944650650024414,
+          "eligible_pixel_count": 2116,
+          "mad_xyz": [
+            0.020631084451451898,
+            0.022783025866374373,
+            0.03882521390914917
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_target_target.npy",
+          "mask_pixel_count": 1609,
+          "mask_purity": 0.0,
+          "mask_recall": 0.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+          "query_camera": [
+            -1.122720335915039,
+            0.5791549439875936,
+            0.3917564111761847
+          ],
+          "region_pixel_count": 2116,
+          "selected_pixel_count": 1058,
+          "selection_xyxy": [
+            233,
+            169,
+            279,
+            215
+          ],
+          "selector": "center_0.12",
+          "world": [
+            -0.014189542271196842,
+            0.017465531826019287,
+            1.249293863773346
+          ]
+        }
+      }
+    },
+    "gt_bbox": {
+      "historical": {
+        "answers": {
+          "front_behind": "behind",
+          "left_right": "left",
+          "target_nearer": false,
+          "which_closer": "reference"
+        },
+        "donor": {
+          "confidence_median": 2.1570534706115723,
+          "confidence_threshold": 2.1091173887252808,
+          "eligible_pixel_count": 748,
+          "mad_xyz": [
+            0.011616595089435577,
+            0.004488945007324219,
+            0.021159112453460693
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_donor_donor.npy",
+          "mask_pixel_count": 635,
+          "mask_purity": 0.8489304812834224,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+          "query_camera": [
+            -1.478813058685745,
+            0.588859172307354,
+            0.45420398174932286
+          ],
+          "region_pixel_count": 748,
+          "selected_pixel_count": 374,
+          "selection_xyxy": [
+            249,
+            257,
+            283,
+            279
+          ],
+          "selector": "gt_bbox",
+          "world": [
+            -0.040057472884655,
+            -0.12891513109207153,
+            1.578989863395691
+          ]
+        },
+        "query_camera_to_world": [
+          [
+            0.21532881259918213,
+            -0.4242742657661438,
+            0.8795594573020935,
+            0.1287120133638382
+          ],
+          [
+            0.4830605387687683,
+            0.8290510177612305,
+            0.2816503047943115,
+            -0.030679915100336075
+          ],
+          [
+            -0.8486966490745544,
+            0.36423301696777344,
+            0.38346874713897705,
+            -0.06472885608673096
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "target": {
+          "confidence_median": 5.216842412948608,
+          "confidence_threshold": 4.413396835327148,
+          "eligible_pixel_count": 2280,
+          "mad_xyz": [
+            0.01687215268611908,
+            0.03155968710780144,
+            0.017107605934143066
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_target_target.npy",
+          "mask_pixel_count": 1609,
+          "mask_purity": 0.7057017543859649,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+          "query_camera": [
+            -1.497060820514872,
+            0.7381703555535948,
+            -0.00794172197262455
+          ],
+          "region_pixel_count": 2280,
+          "selected_pixel_count": 1140,
+          "selection_xyxy": [
+            80,
+            105,
+            118,
+            165
+          ],
+          "selector": "gt_bbox",
+          "world": [
+            -0.5138202607631683,
+            -0.14410678297281265,
+            1.4716423153877258
+          ]
+        }
+      },
+      "stable_reobserve": {
+        "answers": {
+          "front_behind": "front",
+          "left_right": "left",
+          "target_nearer": false,
+          "which_closer": "reference"
+        },
+        "donor": {
+          "confidence_median": 2.376701593399048,
+          "confidence_threshold": 2.3337435722351074,
+          "eligible_pixel_count": 748,
+          "mad_xyz": [
+            0.017239466309547424,
+            0.010562658309936523,
+            0.015054181218147278
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_donor_donor.npy",
+          "mask_pixel_count": 635,
+          "mask_purity": 0.8489304812834224,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+          "query_camera": [
+            0.455906706930455,
+            0.9453929256148941,
+            -0.25020856016699256
+          ],
+          "region_pixel_count": 748,
+          "selected_pixel_count": 374,
+          "selection_xyxy": [
+            249,
+            257,
+            283,
+            279
+          ],
+          "selector": "gt_bbox",
+          "world": [
+            -0.39429736137390137,
+            0.902858316898346,
+            -0.2032591700553894
+          ]
+        },
+        "query_camera_to_world": [
+          [
+            0.21532881259918213,
+            -0.4242742657661438,
+            0.8795594573020935,
+            0.1287120133638382
+          ],
+          [
+            0.4830605387687683,
+            0.8290510177612305,
+            0.2816503047943115,
+            -0.030679915100336075
+          ],
+          [
+            -0.8486966490745544,
+            0.36423301696777344,
+            0.38346874713897705,
+            -0.06472885608673096
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "target": {
+          "confidence_median": 4.367182970046997,
+          "confidence_threshold": 3.462845802307129,
+          "eligible_pixel_count": 2280,
+          "mad_xyz": [
+            0.0187985897064209,
+            0.029802128672599792,
+            0.015338420867919922
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_target_target.npy",
+          "mask_pixel_count": 1609,
+          "mask_purity": 0.7057017543859649,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+          "query_camera": [
+            -1.511452072190164,
+            0.7446578164861686,
+            0.001701126636108441
+          ],
+          "region_pixel_count": 2280,
+          "selected_pixel_count": 1140,
+          "selection_xyxy": [
+            80,
+            105,
+            118,
+            165
+          ],
+          "selector": "gt_bbox",
+          "world": [
+            -0.5111901164054871,
+            -0.14296428114175797,
+            1.4899168014526367
+          ]
+        }
+      },
+      "stale_reobserve": {
+        "answers": {
+          "front_behind": "behind",
+          "left_right": "right",
+          "target_nearer": true,
+          "which_closer": "target"
+        },
+        "donor": {
+          "confidence_median": 3.6279499530792236,
+          "confidence_threshold": 2.9779982566833496,
+          "eligible_pixel_count": 2280,
+          "mad_xyz": [
+            0.018715038895606995,
+            0.029720664024353027,
+            0.01494687795639038
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_stale_donor_donor.npy",
+          "mask_pixel_count": 1609,
+          "mask_purity": 0.7057017543859649,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+          "query_camera": [
+            -1.5010267045199537,
+            0.7395758037872904,
+            0.0005555100318961337
+          ],
+          "region_pixel_count": 2280,
+          "selected_pixel_count": 1140,
+          "selection_xyxy": [
+            80,
+            105,
+            118,
+            165
+          ],
+          "selector": "gt_bbox",
+          "world": [
+            -0.5077967047691345,
+            -0.14246410876512527,
+            1.4787784814834595
+          ]
+        },
+        "query_camera_to_world": [
+          [
+            0.21532881259918213,
+            -0.4242742657661438,
+            0.8795594573020935,
+            0.1287120133638382
+          ],
+          [
+            0.4830605387687683,
+            0.8290510177612305,
+            0.2816503047943115,
+            -0.030679915100336075
+          ],
+          [
+            -0.8486966490745544,
+            0.36423301696777344,
+            0.38346874713897705,
+            -0.06472885608673096
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "target": {
+          "confidence_median": 2.543856382369995,
+          "confidence_threshold": 2.5036691427230835,
+          "eligible_pixel_count": 748,
+          "mad_xyz": [
+            0.0159771591424942,
+            0.007864415645599365,
+            0.013326436281204224
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_stale_target_target.npy",
+          "mask_pixel_count": 635,
+          "mask_purity": 0.8489304812834224,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+          "query_camera": [
+            0.6024887272516739,
+            0.9448457909681327,
+            -0.15169492205643476
+          ],
+          "region_pixel_count": 748,
+          "selected_pixel_count": 374,
+          "selection_xyxy": [
+            249,
+            257,
+            283,
+            279
+          ],
+          "selector": "gt_bbox",
+          "world": [
+            -0.2758532911539078,
+            1.0009590983390808,
+            -0.29008522629737854
+          ]
+        }
+      },
+      "stale_sequence_historical": {
+        "answers": {
+          "front_behind": "behind",
+          "left_right": "left",
+          "target_nearer": false,
+          "which_closer": "reference"
+        },
+        "donor": {
+          "confidence_median": 2.1570534706115723,
+          "confidence_threshold": 2.1091173887252808,
+          "eligible_pixel_count": 748,
+          "mad_xyz": [
+            0.011616595089435577,
+            0.004488945007324219,
+            0.021159112453460693
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_donor_donor.npy",
+          "mask_pixel_count": 635,
+          "mask_purity": 0.8489304812834224,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+          "query_camera": [
+            -1.478813058685745,
+            0.588859172307354,
+            0.45420398174932286
+          ],
+          "region_pixel_count": 748,
+          "selected_pixel_count": 374,
+          "selection_xyxy": [
+            249,
+            257,
+            283,
+            279
+          ],
+          "selector": "gt_bbox",
+          "world": [
+            -0.040057472884655,
+            -0.12891513109207153,
+            1.578989863395691
+          ]
+        },
+        "query_camera_to_world": [
+          [
+            0.21532881259918213,
+            -0.4242742657661438,
+            0.8795594573020935,
+            0.1287120133638382
+          ],
+          [
+            0.4830605387687683,
+            0.8290510177612305,
+            0.2816503047943115,
+            -0.030679915100336075
+          ],
+          [
+            -0.8486966490745544,
+            0.36423301696777344,
+            0.38346874713897705,
+            -0.06472885608673096
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "target": {
+          "confidence_median": 5.216842412948608,
+          "confidence_threshold": 4.413396835327148,
+          "eligible_pixel_count": 2280,
+          "mad_xyz": [
+            0.01687215268611908,
+            0.03155968710780144,
+            0.017107605934143066
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_target_target.npy",
+          "mask_pixel_count": 1609,
+          "mask_purity": 0.7057017543859649,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+          "query_camera": [
+            -1.497060820514872,
+            0.7381703555535948,
+            -0.00794172197262455
+          ],
+          "region_pixel_count": 2280,
+          "selected_pixel_count": 1140,
+          "selection_xyxy": [
+            80,
+            105,
+            118,
+            165
+          ],
+          "selector": "gt_bbox",
+          "world": [
+            -0.5138202607631683,
+            -0.14410678297281265,
+            1.4716423153877258
+          ]
+        }
+      }
+    },
+    "gt_mask": {
+      "historical": {
+        "answers": {
+          "front_behind": "behind",
+          "left_right": "left",
+          "target_nearer": false,
+          "which_closer": "reference"
+        },
+        "donor": {
+          "confidence_median": 2.157233715057373,
+          "confidence_threshold": 2.1198348999023438,
+          "eligible_pixel_count": 635,
+          "mad_xyz": [
+            0.010669417679309845,
+            0.0038212984800338745,
+            0.02283608913421631
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_donor_donor.npy",
+          "mask_pixel_count": 635,
+          "mask_purity": 1.0,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+          "query_camera": [
+            -1.4840888712727607,
+            0.5911687439287636,
+            0.45498559888889023
+          ],
+          "region_pixel_count": 635,
+          "selected_pixel_count": 318,
+          "selection_xyxy": [
+            249,
+            257,
+            283,
+            279
+          ],
+          "selector": "gt_mask",
+          "world": [
+            -0.041485920548439026,
+            -0.12932877242565155,
+            1.5846083760261536
+          ]
+        },
+        "query_camera_to_world": [
+          [
+            0.21532881259918213,
+            -0.4242742657661438,
+            0.8795594573020935,
+            0.1287120133638382
+          ],
+          [
+            0.4830605387687683,
+            0.8290510177612305,
+            0.2816503047943115,
+            -0.030679915100336075
+          ],
+          [
+            -0.8486966490745544,
+            0.36423301696777344,
+            0.38346874713897705,
+            -0.06472885608673096
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "target": {
+          "confidence_median": 5.295337200164795,
+          "confidence_threshold": 4.631346702575684,
+          "eligible_pixel_count": 1609,
+          "mad_xyz": [
+            0.016489803791046143,
+            0.022089257836341858,
+            0.013026237487792969
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_target_target.npy",
+          "mask_pixel_count": 1609,
+          "mask_purity": 1.0,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+          "query_camera": [
+            -1.5005556698407008,
+            0.7453384200540514,
+            -0.004819967433249417
+          ],
+          "region_pixel_count": 1609,
+          "selected_pixel_count": 805,
+          "selection_xyxy": [
+            80,
+            105,
+            118,
+            165
+          ],
+          "selector": "gt_mask",
+          "world": [
+            -0.5148682594299316,
+            -0.13897307217121124,
+            1.4784163236618042
+          ]
+        }
+      },
+      "stable_reobserve": {
+        "answers": {
+          "front_behind": "front",
+          "left_right": "left",
+          "target_nearer": false,
+          "which_closer": "reference"
+        },
+        "donor": {
+          "confidence_median": 2.3753743171691895,
+          "confidence_threshold": 2.3364577293395996,
+          "eligible_pixel_count": 635,
+          "mad_xyz": [
+            0.014809906482696533,
+            0.009327232837677002,
+            0.011483192443847656
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_donor_donor.npy",
+          "mask_pixel_count": 635,
+          "mask_purity": 1.0,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+          "query_camera": [
+            0.46052118334342995,
+            0.9460535113100788,
+            -0.250129795107112
+          ],
+          "region_pixel_count": 635,
+          "selected_pixel_count": 318,
+          "selection_xyxy": [
+            249,
+            257,
+            283,
+            279
+          ],
+          "selector": "gt_mask",
+          "world": [
+            -0.3935147225856781,
+            0.9056572318077087,
+            -0.20690464973449707
+          ]
+        },
+        "query_camera_to_world": [
+          [
+            0.21532881259918213,
+            -0.4242742657661438,
+            0.8795594573020935,
+            0.1287120133638382
+          ],
+          [
+            0.4830605387687683,
+            0.8290510177612305,
+            0.2816503047943115,
+            -0.030679915100336075
+          ],
+          [
+            -0.8486966490745544,
+            0.36423301696777344,
+            0.38346874713897705,
+            -0.06472885608673096
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "target": {
+          "confidence_median": 4.521058082580566,
+          "confidence_threshold": 3.7699766159057617,
+          "eligible_pixel_count": 1609,
+          "mad_xyz": [
+            0.017307013273239136,
+            0.022352159023284912,
+            0.011298060417175293
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_target_target.npy",
+          "mask_pixel_count": 1609,
+          "mask_purity": 1.0,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+          "query_camera": [
+            -1.5130552291756951,
+            0.7508387894914117,
+            0.005059811807104353
+          ],
+          "region_pixel_count": 1609,
+          "selected_pixel_count": 805,
+          "selection_xyxy": [
+            80,
+            105,
+            118,
+            165
+          ],
+          "selector": "gt_mask",
+          "world": [
+            -0.5112035870552063,
+            -0.13766838610172272,
+            1.4948166608810425
+          ]
+        }
+      },
+      "stale_reobserve": {
+        "answers": {
+          "front_behind": "behind",
+          "left_right": "right",
+          "target_nearer": true,
+          "which_closer": "target"
+        },
+        "donor": {
+          "confidence_median": 3.7540535926818848,
+          "confidence_threshold": 3.198432207107544,
+          "eligible_pixel_count": 1609,
+          "mad_xyz": [
+            0.016862034797668457,
+            0.022328943014144897,
+            0.011228322982788086
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_stale_donor_donor.npy",
+          "mask_pixel_count": 1609,
+          "mask_purity": 1.0,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+          "query_camera": [
+            -1.5020585691110828,
+            0.745327382640661,
+            0.00416016381652895
+          ],
+          "region_pixel_count": 1609,
+          "selected_pixel_count": 805,
+          "selection_xyxy": [
+            80,
+            105,
+            118,
+            165
+          ],
+          "selector": "gt_mask",
+          "world": [
+            -0.5072886347770691,
+            -0.1371789574623108,
+            1.4831314086914062
+          ]
+        },
+        "query_camera_to_world": [
+          [
+            0.21532881259918213,
+            -0.4242742657661438,
+            0.8795594573020935,
+            0.1287120133638382
+          ],
+          [
+            0.4830605387687683,
+            0.8290510177612305,
+            0.2816503047943115,
+            -0.030679915100336075
+          ],
+          [
+            -0.8486966490745544,
+            0.36423301696777344,
+            0.38346874713897705,
+            -0.06472885608673096
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "target": {
+          "confidence_median": 2.5405168533325195,
+          "confidence_threshold": 2.5055229663848877,
+          "eligible_pixel_count": 635,
+          "mad_xyz": [
+            0.01522594690322876,
+            0.006763100624084473,
+            0.010438203811645508
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_stale_target_target.npy",
+          "mask_pixel_count": 635,
+          "mask_purity": 1.0,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+          "query_camera": [
+            0.605865614392793,
+            0.9443664604418585,
+            -0.15078526529121028
+          ],
+          "region_pixel_count": 635,
+          "selected_pixel_count": 318,
+          "selection_xyxy": [
+            249,
+            257,
+            283,
+            279
+          ],
+          "selector": "gt_mask",
+          "world": [
+            -0.2741226851940155,
+            1.0024491548538208,
+            -0.2927769422531128
+          ]
+        }
+      },
+      "stale_sequence_historical": {
+        "answers": {
+          "front_behind": "behind",
+          "left_right": "left",
+          "target_nearer": false,
+          "which_closer": "reference"
+        },
+        "donor": {
+          "confidence_median": 2.157233715057373,
+          "confidence_threshold": 2.1198348999023438,
+          "eligible_pixel_count": 635,
+          "mad_xyz": [
+            0.010669417679309845,
+            0.0038212984800338745,
+            0.02283608913421631
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_donor_donor.npy",
+          "mask_pixel_count": 635,
+          "mask_purity": 1.0,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+          "query_camera": [
+            -1.4840888712727607,
+            0.5911687439287636,
+            0.45498559888889023
+          ],
+          "region_pixel_count": 635,
+          "selected_pixel_count": 318,
+          "selection_xyxy": [
+            249,
+            257,
+            283,
+            279
+          ],
+          "selector": "gt_mask",
+          "world": [
+            -0.041485920548439026,
+            -0.12932877242565155,
+            1.5846083760261536
+          ]
+        },
+        "query_camera_to_world": [
+          [
+            0.21532881259918213,
+            -0.4242742657661438,
+            0.8795594573020935,
+            0.1287120133638382
+          ],
+          [
+            0.4830605387687683,
+            0.8290510177612305,
+            0.2816503047943115,
+            -0.030679915100336075
+          ],
+          [
+            -0.8486966490745544,
+            0.36423301696777344,
+            0.38346874713897705,
+            -0.06472885608673096
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "target": {
+          "confidence_median": 5.295337200164795,
+          "confidence_threshold": 4.631346702575684,
+          "eligible_pixel_count": 1609,
+          "mad_xyz": [
+            0.016489803791046143,
+            0.022089257836341858,
+            0.013026237487792969
+          ],
+          "mapped_shape": [
+            384,
+            512
+          ],
+          "mask_original_shape": [
+            300,
+            300
+          ],
+          "mask_path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_target_target.npy",
+          "mask_pixel_count": 1609,
+          "mask_purity": 1.0,
+          "mask_recall": 1.0,
+          "mask_resize": "nearest",
+          "mask_sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+          "query_camera": [
+            -1.5005556698407008,
+            0.7453384200540514,
+            -0.004819967433249417
+          ],
+          "region_pixel_count": 1609,
+          "selected_pixel_count": 805,
+          "selection_xyxy": [
+            80,
+            105,
+            118,
+            165
+          ],
+          "selector": "gt_mask",
+          "world": [
+            -0.5148682594299316,
+            -0.13897307217121124,
+            1.4784163236618042
+          ]
+        }
+      }
+    }
+  },
+  "eligible_as_main_result": false,
+  "episode_count": 12,
+  "fingerprint": "b041270a2127d56a80bdf0a3226ebddf450e0b02d80c454f9a710da51dfc5ae5",
+  "grounding_note": "只使用目标居中验证帧的角色和中心区域，不读取 depth、instance mask 或私有答案。",
+  "group_id": "s_f3c198ac4dd19b96a04a087b",
+  "historical": {
+    "answers": {
+      "front_behind": "front",
+      "left_right": "left",
+      "target_nearer": true,
+      "which_closer": "target"
+    },
+    "donor": {
+      "confidence_median": 1.5647459626197815,
+      "crop_xyxy": [
+        233,
+        169,
+        279,
+        215
+      ],
+      "query_camera": [
+        -1.8127484619316434,
+        0.602235636978945,
+        0.4689598388334342
+      ],
+      "selected_pixel_count": 1058,
+      "world": [
+        -0.1046600267291069,
+        -0.2749803811311722,
+        1.8729302883148193
+      ]
+    },
+    "query_camera_to_world": [
+      [
+        0.21532881259918213,
+        -0.4242742657661438,
+        0.8795594573020935,
+        0.1287120133638382
+      ],
+      [
+        0.4830605387687683,
+        0.8290510177612305,
+        0.2816503047943115,
+        -0.030679915100336075
+      ],
+      [
+        -0.8486966490745544,
+        0.36423301696777344,
+        0.38346874713897705,
+        -0.06472885608673096
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "target": {
+      "confidence_median": 9.242753505706787,
+      "crop_xyxy": [
+        233,
+        169,
+        279,
+        215
+      ],
+      "query_camera": [
+        -1.122720335915039,
+        0.5791549439875936,
+        0.3917564111761847
+      ],
+      "selected_pixel_count": 1058,
+      "world": [
+        -0.014189542271196842,
+        0.017465531826019287,
+        1.249293863773346
+      ]
+    }
+  },
+  "image_size": 512,
+  "input_mode": "rgb_only_centered_verification_frame",
+  "inputs": [
+    {
+      "index": 0,
+      "path": "data/episodes/spatial30/cache/rgb/s_f3c198ac4dd19b96a04a087b_history_target.png",
+      "scenario": "stable",
+      "sha256": "79fa0f4dedf33213f881520782a6ab96b7d9823dba07b650e75cfee616f0c00a"
+    },
+    {
+      "index": 1,
+      "path": "data/episodes/spatial30/cache/rgb/s_f3c198ac4dd19b96a04a087b_history_donor.png",
+      "scenario": "stable",
+      "sha256": "f0a5b88e25d1ee2061f1b95f1a17a2a230cc9bd1f450616b56b93d065cbc23b5"
+    },
+    {
+      "index": 2,
+      "path": "data/episodes/spatial30/cache/rgb/s_f3c198ac4dd19b96a04a087b_query_stable.png",
+      "scenario": "stable",
+      "sha256": "9fb173678b8462a0af945086877c888d06dd95113c7ed472aa93f8edd2382db5"
+    },
+    {
+      "index": 3,
+      "path": "data/episodes/spatial30/cache/rgb/s_f3c198ac4dd19b96a04a087b_history_target.png",
+      "scenario": "stable",
+      "sha256": "79fa0f4dedf33213f881520782a6ab96b7d9823dba07b650e75cfee616f0c00a"
+    },
+    {
+      "index": 4,
+      "path": "data/episodes/spatial30/cache/rgb/s_f3c198ac4dd19b96a04a087b_history_donor.png",
+      "scenario": "stable",
+      "sha256": "f0a5b88e25d1ee2061f1b95f1a17a2a230cc9bd1f450616b56b93d065cbc23b5"
+    },
+    {
+      "index": 0,
+      "path": "data/episodes/spatial30/cache/rgb/s_f3c198ac4dd19b96a04a087b_history_target.png",
+      "scenario": "stale",
+      "sha256": "79fa0f4dedf33213f881520782a6ab96b7d9823dba07b650e75cfee616f0c00a"
+    },
+    {
+      "index": 1,
+      "path": "data/episodes/spatial30/cache/rgb/s_f3c198ac4dd19b96a04a087b_history_donor.png",
+      "scenario": "stale",
+      "sha256": "f0a5b88e25d1ee2061f1b95f1a17a2a230cc9bd1f450616b56b93d065cbc23b5"
+    },
+    {
+      "index": 2,
+      "path": "data/episodes/spatial30/cache/rgb/s_f3c198ac4dd19b96a04a087b_query_stable.png",
+      "scenario": "stale",
+      "sha256": "9fb173678b8462a0af945086877c888d06dd95113c7ed472aa93f8edd2382db5"
+    },
+    {
+      "index": 3,
+      "path": "data/episodes/spatial30/cache/rgb/s_f3c198ac4dd19b96a04a087b_stale_target.png",
+      "scenario": "stale",
+      "sha256": "ef120bceccdb4f95f4a2093169f50dbf0b8450c7bf1ac2d36166add55b86baaf"
+    },
+    {
+      "index": 4,
+      "path": "data/episodes/spatial30/cache/rgb/s_f3c198ac4dd19b96a04a087b_stale_donor.png",
+      "scenario": "stale",
+      "sha256": "8c542a96054147d0f9de43b26dcd2b6b6dda628d0d5603e2b1ce729f25fb8ede"
+    }
+  ],
+  "mask_inputs": [
+    {
+      "nonzero_pixels": 288,
+      "path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_donor_donor.npy",
+      "role": "donor",
+      "scenario": "stable",
+      "sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "current"
+    },
+    {
+      "nonzero_pixels": 732,
+      "path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_target_target.npy",
+      "role": "target",
+      "scenario": "stable",
+      "sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "current"
+    },
+    {
+      "nonzero_pixels": 288,
+      "path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_donor_donor.npy",
+      "role": "donor",
+      "scenario": "stable",
+      "sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "historical"
+    },
+    {
+      "nonzero_pixels": 732,
+      "path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_target_target.npy",
+      "role": "target",
+      "scenario": "stable",
+      "sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "historical"
+    },
+    {
+      "nonzero_pixels": 732,
+      "path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_stale_donor_donor.npy",
+      "role": "donor",
+      "scenario": "stale",
+      "sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "current"
+    },
+    {
+      "nonzero_pixels": 288,
+      "path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_stale_target_target.npy",
+      "role": "target",
+      "scenario": "stale",
+      "sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "current"
+    },
+    {
+      "nonzero_pixels": 288,
+      "path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_donor_donor.npy",
+      "role": "donor",
+      "scenario": "stale",
+      "sha256": "73f65479d6ce87e9598f19bc6d8821fdbfac0e539f594924fbd8b8b9bb95bb5f",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "historical"
+    },
+    {
+      "nonzero_pixels": 732,
+      "path": "data/episodes/spatial30/cache/mask/s_f3c198ac4dd19b96a04a087b_history_target_target.npy",
+      "role": "target",
+      "scenario": "stale",
+      "sha256": "5894fe9c7e9ddaebcd9e76e5298ba90de38d1847584c2ffd826dd39d7c8804bf",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "historical"
+    }
+  ],
+  "peak_allocated_bytes": 3741721088,
+  "protocol_revision": "r001",
+  "qa_revealed": true,
+  "schema_version": 1,
+  "stable_reobserve": {
+    "answers": {
+      "front_behind": "front",
+      "left_right": "left",
+      "target_nearer": false,
+      "which_closer": "reference"
+    },
+    "donor": {
+      "confidence_median": 1.6472524404525757,
+      "crop_xyxy": [
+        233,
+        169,
+        279,
+        215
+      ],
+      "query_camera": [
+        0.7926299812144844,
+        0.9599034180225852,
+        -0.32455623750564655
+      ],
+      "selected_pixel_count": 1058,
+      "world": [
+        -0.3933407664299011,
+        1.0566059350967407,
+        -0.5122599005699158
+      ]
+    },
+    "query_camera_to_world": [
+      [
+        0.21532881259918213,
+        -0.4242742657661438,
+        0.8795594573020935,
+        0.1287120133638382
+      ],
+      [
+        0.4830605387687683,
+        0.8290510177612305,
+        0.2816503047943115,
+        -0.030679915100336075
+      ],
+      [
+        -0.8486966490745544,
+        0.36423301696777344,
+        0.38346874713897705,
+        -0.06472885608673096
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "target": {
+      "confidence_median": 7.866735219955444,
+      "crop_xyxy": [
+        233,
+        169,
+        279,
+        215
+      ],
+      "query_camera": [
+        -1.1355171974304703,
+        0.5853640397793957,
+        0.39817835527891265
+      ],
+      "selected_pixel_count": 1058,
+      "world": [
+        -0.013930953573435545,
+        0.018240272998809814,
+        1.2648786902427673
+      ]
+    }
+  },
+  "stale_reobserve": {
+    "answers": {
+      "front_behind": "behind",
+      "left_right": "right",
+      "target_nearer": false,
+      "which_closer": "reference"
+    },
+    "donor": {
+      "confidence_median": 6.4012956619262695,
+      "crop_xyxy": [
+        233,
+        169,
+        279,
+        215
+      ],
+      "query_camera": [
+        -1.1279579234283204,
+        0.581708979584622,
+        0.39773756300936913
+      ],
+      "selected_pixel_count": 1058,
+      "world": [
+        -0.011140178889036179,
+        0.018737479113042355,
+        1.2569628357887268
+      ]
+    },
+    "query_camera_to_world": [
+      [
+        0.21532881259918213,
+        -0.4242742657661438,
+        0.8795594573020935,
+        0.1287120133638382
+      ],
+      [
+        0.4830605387687683,
+        0.8290510177612305,
+        0.2816503047943115,
+        -0.030679915100336075
+      ],
+      [
+        -0.8486966490745544,
+        0.36423301696777344,
+        0.38346874713897705,
+        -0.06472885608673096
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "target": {
+      "confidence_median": 1.8557053804397583,
+      "crop_xyxy": [
+        233,
+        169,
+        279,
+        215
+      ],
+      "query_camera": [
+        0.9571528758325296,
+        0.9778257218238089,
+        -0.22258033890910145
+      ],
+      "selected_pixel_count": 1058,
+      "world": [
+        -0.2758243530988693,
+        1.1796604990959167,
+        -0.6062574684619904
+      ]
+    }
+  },
+  "stale_sequence_historical": {
+    "answers": {
+      "front_behind": "front",
+      "left_right": "left",
+      "target_nearer": true,
+      "which_closer": "target"
+    },
+    "donor": {
+      "confidence_median": 1.5647459626197815,
+      "crop_xyxy": [
+        233,
+        169,
+        279,
+        215
+      ],
+      "query_camera": [
+        -1.8127484619316434,
+        0.602235636978945,
+        0.4689598388334342
+      ],
+      "selected_pixel_count": 1058,
+      "world": [
+        -0.1046600267291069,
+        -0.2749803811311722,
+        1.8729302883148193
+      ]
+    },
+    "query_camera_to_world": [
+      [
+        0.21532881259918213,
+        -0.4242742657661438,
+        0.8795594573020935,
+        0.1287120133638382
+      ],
+      [
+        0.4830605387687683,
+        0.8290510177612305,
+        0.2816503047943115,
+        -0.030679915100336075
+      ],
+      [
+        -0.8486966490745544,
+        0.36423301696777344,
+        0.38346874713897705,
+        -0.06472885608673096
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "target": {
+      "confidence_median": 9.242753505706787,
+      "crop_xyxy": [
+        233,
+        169,
+        279,
+        215
+      ],
+      "query_camera": [
+        -1.122720335915039,
+        0.5791549439875936,
+        0.3917564111761847
+      ],
+      "selected_pixel_count": 1058,
+      "world": [
+        -0.014189542271196842,
+        0.017465531826019287,
+        1.249293863773346
+      ]
+    }
+  },
+  "status": "success",
+  "timing": {
+    "frame_count": 10,
+    "stable_sequence_seconds": 0.6881749359890819,
+    "stale_sequence_seconds": 0.6081094790133648,
+    "total_seconds": 1.2962844150024466
+  },
+  "uses_gt_mask": true
+}

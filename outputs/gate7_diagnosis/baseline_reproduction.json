@@ -1,0 +1,22 @@
+{
+  "backends": {
+    "cut3r": {
+      "accuracy": 0.5611111111111111,
+      "episode_count": 360,
+      "exact_answer_match_count": 360,
+      "exact_reproduction": true,
+      "published_accuracy": 0.5611111111111111
+    },
+    "vggt": {
+      "accuracy": 0.45,
+      "episode_count": 360,
+      "exact_answer_match_count": 360,
+      "exact_reproduction": true,
+      "published_accuracy": 0.45
+    }
+  },
+  "diagnostic_only": true,
+  "episode_count": 360,
+  "group_count": 30,
+  "schema_version": 1
+}

@@ -1,0 +1,66 @@
+{
+  "baseline_reproduction": {
+    "cut3r": {
+      "accuracy": 0.5611111111111111,
+      "episode_count": 360,
+      "exact_answer_match_count": 360,
+      "exact_reproduction": true,
+      "published_accuracy": 0.5611111111111111
+    },
+    "vggt": {
+      "accuracy": 0.45,
+      "episode_count": 360,
+      "exact_answer_match_count": 360,
+      "exact_reproduction": true,
+      "published_accuracy": 0.45
+    }
+  },
+  "complete": true,
+  "diagnostic_only": true,
+  "pose_failure_count": 4,
+  "role_binding_pass": true,
+  "schema_version": 1,
+  "task_head": {
+    "R0_accuracy": 1.0,
+    "T0_accuracy": 1.0,
+    "TL_accuracy": 0.9805555555555555,
+    "by_question_type": {
+      "front_behind": {
+        "R0_accuracy": 1.0,
+        "T0_accuracy": 1.0,
+        "TL_accuracy": 0.9222222222222223,
+        "count": 90,
+        "legacy_contract_mismatch_count": 7
+      },
+      "left_right": {
+        "R0_accuracy": 1.0,
+        "T0_accuracy": 1.0,
+        "TL_accuracy": 1.0,
+        "count": 90,
+        "legacy_contract_mismatch_count": 0
+      },
+      "target_nearer": {
+        "R0_accuracy": 1.0,
+        "T0_accuracy": 1.0,
+        "TL_accuracy": 1.0,
+        "count": 90,
+        "legacy_contract_mismatch_count": 0
+      },
+      "which_closer": {
+        "R0_accuracy": 1.0,
+        "T0_accuracy": 1.0,
+        "TL_accuracy": 1.0,
+        "count": 90,
+        "legacy_contract_mismatch_count": 0
+      }
+    },
+    "diagnostic_only": true,
+    "episode_count": 360,
+    "front_behind_label_counts": {
+      "behind": 90
+    },
+    "legacy_contract_mismatch_count": 7,
+    "schema_version": 1,
+    "task_semantics_mismatch": true
+  }
+}

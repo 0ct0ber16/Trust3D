@@ -1,0 +1,106 @@
+{
+  "baseline_hashes": [
+    {
+      "actual_sha256": "2c640c1279c7a4724ca60287e6f3ec9f943416ce2964018d2d8397e280fe94d5",
+      "expected_sha256": "2c640c1279c7a4724ca60287e6f3ec9f943416ce2964018d2d8397e280fe94d5",
+      "match": true,
+      "path": "outputs/gate7/validation.json"
+    },
+    {
+      "actual_sha256": "8af0a03e9f4ac956dbcd5f859eb093fc5197d1c581b779eb8367c185a5df40fc",
+      "expected_sha256": "8af0a03e9f4ac956dbcd5f859eb093fc5197d1c581b779eb8367c185a5df40fc",
+      "match": true,
+      "path": "outputs/gate7/predictions.jsonl"
+    },
+    {
+      "actual_sha256": "83a10737770129b97cf36c3b72b616501c9d5910ef49a74b01c446cfe690694c",
+      "expected_sha256": "83a10737770129b97cf36c3b72b616501c9d5910ef49a74b01c446cfe690694c",
+      "match": true,
+      "path": "outputs/gate7/checkpoint_recovery.json"
+    },
+    {
+      "actual_sha256": "426fde42f5ed78d1bca75575ff727e972b9441d335cb5107474128fc5094be76",
+      "expected_sha256": "426fde42f5ed78d1bca75575ff727e972b9441d335cb5107474128fc5094be76",
+      "match": true,
+      "path": "outputs/gate7/cut3r_geometry/manifest.json"
+    },
+    {
+      "actual_sha256": "d36a8bc74de8fc4cc0ac34cce715526f6eb5bb6d9514fece98a15a82041e897a",
+      "expected_sha256": "d36a8bc74de8fc4cc0ac34cce715526f6eb5bb6d9514fece98a15a82041e897a",
+      "match": true,
+      "path": "outputs/plan2/final_decision.json"
+    },
+    {
+      "actual_sha256": "13759a89a66b89ea129e94ef638605f28c575780ca9d9ea53a0c8f4b794cb98b",
+      "expected_sha256": "13759a89a66b89ea129e94ef638605f28c575780ca9d9ea53a0c8f4b794cb98b",
+      "match": true,
+      "path": "outputs/plan2/vggt_validation.json"
+    },
+    {
+      "actual_sha256": "27ccbf98703eba4d48217747d86695cc8a9cc4e79ea25f314cb324eedc9df3f8",
+      "expected_sha256": "27ccbf98703eba4d48217747d86695cc8a9cc4e79ea25f314cb324eedc9df3f8",
+      "match": true,
+      "path": "outputs/plan2/vggt_predictions.jsonl"
+    },
+    {
+      "actual_sha256": "9d5cd67479fb1e1c8291effb0d77ed876b0cc27d6b7f9cd02eb43045f3022263",
+      "expected_sha256": "9d5cd67479fb1e1c8291effb0d77ed876b0cc27d6b7f9cd02eb43045f3022263",
+      "match": true,
+      "path": "data/episodes/spatial30/episodes_public.jsonl"
+    },
+    {
+      "actual_sha256": "e81df1510a292be065dd8db93d155ee8afa798f435e6064f80ea08b2d484cf21",
+      "expected_sha256": "e81df1510a292be065dd8db93d155ee8afa798f435e6064f80ea08b2d484cf21",
+      "match": true,
+      "path": "data/episodes/spatial30/oracle_private.jsonl"
+    },
+    {
+      "actual_sha256": "057c60055eaa0ee59cf8d4d76d1db22a900c3697e2667c495e05ec07336cf888",
+      "expected_sha256": "057c60055eaa0ee59cf8d4d76d1db22a900c3697e2667c495e05ec07336cf888",
+      "match": true,
+      "path": "outputs/gate6/routes.jsonl"
+    }
+  ],
+  "bootstrap_samples": 10000,
+  "bootstrap_seed": 20260730,
+  "code_sha256": {
+    "/224010104/Jerry/trust3d/configs/gate7_failure_diagnosis.json": "400786c40e8d8a16501258770241c85a27c420dacccbf9598dd2add4f64de1ef",
+    "scripts/run_gate7_failure_diagnosis.sh": "a5568cd6523dacfa6c6a5d1f0c2be5db21c2b6137e0216bdcc95ae5795030a33",
+    "tests/test_gate7_geometry_contract.py": "390106bcb0c97e05acddfa313a66cedb4900b9978ee97ed260abec59172ffc06",
+    "trust3d/eval/diagnose_gate7_layers.py": "b84d10fe9712348649a5345cdfdc45dcb9c805ea37c7f0fcdf21103ca66f4a48",
+    "trust3d/geometry/diagnostic_grounding.py": "1252380555e633e88ca610559ff98e14b4fb16cd120c6ff0a94efd87c55a8479",
+    "trust3d/geometry/run_cut3r.py": "4f6fcd4bd6556898f755aed238dca8d4569f641186d824f86ea478fef289f06c",
+    "trust3d/geometry/run_vggt.py": "16424fd38b283fdbcf87fc89c62e2f6d34717bc83e707af22dfb6e7e665ea39e"
+  },
+  "config_sha256": "400786c40e8d8a16501258770241c85a27c420dacccbf9598dd2add4f64de1ef",
+  "created_at": "2026-07-30T10:55:14.258848+00:00",
+  "diagnostic_only": true,
+  "git_commit": "0d7c6fd53007eb27eec87d20b2d6023bfa9c498c",
+  "original_results_mutable": false,
+  "pilot_group_ids": [
+    "s_cd85bb843aadb5708a2ea2d0",
+    "s_97ea04e6478be3c0582b3214",
+    "s_ca12ed41b575fd899e71378b"
+  ],
+  "qa_revealed": true,
+  "resources": {
+    "maximum_cpu_load_fraction": 0.75,
+    "maximum_gpu_utilization_percent": 10,
+    "minimum_available_disk_gib": 100,
+    "minimum_available_memory_gib": 64,
+    "watch_interval_seconds": 1
+  },
+  "revision": "r000",
+  "schema_version": 1,
+  "selectors": [
+    "center_0.12",
+    "gt_bbox",
+    "gt_mask"
+  ],
+  "tolerances": {
+    "center_point_absolute": 1e-05,
+    "decision_boundary": 1e-06,
+    "matrix_absolute": 1e-06,
+    "nonzero_baseline": 1e-08
+  }
+}

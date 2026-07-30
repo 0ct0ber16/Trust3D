@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "state": "complete",
+  "stage": "complete_failure_analysis",
+  "message": "计划与详细报告全部完成",
+  "current_log": "/224010104/Jerry/logs/gate7-diagnosis/report.log",
+  "backend": "",
+  "gpu_uuid": "",
+  "hostname": "c0ahe0i1kk7lo-0",
+  "runner_pid": 1270030,
+  "protocol_revision": "r001",
+  "completed_groups": {
+    "cut3r": 30,
+    "vggt": 30
+  },
+  "pending_groups": {
+    "cut3r": 0,
+    "vggt": 0
+  },
+  "updated_at": "2026-07-30T12:22:39+00:00"
+}

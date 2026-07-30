@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import random
+import shutil
 import sys
 import time
 import traceback
@@ -14,6 +15,11 @@ from pathlib import Path
 import numpy as np
 
 from trust3d.data.select_events import read_jsonl
+from trust3d.geometry.diagnostic_grounding import (
+    mask_input_records,
+    role_mask_paths,
+    summarize_stage,
+)
 
 
 SCHEMA_VERSION = 1
@@ -35,12 +41,50 @@ def _sha256_file(path):
 def _atomic_json(path, value):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_name(path.name + ".tmp")
-    temporary.write_text(
-        json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-    temporary.replace(path)
+    temporary = path.with_name(f"{path.name}.tmp.{os.getpid()}")
+    with temporary.open("w", encoding="utf-8") as handle:
+        json.dump(value, handle, ensure_ascii=False, indent=2, sort_keys=True)
+        handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(temporary, path)
+    descriptor = os.open(path.parent, os.O_RDONLY)
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
+def _load_diagnostic_config(path, backend):
+    if path is None:
+        return None
+    path = Path(path)
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if value.get("diagnostic_only") is not True:
+        raise ValueError("诊断配置必须显式设置 diagnostic_only=true")
+    expected = value.get("backends", {}).get(backend, {})
+    if not expected.get("adapter_version"):
+        raise ValueError(f"诊断配置缺少 backend: {backend}")
+    value["_path"] = str(path)
+    value["_sha256"] = _sha256_file(path)
+    return value
+
+
+def _assert_diagnostic_output(path, config):
+    root = Path(config["paths"]["output_root"]).resolve()
+    resolved = Path(path).resolve()
+    if resolved != root and root not in resolved.parents:
+        raise ValueError(f"诊断输出越界: {resolved}")
+
+
+def _archive_existing(path):
+    path = Path(path)
+    if not path.exists():
+        return
+    archive = path.parent / "failed_attempts" / path.stem
+    archive.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    shutil.move(str(path), str(archive / f"{stamp}.json"))
 
 
 def centered_point(points, confidence, crop_fraction=0.12, confidence_quantile=0.5):
@@ -174,7 +218,14 @@ def _sequence_paths(public, context, dataset_root, branch):
     return paths
 
 
-def _fingerprint(group_id, sequence_paths, checkpoint_sha256, image_size, crop_fraction):
+def _fingerprint(
+    group_id,
+    sequence_paths,
+    checkpoint_sha256,
+    image_size,
+    crop_fraction,
+    diagnostic=None,
+):
     inputs = []
     for scenario, paths in sorted(sequence_paths.items()):
         for index, path in enumerate(paths):
@@ -194,11 +245,13 @@ def _fingerprint(group_id, sequence_paths, checkpoint_sha256, image_size, crop_f
         "crop_fraction": crop_fraction,
         "inputs": inputs,
     }
+    if diagnostic is not None:
+        payload["diagnostic"] = diagnostic
     encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
     return hashlib.sha256(encoded).hexdigest(), inputs
 
 
-def _valid_checkpoint(path, fingerprint):
+def _valid_checkpoint(path, fingerprint, require_diagnostics=False):
     path = Path(path)
     if not path.is_file():
         return None
@@ -215,7 +268,15 @@ def _valid_checkpoint(path, fingerprint):
         "stale_reobserve",
         "timing",
     }
-    return value if required <= value.keys() else None
+    if not required <= value.keys():
+        return None
+    if require_diagnostics and set(value.get("diagnostic_selectors", {})) != {
+        "center_0.12",
+        "gt_bbox",
+        "gt_mask",
+    }:
+        return None
+    return value
 
 
 def _prepare_views(paths, image_size):
@@ -252,7 +313,27 @@ def _prepare_views(paths, image_size):
     return views
 
 
-def _run_sequence(paths, model, device, image_size, crop_fraction):
+def _decorate_diagnostic_stage(stage, query_pose):
+    for role in ("target", "donor"):
+        stage[role]["query_camera"] = point_in_camera(
+            stage[role]["world"], query_pose
+        )
+    stage["query_camera_to_world"] = query_pose.tolist()
+    stage["answers"] = spatial_answers(
+        stage["target"]["query_camera"], stage["donor"]["query_camera"]
+    )
+    return stage
+
+
+def _run_sequence(
+    paths,
+    model,
+    device,
+    image_size,
+    crop_fraction,
+    diagnostic_masks=None,
+    diagnostic_config=None,
+):
     import torch
     from src.dust3r.inference import inference
     from src.dust3r.utils.camera import pose_encoding_to_camera
@@ -307,8 +388,88 @@ def _run_sequence(paths, model, device, image_size, crop_fraction):
         "peak_allocated_bytes": peak_memory,
         "frame_count": len(paths),
     }
+    if diagnostic_config is not None:
+        quantile = float(diagnostic_config["confidence_quantile"])
+        historical = summarize_stage(
+            world_maps,
+            confidences,
+            {"target": 0, "donor": 1},
+            diagnostic_masks["historical"],
+            crop_fraction,
+            quantile,
+        )
+        current = summarize_stage(
+            world_maps,
+            confidences,
+            {"target": 3, "donor": 4},
+            diagnostic_masks["current"],
+            crop_fraction,
+            quantile,
+        )
+        selectors = {}
+        for selector in historical:
+            selectors[selector] = {
+                "historical": _decorate_diagnostic_stage(
+                    historical[selector], poses[2]
+                ),
+                "current": _decorate_diagnostic_stage(current[selector], poses[2]),
+            }
+        tolerance = diagnostic_config["tolerances"]["center_point_absolute"]
+        for stage_name in ("historical", "current"):
+            for role in ("target", "donor"):
+                expected = np.asarray(value[stage_name][role]["world"])
+                actual = np.asarray(
+                    selectors["center_0.12"][stage_name][role]["world"]
+                )
+                if not np.allclose(expected, actual, atol=tolerance, rtol=0):
+                    raise ValueError("诊断 center 与原中心点实现不一致")
+        value["diagnostic_selectors"] = selectors
     del outputs, state_args, views
     return value
+
+
+def _diagnostic_mask_bundle(context, dataset_root):
+    return {
+        "stable": role_mask_paths(
+            context, dataset_root, "risk_stable"
+        ),
+        "stale": role_mask_paths(context, dataset_root, "risk_stale"),
+    }
+
+
+def _combine_diagnostic_selectors(stable, stale):
+    values = {}
+    for selector in stable["diagnostic_selectors"]:
+        values[selector] = {
+            "historical": stable["diagnostic_selectors"][selector]["historical"],
+            "stale_sequence_historical": stale["diagnostic_selectors"][selector][
+                "historical"
+            ],
+            "stable_reobserve": stable["diagnostic_selectors"][selector]["current"],
+            "stale_reobserve": stale["diagnostic_selectors"][selector]["current"],
+        }
+    return values
+
+
+def _validate_baseline_reproduction(value, baseline_root, tolerance):
+    path = Path(baseline_root) / "checkpoints" / f"{value['group_id']}.json"
+    baseline = json.loads(path.read_text(encoding="utf-8"))
+    for stage in (
+        "historical",
+        "stale_sequence_historical",
+        "stable_reobserve",
+        "stale_reobserve",
+    ):
+        if value[stage]["answers"] != baseline[stage]["answers"]:
+            raise ValueError(f"{stage} 未复现原 Gate 7 答案")
+        for role in ("target", "donor"):
+            if not np.allclose(
+                value[stage][role]["world"],
+                baseline[stage][role]["world"],
+                atol=tolerance,
+                rtol=0,
+            ):
+                raise ValueError(f"{stage}/{role} 未在容差内复现原中心点")
 
 
 def _load_model(cut3r_root, checkpoint, device):
@@ -352,10 +513,23 @@ def run(args):
     if str(args.device).split(":", 1)[0] not in {"cpu", "cuda"}:
         raise ValueError("device 只支持 cpu 或 cuda")
 
+    diagnostic_config = _load_diagnostic_config(args.diagnostic_config, "cut3r")
+    if diagnostic_config is not None:
+        _assert_diagnostic_output(args.output, diagnostic_config)
     checkpoint_sha256 = _sha256_file(args.checkpoint)
+    if diagnostic_config is not None:
+        expected_sha = diagnostic_config["backends"]["cut3r"][
+            "checkpoint_sha256"
+        ]
+        if checkpoint_sha256 != expected_sha:
+            raise ValueError("CUT3R 权重与诊断配置不一致")
     public_sha256 = _sha256_file(args.episodes)
     contexts = _source_contexts(args.source_checkpoints)
     groups = _public_groups(args.episodes, args.group_id, args.max_groups)
+    if diagnostic_config is not None and args.group_id is None:
+        pilot = diagnostic_config["pilot_group_ids"]
+        rank = {group_id: index for index, group_id in enumerate(pilot)}
+        groups.sort(key=lambda item: (rank.get(item[0], len(rank)), item[0]))
     checkpoint_root = args.output / "checkpoints"
     checkpoint_root.mkdir(parents=True, exist_ok=True)
     prepared = []
@@ -370,21 +544,57 @@ def run(args):
             ),
             "stale": _sequence_paths(public, context, args.dataset_root, "risk_stale"),
         }
+        masks = (
+            _diagnostic_mask_bundle(context, args.dataset_root)
+            if diagnostic_config is not None
+            else None
+        )
+        diagnostic_fingerprint = None
+        mask_inputs = []
+        if diagnostic_config is not None:
+            for scenario, paths in sorted(masks.items()):
+                for record in mask_input_records(paths):
+                    mask_inputs.append({"scenario": scenario, **record})
+            diagnostic_fingerprint = {
+                "protocol_revision": diagnostic_config["protocol_revision"],
+                "config_sha256": diagnostic_config["_sha256"],
+                "adapter_version": diagnostic_config["backends"]["cut3r"][
+                    "adapter_version"
+                ],
+                "selectors": diagnostic_config["selectors"],
+                "confidence_quantile": diagnostic_config[
+                    "confidence_quantile"
+                ],
+                "mask_inputs": mask_inputs,
+            }
         fingerprint, inputs = _fingerprint(
             group_id,
             sequences,
             checkpoint_sha256,
             args.image_size,
             args.center_crop_fraction,
+            diagnostic_fingerprint,
         )
         path = checkpoint_root / f"{group_id}.json"
-        existing = _valid_checkpoint(path, fingerprint)
+        existing = _valid_checkpoint(
+            path, fingerprint, require_diagnostics=diagnostic_config is not None
+        )
         if existing is not None:
             print(f"resume={group_id} 已通过 fingerprint 校验，跳过推理", flush=True)
             results.append(existing)
             continue
         prepared.append(
-            (group_id, episode_count, context, sequences, fingerprint, inputs, path)
+            (
+                group_id,
+                episode_count,
+                context,
+                sequences,
+                masks,
+                mask_inputs,
+                fingerprint,
+                inputs,
+                path,
+            )
         )
 
     model = None
@@ -396,14 +606,28 @@ def run(args):
         print(f"model_load_seconds={model_load_seconds:.6f}", flush=True)
 
     for index, item in enumerate(prepared, start=1):
-        group_id, episode_count, context, sequences, fingerprint, inputs, path = item
+        (
+            group_id,
+            episode_count,
+            context,
+            sequences,
+            masks,
+            mask_inputs,
+            fingerprint,
+            inputs,
+            path,
+        ) = item
         print(
             f"group={group_id} progress={index}/{len(prepared)} start={_utc_now()}",
             flush=True,
         )
         base = {
             "schema_version": SCHEMA_VERSION,
-            "adapter_version": ADAPTER_VERSION,
+            "adapter_version": diagnostic_config["backends"]["cut3r"][
+                "adapter_version"
+            ]
+            if diagnostic_config is not None
+            else ADAPTER_VERSION,
             "group_id": group_id,
             "episode_count": episode_count,
             "fingerprint": fingerprint,
@@ -414,6 +638,18 @@ def run(args):
             "grounding_note": "只使用目标居中验证帧的角色和中心区域，不读取 depth、instance mask 或私有答案。",
             "inputs": inputs,
         }
+        if diagnostic_config is not None:
+            base.update(
+                {
+                    "diagnostic_only": True,
+                    "qa_revealed": True,
+                    "uses_gt_mask": True,
+                    "eligible_as_main_result": False,
+                    "protocol_revision": diagnostic_config["protocol_revision"],
+                    "diagnostic_config_sha256": diagnostic_config["_sha256"],
+                    "mask_inputs": mask_inputs,
+                }
+            )
         try:
             stable = _run_sequence(
                 sequences["stable"],
@@ -421,6 +657,8 @@ def run(args):
                 args.device,
                 args.image_size,
                 args.center_crop_fraction,
+                masks["stable"] if masks is not None else None,
+                diagnostic_config,
             )
             stale = _run_sequence(
                 sequences["stale"],
@@ -428,6 +666,8 @@ def run(args):
                 args.device,
                 args.image_size,
                 args.center_crop_fraction,
+                masks["stale"] if masks is not None else None,
+                diagnostic_config,
             )
             value = dict(base)
             value.update(
@@ -454,6 +694,17 @@ def run(args):
                     ),
                 }
             )
+            if diagnostic_config is not None:
+                value["diagnostic_selectors"] = _combine_diagnostic_selectors(
+                    stable, stale
+                )
+                _validate_baseline_reproduction(
+                    value,
+                    diagnostic_config["paths"]["cut3r_baseline_geometry"],
+                    diagnostic_config["tolerances"]["center_point_absolute"],
+                )
+                value["baseline_reproduction_pass"] = True
+            _archive_existing(path)
             _atomic_json(path, value)
             results.append(value)
             print(
@@ -484,7 +735,11 @@ def run(args):
     failures = [value for value in results if value.get("status") != "success"]
     manifest = {
         "schema_version": SCHEMA_VERSION,
-        "adapter_version": ADAPTER_VERSION,
+        "adapter_version": diagnostic_config["backends"]["cut3r"][
+            "adapter_version"
+        ]
+        if diagnostic_config is not None
+        else ADAPTER_VERSION,
         "created_at": _utc_now(),
         "episodes_path": str(args.episodes),
         "episodes_sha256": public_sha256,
@@ -505,6 +760,17 @@ def run(args):
             for value in sorted(results, key=lambda item: item["group_id"])
         ],
     }
+    if diagnostic_config is not None:
+        manifest.update(
+            {
+                "diagnostic_only": True,
+                "qa_revealed": True,
+                "uses_gt_mask": True,
+                "eligible_as_main_result": False,
+                "protocol_revision": diagnostic_config["protocol_revision"],
+                "diagnostic_config_sha256": diagnostic_config["_sha256"],
+            }
+        )
     _atomic_json(args.output / "manifest.json", manifest)
     return manifest
 
@@ -531,6 +797,7 @@ def build_parser():
     parser.add_argument("--group-id")
     parser.add_argument("--max-groups", type=int)
     parser.add_argument("--continue-on-error", action="store_true")
+    parser.add_argument("--diagnostic-config", type=Path)
     return parser
 
 

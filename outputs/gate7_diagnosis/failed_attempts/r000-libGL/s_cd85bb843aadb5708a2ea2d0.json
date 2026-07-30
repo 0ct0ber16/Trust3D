@@ -1,0 +1,183 @@
+{
+  "adapter_version": "gate7-cut3r-rgb-v1-diag-v1",
+  "center_crop_fraction": 0.12,
+  "checkpoint_sha256": "45f7e98a0a64dbeb54901ae2b878cd8cd125f20a4497316483f0bd6f109f8103",
+  "diagnostic_config_sha256": "400786c40e8d8a16501258770241c85a27c420dacccbf9598dd2add4f64de1ef",
+  "diagnostic_only": true,
+  "eligible_as_main_result": false,
+  "episode_count": 12,
+  "error": "libGL.so.1: cannot open shared object file: No such file or directory",
+  "error_type": "ImportError",
+  "failed_at": "2026-07-30T11:04:09.614591+00:00",
+  "fingerprint": "272a4eb9a2e5543059a13b17ebed0d4d3d43325d5ba082d490620e935e7a5a2e",
+  "grounding_note": "只使用目标居中验证帧的角色和中心区域，不读取 depth、instance mask 或私有答案。",
+  "group_id": "s_cd85bb843aadb5708a2ea2d0",
+  "image_size": 512,
+  "input_mode": "rgb_only_centered_verification_frame",
+  "inputs": [
+    {
+      "index": 0,
+      "path": "data/episodes/spatial30/cache/rgb/s_cd85bb843aadb5708a2ea2d0_history_target.png",
+      "scenario": "stable",
+      "sha256": "7d1aa1a2aee8149c3683fce0e73cfc906929ec0e74304678324cfebbad054817"
+    },
+    {
+      "index": 1,
+      "path": "data/episodes/spatial30/cache/rgb/s_cd85bb843aadb5708a2ea2d0_history_donor.png",
+      "scenario": "stable",
+      "sha256": "56e2d4a2445749c99e1c5e1658abed32d279e4376a80746bf5b9fd0cde77b7fe"
+    },
+    {
+      "index": 2,
+      "path": "data/episodes/spatial30/cache/rgb/s_cd85bb843aadb5708a2ea2d0_query_stable.png",
+      "scenario": "stable",
+      "sha256": "f76c32431648b258890f386e6112d07e7ffee09b1e47a2e189474181ac4fca59"
+    },
+    {
+      "index": 3,
+      "path": "data/episodes/spatial30/cache/rgb/s_cd85bb843aadb5708a2ea2d0_history_target.png",
+      "scenario": "stable",
+      "sha256": "7d1aa1a2aee8149c3683fce0e73cfc906929ec0e74304678324cfebbad054817"
+    },
+    {
+      "index": 4,
+      "path": "data/episodes/spatial30/cache/rgb/s_cd85bb843aadb5708a2ea2d0_history_donor.png",
+      "scenario": "stable",
+      "sha256": "56e2d4a2445749c99e1c5e1658abed32d279e4376a80746bf5b9fd0cde77b7fe"
+    },
+    {
+      "index": 0,
+      "path": "data/episodes/spatial30/cache/rgb/s_cd85bb843aadb5708a2ea2d0_history_target.png",
+      "scenario": "stale",
+      "sha256": "7d1aa1a2aee8149c3683fce0e73cfc906929ec0e74304678324cfebbad054817"
+    },
+    {
+      "index": 1,
+      "path": "data/episodes/spatial30/cache/rgb/s_cd85bb843aadb5708a2ea2d0_history_donor.png",
+      "scenario": "stale",
+      "sha256": "56e2d4a2445749c99e1c5e1658abed32d279e4376a80746bf5b9fd0cde77b7fe"
+    },
+    {
+      "index": 2,
+      "path": "data/episodes/spatial30/cache/rgb/s_cd85bb843aadb5708a2ea2d0_query_stable.png",
+      "scenario": "stale",
+      "sha256": "f76c32431648b258890f386e6112d07e7ffee09b1e47a2e189474181ac4fca59"
+    },
+    {
+      "index": 3,
+      "path": "data/episodes/spatial30/cache/rgb/s_cd85bb843aadb5708a2ea2d0_stale_target.png",
+      "scenario": "stale",
+      "sha256": "69ddf5d42d01924e230ea59a057a9cd56d7a5793648139b01d3872317f623bc3"
+    },
+    {
+      "index": 4,
+      "path": "data/episodes/spatial30/cache/rgb/s_cd85bb843aadb5708a2ea2d0_stale_donor.png",
+      "scenario": "stale",
+      "sha256": "cd64e4f0f843597b2c80640d85340c1b6740f35e7a4cdb67e8b49286c7fc1c4b"
+    }
+  ],
+  "mask_inputs": [
+    {
+      "nonzero_pixels": 79,
+      "path": "data/episodes/spatial30/cache/mask/s_cd85bb843aadb5708a2ea2d0_history_donor_donor.npy",
+      "role": "donor",
+      "scenario": "stable",
+      "sha256": "004a12a9611bdd89729d3b412c34781db1a070095de0557e7b59bfafe6be642a",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "current"
+    },
+    {
+      "nonzero_pixels": 34,
+      "path": "data/episodes/spatial30/cache/mask/s_cd85bb843aadb5708a2ea2d0_history_target_target.npy",
+      "role": "target",
+      "scenario": "stable",
+      "sha256": "fd01b78a1311cecf6fa913d7b3fcf683736bf6b41162adecb24328e296ffe143",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "current"
+    },
+    {
+      "nonzero_pixels": 79,
+      "path": "data/episodes/spatial30/cache/mask/s_cd85bb843aadb5708a2ea2d0_history_donor_donor.npy",
+      "role": "donor",
+      "scenario": "stable",
+      "sha256": "004a12a9611bdd89729d3b412c34781db1a070095de0557e7b59bfafe6be642a",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "historical"
+    },
+    {
+      "nonzero_pixels": 34,
+      "path": "data/episodes/spatial30/cache/mask/s_cd85bb843aadb5708a2ea2d0_history_target_target.npy",
+      "role": "target",
+      "scenario": "stable",
+      "sha256": "fd01b78a1311cecf6fa913d7b3fcf683736bf6b41162adecb24328e296ffe143",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "historical"
+    },
+    {
+      "nonzero_pixels": 34,
+      "path": "data/episodes/spatial30/cache/mask/s_cd85bb843aadb5708a2ea2d0_stale_donor_donor.npy",
+      "role": "donor",
+      "scenario": "stale",
+      "sha256": "fd01b78a1311cecf6fa913d7b3fcf683736bf6b41162adecb24328e296ffe143",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "current"
+    },
+    {
+      "nonzero_pixels": 79,
+      "path": "data/episodes/spatial30/cache/mask/s_cd85bb843aadb5708a2ea2d0_stale_target_target.npy",
+      "role": "target",
+      "scenario": "stale",
+      "sha256": "004a12a9611bdd89729d3b412c34781db1a070095de0557e7b59bfafe6be642a",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "current"
+    },
+    {
+      "nonzero_pixels": 79,
+      "path": "data/episodes/spatial30/cache/mask/s_cd85bb843aadb5708a2ea2d0_history_donor_donor.npy",
+      "role": "donor",
+      "scenario": "stale",
+      "sha256": "004a12a9611bdd89729d3b412c34781db1a070095de0557e7b59bfafe6be642a",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "historical"
+    },
+    {
+      "nonzero_pixels": 34,
+      "path": "data/episodes/spatial30/cache/mask/s_cd85bb843aadb5708a2ea2d0_history_target_target.npy",
+      "role": "target",
+      "scenario": "stale",
+      "sha256": "fd01b78a1311cecf6fa913d7b3fcf683736bf6b41162adecb24328e296ffe143",
+      "shape": [
+        300,
+        300
+      ],
+      "stage": "historical"
+    }
+  ],
+  "protocol_revision": "r000",
+  "qa_revealed": true,
+  "schema_version": 1,
+  "status": "failure",
+  "traceback": "Traceback (most recent call last):\n  File \"/224010104/Jerry/trust3d/trust3d/geometry/run_cut3r.py\", line 654, in run\n    stable = _run_sequence(\n             ^^^^^^^^^^^^^^\n  File \"/224010104/Jerry/trust3d/trust3d/geometry/run_cut3r.py\", line 343, in _run_sequence\n    views = _prepare_views(paths, image_size)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/224010104/Jerry/trust3d/trust3d/geometry/run_cut3r.py\", line 284, in _prepare_views\n    from src.dust3r.utils.image import load_images\n  File \"/224010104/Jerry/trust3d/external/cut3r/src/dust3r/utils/image.py\", line 15, in <module>\n    import cv2  # noqa\n    ^^^^^^^^^^\n  File \"/224010104/Jerry/.conda/envs/cut3r/lib/python3.11/site-packages/cv2/__init__.py\", line 181, in <module>\n    bootstrap()\n  File \"/224010104/Jerry/.conda/envs/cut3r/lib/python3.11/site-packages/cv2/__init__.py\", line 153, in bootstrap\n    native_module = importlib.import_module(\"cv2\")\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/224010104/Jerry/.conda/envs/cut3r/lib/python3.11/importlib/__init__.py\", line 126, in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nImportError: libGL.so.1: cannot open shared object file: No such file or directory\n",
+  "uses_gt_mask": true
+}

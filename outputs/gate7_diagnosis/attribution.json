@@ -1,0 +1,40 @@
+{
+  "analysis_revision": "r001-analysis-a1",
+  "backends": {
+    "cut3r": {
+      "complete_group_count": 29,
+      "conditional_complete_case_factor_label": "backbone_geometry_dominant",
+      "factor_label": "inconclusive_small_sample",
+      "inconclusive_due_to_missing_groups": true,
+      "missing_group_ids": [
+        "s_39ad630766a4d0f9dcbe9445"
+      ],
+      "primary_label": "proven_task_head_semantics_bug",
+      "secondary_labels": [
+        "inconclusive_small_sample"
+      ],
+      "task_semantics_mismatch_proven": true
+    },
+    "vggt": {
+      "complete_group_count": 29,
+      "conditional_complete_case_factor_label": "backbone_geometry_dominant",
+      "factor_label": "inconclusive_small_sample",
+      "inconclusive_due_to_missing_groups": true,
+      "missing_group_ids": [
+        "s_39ad630766a4d0f9dcbe9445"
+      ],
+      "primary_label": "proven_task_head_semantics_bug",
+      "secondary_labels": [
+        "inconclusive_small_sample"
+      ],
+      "task_semantics_mismatch_proven": true
+    }
+  },
+  "decision_thresholds": {
+    "dominance_margin": 0.1,
+    "interaction_minimum_absolute": 0.1,
+    "major_effect_minimum": 0.2
+  },
+  "diagnostic_only": true,
+  "schema_version": 1
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "stage": "lock",
+  "status": "complete",
+  "output": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/protocol_lock.json",
+  "output_sha256": "4f51c52fd93d767cb4b78fc0a4fd1321f3dcc8b1515fcdac0a961754f53ac693",
+  "completed_at": "2026-07-30T10:55:14+00:00",
+  "git_commit": "0d7c6fd53007eb27eec87d20b2d6023bfa9c498c"
+}

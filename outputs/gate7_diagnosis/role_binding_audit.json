@@ -1,0 +1,15 @@
+{
+  "binding_contract": {
+    "0": "historical target",
+    "1": "historical donor",
+    "2": "query",
+    "3": "current target",
+    "4": "current donor"
+  },
+  "checked_input_count": 600,
+  "diagnostic_only": true,
+  "failure_count": 0,
+  "failures": [],
+  "pass": true,
+  "schema_version": 1
+}

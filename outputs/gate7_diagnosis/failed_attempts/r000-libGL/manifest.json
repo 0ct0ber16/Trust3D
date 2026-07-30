@@ -1,0 +1,28 @@
+{
+  "adapter_version": "gate7-cut3r-rgb-v1-diag-v1",
+  "checkpoint_path": "external/cut3r/src/cut3r_512_dpt_4_64.pth",
+  "checkpoint_sha256": "45f7e98a0a64dbeb54901ae2b878cd8cd125f20a4497316483f0bd6f109f8103",
+  "complete": false,
+  "created_at": "2026-07-30T11:04:09.658707+00:00",
+  "diagnostic_config_sha256": "400786c40e8d8a16501258770241c85a27c420dacccbf9598dd2add4f64de1ef",
+  "diagnostic_only": true,
+  "eligible_as_main_result": false,
+  "episodes_path": "data/episodes/spatial30/episodes_public.jsonl",
+  "episodes_sha256": "9d5cd67479fb1e1c8291effb0d77ed876b0cc27d6b7f9cd02eb43045f3022263",
+  "failure_group_count": 1,
+  "groups": [
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/cut3r/checkpoints/s_cd85bb843aadb5708a2ea2d0.json",
+      "fingerprint": "272a4eb9a2e5543059a13b17ebed0d4d3d43325d5ba082d490620e935e7a5a2e",
+      "group_id": "s_cd85bb843aadb5708a2ea2d0",
+      "status": "failure"
+    }
+  ],
+  "model_load_seconds_this_run": 56.05077075998997,
+  "protocol_revision": "r000",
+  "qa_revealed": true,
+  "requested_group_count": 30,
+  "schema_version": 1,
+  "success_group_count": 0,
+  "uses_gt_mask": true
+}

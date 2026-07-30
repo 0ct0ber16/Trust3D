@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "diagnostic_only": true,
+  "checkpoint_recovery_pass": true,
+  "all_hashes_match": true,
+  "checked_checkpoint_count": 60,
+  "before_sha256": "eea1218d07c40e08478d646cbf475427611a5158d0eaa1679c473ab914e60073",
+  "after_sha256": "eea1218d07c40e08478d646cbf475427611a5158d0eaa1679c473ab914e60073",
+  "checked_at": "2026-07-30T11:25:37+00:00"
+}

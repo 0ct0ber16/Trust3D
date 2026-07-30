@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "stage": "offline",
+  "status": "complete",
+  "output": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/offline_audit.json",
+  "output_sha256": "88490e5e8181e9c5577ca2efd40c4bcdf2730e71fa607185bfd1f3d7c98db2e1",
+  "completed_at": "2026-07-30T10:55:16+00:00",
+  "git_commit": "0d7c6fd53007eb27eec87d20b2d6023bfa9c498c"
+}

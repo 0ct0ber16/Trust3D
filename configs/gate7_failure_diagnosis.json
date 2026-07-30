@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "diagnostic_only": true,
+  "qa_revealed": true,
+  "eligible_as_main_result": false,
+  "seed": 20260730,
+  "bootstrap_seed": 20260730,
+  "bootstrap_samples": 10000,
+  "protocol_revision": "r001",
+  "task_head_versions": {
+    "legacy": "gate7-camera-z-v1",
+    "contract_valid": "gate7-planar-yaw-v1"
+  },
+  "selectors": [
+    "center_0.12",
+    "gt_bbox",
+    "gt_mask"
+  ],
+  "center_crop_fraction": 0.12,
+  "confidence_quantile": 0.5,
+  "pilot_group_ids": [
+    "s_cd85bb843aadb5708a2ea2d0",
+    "s_97ea04e6478be3c0582b3214",
+    "s_ca12ed41b575fd899e71378b"
+  ],
+  "counts": {
+    "groups": 30,
+    "questions": 360,
+    "questions_per_group": 12
+  },
+  "paths": {
+    "output_root": "outputs/gate7_diagnosis",
+    "public_episodes": "data/episodes/spatial30/episodes_public.jsonl",
+    "private_oracle": "data/episodes/spatial30/oracle_private.jsonl",
+    "routes": "outputs/gate6/routes.jsonl",
+    "source_checkpoints": "data/episodes/spatial30/checkpoints",
+    "dataset_root": "data/episodes/spatial30",
+    "cut3r_baseline_geometry": "outputs/gate7/cut3r_geometry",
+    "vggt_baseline_geometry": "outputs/plan2/vggt_geometry"
+  },
+  "backends": {
+    "cut3r": {
+      "adapter_version": "gate7-cut3r-rgb-v1-diag-v1",
+      "checkpoint": "external/cut3r/src/cut3r_512_dpt_4_64.pth",
+      "checkpoint_sha256": "45f7e98a0a64dbeb54901ae2b878cd8cd125f20a4497316483f0bd6f109f8103",
+      "image_size": 512,
+      "minimum_free_gpu_mib": 16384
+    },
+    "vggt": {
+      "adapter_version": "plan2-vggt-depth-v1-diag-v1",
+      "checkpoint": "external/vggt/model.safetensors",
+      "checkpoint_sha256": "f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e",
+      "image_size": 518,
+      "minimum_free_gpu_mib": 20480
+    }
+  },
+  "resources": {
+    "maximum_cpu_load_fraction": 0.75,
+    "minimum_available_memory_gib": 64,
+    "minimum_available_disk_gib": 100,
+    "maximum_gpu_utilization_percent": 10,
+    "watch_interval_seconds": 1
+  },
+  "tolerances": {
+    "matrix_absolute": 1e-6,
+    "center_point_absolute": 1e-5,
+    "decision_boundary": 1e-6,
+    "nonzero_baseline": 1e-8
+  },
+  "baseline_sha256": {
+    "outputs/gate7/validation.json": "2c640c1279c7a4724ca60287e6f3ec9f943416ce2964018d2d8397e280fe94d5",
+    "outputs/gate7/predictions.jsonl": "8af0a03e9f4ac956dbcd5f859eb093fc5197d1c581b779eb8367c185a5df40fc",
+    "outputs/gate7/checkpoint_recovery.json": "83a10737770129b97cf36c3b72b616501c9d5910ef49a74b01c446cfe690694c",
+    "outputs/gate7/cut3r_geometry/manifest.json": "426fde42f5ed78d1bca75575ff727e972b9441d335cb5107474128fc5094be76",
+    "outputs/plan2/final_decision.json": "d36a8bc74de8fc4cc0ac34cce715526f6eb5bb6d9514fece98a15a82041e897a",
+    "outputs/plan2/vggt_validation.json": "13759a89a66b89ea129e94ef638605f28c575780ca9d9ea53a0c8f4b794cb98b",
+    "outputs/plan2/vggt_predictions.jsonl": "27ccbf98703eba4d48217747d86695cc8a9cc4e79ea25f314cb324eedc9df3f8",
+    "data/episodes/spatial30/episodes_public.jsonl": "9d5cd67479fb1e1c8291effb0d77ed876b0cc27d6b7f9cd02eb43045f3022263",
+    "data/episodes/spatial30/oracle_private.jsonl": "e81df1510a292be065dd8db93d155ee8afa798f435e6064f80ea08b2d484cf21",
+    "outputs/gate6/routes.jsonl": "057c60055eaa0ee59cf8d4d76d1db22a900c3697e2667c495e05ec07336cf888"
+  }
+}

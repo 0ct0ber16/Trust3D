@@ -1,0 +1,207 @@
+{
+  "adapter_version": "plan2-vggt-depth-v1-diag-v1",
+  "backend_id": "vggt",
+  "checkpoint_path": "external/vggt/model.safetensors",
+  "checkpoint_sha256": "f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e",
+  "complete": true,
+  "config_sha256": "8ea3e131dc315da8bcd34c8173ae0e0af1d04c93e749b63b96a85a41250d9556",
+  "created_at": "2026-07-30T11:24:54.615364+00:00",
+  "diagnostic_config_sha256": "ad2c3128352b786b996eafd1045d5c62ebbc419a4ee9ec21c69f7dd49fc03620",
+  "diagnostic_gt_mask_access_declared": true,
+  "diagnostic_only": true,
+  "eligible_as_main_result": false,
+  "episodes_path": "data/episodes/spatial30/episodes_public.jsonl",
+  "episodes_sha256": "9d5cd67479fb1e1c8291effb0d77ed876b0cc27d6b7f9cd02eb43045f3022263",
+  "failure_group_count": 0,
+  "groups": [
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_02195803c5ebd4d3dcb170a7.json",
+      "fingerprint": "d61f257d07377ea5c920d28cd22256cf0fb4231cfc5b606ad9ff312c5224b020",
+      "group_id": "s_02195803c5ebd4d3dcb170a7",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_0b93c631a13c7f6c97350767.json",
+      "fingerprint": "aa22c43819df3c0681a427a8f247a5a51f07c3de9403ceb87aef9253b6a2931d",
+      "group_id": "s_0b93c631a13c7f6c97350767",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_296a3a3a030619522f3f1a56.json",
+      "fingerprint": "104ccebef9a9fd734bb23e8bc7da5c44d815690892abe88f6553f0d04b52291a",
+      "group_id": "s_296a3a3a030619522f3f1a56",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_2c117a1e691376ae4428389c.json",
+      "fingerprint": "6718a02d1d9b3ac53ca6bdec8016c17c7cf98532163fc318de52a6db3c9e6c28",
+      "group_id": "s_2c117a1e691376ae4428389c",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_2e41a5aabaa9a4541c53cac4.json",
+      "fingerprint": "a6f30043b1a14236c769dee5155c855e778c4c6758fc2b8bacd5ca97075da636",
+      "group_id": "s_2e41a5aabaa9a4541c53cac4",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_39ad630766a4d0f9dcbe9445.json",
+      "fingerprint": "5cbca58b6abd1c5f305569c84c0fd96f2e0894c54be061c126dd8b9658767705",
+      "group_id": "s_39ad630766a4d0f9dcbe9445",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_3a2c6f6b92fbd145f4f14c8a.json",
+      "fingerprint": "0c5f497bdcbd1f8870462a1aaf86325c2789c4b3502b61c555159636e1e11202",
+      "group_id": "s_3a2c6f6b92fbd145f4f14c8a",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_61d115c4b0b6f8daa23e3d7c.json",
+      "fingerprint": "4fe7d04ffddaf2d71875cf4c380b877ffb0261199953fd2161244d128e7b8bab",
+      "group_id": "s_61d115c4b0b6f8daa23e3d7c",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_7c6df2ffd6ebbb22871f9f2e.json",
+      "fingerprint": "8c847139cfee60e6d1f3227e62d4b3425fb93bf391f01e4215de834f762c8569",
+      "group_id": "s_7c6df2ffd6ebbb22871f9f2e",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_919a234db5a121ffdd6e4b23.json",
+      "fingerprint": "27c3b3a19b0d936cd47d95f55191e8747c9ca423a75f5b58c06f3c1952124b88",
+      "group_id": "s_919a234db5a121ffdd6e4b23",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_97ea04e6478be3c0582b3214.json",
+      "fingerprint": "f06261cc2fcba6ea43a663daa1d48e48164a8c83c361c0e5bc40240edcc13b55",
+      "group_id": "s_97ea04e6478be3c0582b3214",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_a64eb2f278912097718f7f8d.json",
+      "fingerprint": "9f0e526a761edfad274ecf4726e13da51e49f3ed41a596641e5f50ecf54f8ccb",
+      "group_id": "s_a64eb2f278912097718f7f8d",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_b203cd84c550d762a694adc4.json",
+      "fingerprint": "9222a9839d9841112a29740cbb0cb60e97c89feb84f2ee87104cba7df30a86b4",
+      "group_id": "s_b203cd84c550d762a694adc4",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_b272ab5beb5c5603940920a3.json",
+      "fingerprint": "5d6875e1ad96bc7285fc9930828be4852b33d5ac64ec842410ff45ee4acf83ed",
+      "group_id": "s_b272ab5beb5c5603940920a3",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_b791db9e92e52dc67b9dc7ac.json",
+      "fingerprint": "6424517e935cfd416a33ee1d17d585b4c8b2501a0804aa914a0c022fcf76bcc1",
+      "group_id": "s_b791db9e92e52dc67b9dc7ac",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_bae3bc59ea0b136f910c78ba.json",
+      "fingerprint": "17ea622e96c6467486270cd9f6382d3a23f99f1c397fa6446a4190878cf35e3d",
+      "group_id": "s_bae3bc59ea0b136f910c78ba",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_bdc5e8a42faf0c8378a5d7d3.json",
+      "fingerprint": "544bb7c22d128a3123aa26d2aef3b7ed1513d11c5546da0bfff220e4ee8313d6",
+      "group_id": "s_bdc5e8a42faf0c8378a5d7d3",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_bdfc3974c1d9e6684898c508.json",
+      "fingerprint": "da79f136cca1aead226b2df2181b4cd68ebb2f65c70881859830ddf43fe39843",
+      "group_id": "s_bdfc3974c1d9e6684898c508",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_ca083d9add3fac512d4cef00.json",
+      "fingerprint": "e515942e55883324d35a5e889f536cc0715c46a7930c984707c33567739479fd",
+      "group_id": "s_ca083d9add3fac512d4cef00",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_ca12ed41b575fd899e71378b.json",
+      "fingerprint": "787fb5021829349e86bbc14f900b11dc679a8c5da1fa11397ae4917dadc0f404",
+      "group_id": "s_ca12ed41b575fd899e71378b",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_cd85bb843aadb5708a2ea2d0.json",
+      "fingerprint": "2d5b7608ffee7be19a5aa986cc5d540464645114a7edee5d8ffe9e0d05fd3ada",
+      "group_id": "s_cd85bb843aadb5708a2ea2d0",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_d2368a83036109d80329686c.json",
+      "fingerprint": "c2818cc3b1a4cc41f37d2c8e913bba1d723aae78e601b576352d413c2f28eb02",
+      "group_id": "s_d2368a83036109d80329686c",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_d9657d59f748312c18c1a657.json",
+      "fingerprint": "0cc756a91a9f6c5f071fb30b545c3b90e9f786b92d6fe910de42d0302c495adf",
+      "group_id": "s_d9657d59f748312c18c1a657",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_e73f05a60c0f8025bf22c1a2.json",
+      "fingerprint": "f7acd6848052996e0c01e2c96bea07df647e2a9d7464b40934bc34fb9cbee559",
+      "group_id": "s_e73f05a60c0f8025bf22c1a2",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_ef34bcabc8bf1b70e502d928.json",
+      "fingerprint": "68f5b171787f707e9b896a0366b8f91e2ec1ba1ff71d7bad3a60140244f55575",
+      "group_id": "s_ef34bcabc8bf1b70e502d928",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_f3c198ac4dd19b96a04a087b.json",
+      "fingerprint": "241f0771dd88245956caf19313dab571000f4263a0bfb7332db6074e977d136e",
+      "group_id": "s_f3c198ac4dd19b96a04a087b",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_f69085b2e36b2513d5aa4f06.json",
+      "fingerprint": "6e34a03015573b60bc25e7228262087080404d377656d5c5078179ec9af41ac6",
+      "group_id": "s_f69085b2e36b2513d5aa4f06",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_f7b0e894cff823e146ff1be4.json",
+      "fingerprint": "0c41b13a49dc4769ef2df5ba33edfbf07002f3952f789a0d01e5c0a93ec1b49e",
+      "group_id": "s_f7b0e894cff823e146ff1be4",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_fc4032ce5f961919bd096926.json",
+      "fingerprint": "8079150ad9ee32e8bb600a6a29d8d8d321203f4d4bd2ed18c7fcb5604edfc2ba",
+      "group_id": "s_fc4032ce5f961919bd096926",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/gate7_diagnosis/vggt/checkpoints/s_fe37e8a6e561e49d9de7f1c2.json",
+      "fingerprint": "929d102ada23707410737fc379ef287e3071291e19881f799050f804186a9adb",
+      "group_id": "s_fe37e8a6e561e49d9de7f1c2",
+      "status": "success"
+    }
+  ],
+  "model_load_seconds_this_run": 50.918499178020284,
+  "private_file_open_count": 0,
+  "private_file_scope": "oracle_private_jsonl",
+  "protocol_revision": "r001",
+  "qa_revealed": true,
+  "requested_group_count": 30,
+  "schema_version": 1,
+  "success_group_count": 30,
+  "uses_gt_mask": true
+}

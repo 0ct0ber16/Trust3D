@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "protocol_revision": "r001",
+  "analysis_revision": "r001-analysis-a1",
+  "diagnostic_only": true,
+  "reason": "归因器未实现预注册的 alignment_unidentifiable 缺失处理，错误地终止全部 D5；修复为 30-group 未对齐指标与 29-group complete-case 配对效应，并强制降级因子标签。",
+  "changed_scope": [
+    "trust3d/eval/diagnose_gate7_layers.py",
+    "tests/test_gate7_geometry_contract.py"
+  ],
+  "code_sha256_before": {
+    "evaluator": "b84d10fe9712348649a5345cdfdc45dcb9c805ea37c7f0fcdf21103ca66f4a48",
+    "test": "390106bcb0c97e05acddfa313a66cedb4900b9978ee97ed260abec59172ffc06"
+  },
+  "code_sha256_after": {
+    "evaluator": "25e0e1e1c0c49763571bef40c90b29adbfb44f60ea9b3e7520614aea99586900",
+    "test": "1419bb2cce769922457205895cad7de4ad18ab848ea93be5401382f16b0a5496"
+  },
+  "model_forward_rerun": false,
+  "model_checkpoints_modified": false,
+  "original_gate7_modified": false,
+  "original_plan2_modified": false,
+  "preserved_artifacts": {
+    "checkpoint_recovery_sha256": "ea6a58fcf69b34f33c319bf16addf274aa7f2cd9aaef8738cc293232eec00f35",
+    "cut3r_manifest_sha256": "95780951ed58d96566db9511f7f7f740e217a2826f74edf5c3c0f62a9374fd18",
+    "vggt_manifest_sha256": "cb77acd48f70daa126c98237a3851619c5cfb56d3c3e67b76550293ab47bfd35"
+  },
+  "missing_data_rule": {
+    "group_id": "s_39ad630766a4d0f9dcbe9445",
+    "reason": "GT 五帧相机中心最大 baseline 为 0，Sim(3) scale 不可识别",
+    "unaligned_group_count": 30,
+    "aligned_complete_case_group_count": 29,
+    "factor_label_downgrade": "inconclusive_small_sample"
+  },
+  "created_at": "2026-07-30T12:22:21+00:00",
+  "amendment_sha256": "e4cd621f1bdca4ccb1c42f9c20b58706b7f0362be5073476719328af6839d37e",
+  "amendment_sha256_scope": "添加 amendment_sha256 字段前的规范化 payload"
+}

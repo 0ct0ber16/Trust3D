@@ -15,13 +15,20 @@ from pathlib import Path
 import numpy as np
 
 from trust3d.geometry.run_cut3r import (
+    _assert_diagnostic_output,
+    _combine_diagnostic_selectors,
+    _decorate_diagnostic_stage,
+    _diagnostic_mask_bundle,
+    _load_diagnostic_config,
     _public_groups,
     _sequence_paths,
     _source_contexts,
+    _validate_baseline_reproduction,
     centered_point,
     point_in_camera,
     spatial_answers,
 )
+from trust3d.geometry.diagnostic_grounding import mask_input_records, summarize_stage
 
 
 SCHEMA_VERSION = 1
@@ -49,6 +56,11 @@ def _atomic_json(path, value):
         handle.flush()
         os.fsync(handle.fileno())
     os.replace(temporary, path)
+    descriptor = os.open(path.parent, os.O_RDONLY)
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
 
 
 def _load_config(path):
@@ -78,7 +90,15 @@ def _load_config(path):
     return value
 
 
-def _fingerprint(group_id, inputs, config, config_sha256, public_sha256, routes_sha256):
+def _fingerprint(
+    group_id,
+    inputs,
+    config,
+    config_sha256,
+    public_sha256,
+    routes_sha256,
+    diagnostic=None,
+):
     payload = {
         "adapter_version": config["adapter_version"],
         "group_id": group_id,
@@ -96,6 +116,8 @@ def _fingerprint(group_id, inputs, config, config_sha256, public_sha256, routes_
         "confidence_quantile": config["confidence_quantile"],
         "inputs": inputs,
     }
+    if diagnostic is not None:
+        payload["diagnostic"] = diagnostic
     encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
     return hashlib.sha256(encoded).hexdigest()
 
@@ -122,7 +144,7 @@ def _assert_cut3r_inputs(group_id, inputs, cut3r_geometry):
         raise ValueError(f"group {group_id} 的 VGGT 输入与 Gate 7 CUT3R 不一致")
 
 
-def _valid_checkpoint(path, fingerprint):
+def _valid_checkpoint(path, fingerprint, require_diagnostics=False):
     path = Path(path)
     if not path.is_file():
         return None
@@ -138,13 +160,17 @@ def _valid_checkpoint(path, fingerprint):
         "camera_trajectories",
         "timing",
     }
-    if (
-        value.get("status") == "success"
-        and value.get("fingerprint") == fingerprint
-        and required <= set(value)
-    ):
-        return value
-    return None
+    if value.get("status") != "success" or value.get("fingerprint") != fingerprint:
+        return None
+    if not required <= set(value):
+        return None
+    if require_diagnostics and set(value.get("diagnostic_selectors", {})) != {
+        "center_0.12",
+        "gt_bbox",
+        "gt_mask",
+    }:
+        return None
+    return value
 
 
 def _archive_existing(path):
@@ -205,7 +231,14 @@ def _geometry(world_maps, confidences, poses, target_index, donor_index, fractio
     }
 
 
-def _run_sequence(paths, model, device, config):
+def _run_sequence(
+    paths,
+    model,
+    device,
+    config,
+    diagnostic_masks=None,
+    diagnostic_config=None,
+):
     import torch
 
     from vggt.utils.geometry import (
@@ -271,8 +304,7 @@ def _run_sequence(paths, model, device, config):
                 world_maps, confidence, poses, 3, 4, fraction, quantile
             ),
         }
-    del images, tokens, pose_enc, depth_conf
-    return {
+    value = {
         **main,
         "diagnostic_candidates": diagnostics,
         "camera_to_world": poses.tolist(),
@@ -282,22 +314,71 @@ def _run_sequence(paths, model, device, config):
         "peak_allocated_bytes": peak_memory,
         "frame_count": len(paths),
     }
+    if diagnostic_config is not None:
+        historical = summarize_stage(
+            world_maps,
+            confidence,
+            {"target": 0, "donor": 1},
+            diagnostic_masks["historical"],
+            config["center_crop_fraction"],
+            config["confidence_quantile"],
+        )
+        current = summarize_stage(
+            world_maps,
+            confidence,
+            {"target": 3, "donor": 4},
+            diagnostic_masks["current"],
+            config["center_crop_fraction"],
+            config["confidence_quantile"],
+        )
+        selectors = {}
+        for selector in historical:
+            selectors[selector] = {
+                "historical": _decorate_diagnostic_stage(
+                    historical[selector], poses[2]
+                ),
+                "current": _decorate_diagnostic_stage(current[selector], poses[2]),
+            }
+        tolerance = diagnostic_config["tolerances"]["center_point_absolute"]
+        for stage_name in ("historical", "current"):
+            for role in ("target", "donor"):
+                if not np.allclose(
+                    value[stage_name][role]["world"],
+                    selectors["center_0.12"][stage_name][role]["world"],
+                    atol=tolerance,
+                    rtol=0,
+                ):
+                    raise ValueError("VGGT 诊断 center 与原中心点实现不一致")
+        value["diagnostic_selectors"] = selectors
+    del images, tokens, pose_enc, depth_conf
+    return value
 
 
 def run(args):
     if not os.environ.get("TMUX"):
         raise RuntimeError("Plan 2 VGGT 只能在 tmux 中执行")
     config = _load_config(args.config)
+    diagnostic_config = _load_diagnostic_config(args.diagnostic_config, "vggt")
+    if diagnostic_config is not None:
+        _assert_diagnostic_output(args.output, diagnostic_config)
     if Path(args.checkpoint).stat().st_size != config["model_file_bytes"]:
         raise ValueError("VGGT 权重大小与冻结配置不一致")
     checkpoint_sha256 = _sha256_file(args.checkpoint)
     if checkpoint_sha256 != config["model_sha256"]:
         raise ValueError("VGGT 权重 SHA256 与冻结配置不一致")
+    if diagnostic_config is not None and checkpoint_sha256 != diagnostic_config[
+        "backends"
+    ]["vggt"]["checkpoint_sha256"]:
+        raise ValueError("VGGT 权重与诊断配置不一致")
     config_sha256 = _sha256_file(args.config)
     public_sha256 = _sha256_file(args.episodes)
     routes_sha256 = _sha256_file(args.routes)
     contexts = _source_contexts(args.source_checkpoints)
     groups = _public_groups(args.episodes, args.group_id, args.max_groups)
+    if diagnostic_config is not None and args.group_id is None:
+        pilot = diagnostic_config["pilot_group_ids"]
+        rank = {group_id: index for index, group_id in enumerate(pilot)}
+        groups.sort(key=lambda item: (rank.get(item[0], len(rank)), item[0]))
     checkpoint_root = args.output / "checkpoints"
     checkpoint_root.mkdir(parents=True, exist_ok=True)
     prepared = []
@@ -316,6 +397,29 @@ def run(args):
         }
         inputs = _input_records(sequences)
         _assert_cut3r_inputs(group_id, inputs, args.cut3r_geometry)
+        masks = (
+            _diagnostic_mask_bundle(context, args.dataset_root)
+            if diagnostic_config is not None
+            else None
+        )
+        diagnostic_fingerprint = None
+        mask_inputs = []
+        if diagnostic_config is not None:
+            for scenario, paths in sorted(masks.items()):
+                for record in mask_input_records(paths):
+                    mask_inputs.append({"scenario": scenario, **record})
+            diagnostic_fingerprint = {
+                "protocol_revision": diagnostic_config["protocol_revision"],
+                "config_sha256": diagnostic_config["_sha256"],
+                "adapter_version": diagnostic_config["backends"]["vggt"][
+                    "adapter_version"
+                ],
+                "selectors": diagnostic_config["selectors"],
+                "confidence_quantile": diagnostic_config[
+                    "confidence_quantile"
+                ],
+                "mask_inputs": mask_inputs,
+            }
         fingerprint = _fingerprint(
             group_id,
             inputs,
@@ -323,15 +427,27 @@ def run(args):
             config_sha256,
             public_sha256,
             routes_sha256,
+            diagnostic_fingerprint,
         )
         path = checkpoint_root / f"{group_id}.json"
-        existing = _valid_checkpoint(path, fingerprint)
+        existing = _valid_checkpoint(
+            path, fingerprint, require_diagnostics=diagnostic_config is not None
+        )
         if existing is not None:
             print(f"resume={group_id} fingerprint 通过，跳过推理", flush=True)
             results.append(existing)
             continue
         prepared.append(
-            (group_id, episode_count, sequences, fingerprint, inputs, path)
+            (
+                group_id,
+                episode_count,
+                sequences,
+                masks,
+                mask_inputs,
+                fingerprint,
+                inputs,
+                path,
+            )
         )
 
     if not prepared:
@@ -356,6 +472,8 @@ def run(args):
             results,
             0.0,
         )
+        if diagnostic_config is not None:
+            manifest.update(_diagnostic_manifest_fields(diagnostic_config))
         _atomic_json(args.output / "manifest.json", manifest)
         return manifest
 
@@ -366,11 +484,24 @@ def run(args):
     )
     print(f"model_load_seconds={model_load_seconds:.6f}", flush=True)
     for index, item in enumerate(prepared, start=1):
-        group_id, episode_count, sequences, fingerprint, inputs, path = item
+        (
+            group_id,
+            episode_count,
+            sequences,
+            masks,
+            mask_inputs,
+            fingerprint,
+            inputs,
+            path,
+        ) = item
         _archive_existing(path)
         base = {
             "schema_version": SCHEMA_VERSION,
-            "adapter_version": config["adapter_version"],
+            "adapter_version": diagnostic_config["backends"]["vggt"][
+                "adapter_version"
+            ]
+            if diagnostic_config is not None
+            else config["adapter_version"],
             "backend_id": "vggt",
             "repository_commit": config["repository_commit"],
             "group_id": group_id,
@@ -388,13 +519,39 @@ def run(args):
             "grounding_note": "只使用目标居中验证帧中心区域，不读取 GT 或私有答案。",
             "inputs": inputs,
         }
+        if diagnostic_config is not None:
+            base.update(
+                {
+                    "diagnostic_only": True,
+                    "qa_revealed": True,
+                    "uses_gt_mask": True,
+                    "eligible_as_main_result": False,
+                    "protocol_revision": diagnostic_config["protocol_revision"],
+                    "diagnostic_config_sha256": diagnostic_config["_sha256"],
+                    "mask_inputs": mask_inputs,
+                }
+            )
         print(
             f"group={group_id} progress={index}/{len(prepared)} start={_utc_now()}",
             flush=True,
         )
         try:
-            stable = _run_sequence(sequences["stable"], model, args.device, config)
-            stale = _run_sequence(sequences["stale"], model, args.device, config)
+            stable = _run_sequence(
+                sequences["stable"],
+                model,
+                args.device,
+                config,
+                masks["stable"] if masks is not None else None,
+                diagnostic_config,
+            )
+            stale = _run_sequence(
+                sequences["stale"],
+                model,
+                args.device,
+                config,
+                masks["stale"] if masks is not None else None,
+                diagnostic_config,
+            )
             diagnostic_candidates = {}
             for fraction in config["diagnostic_crop_fractions"]:
                 key = str(fraction)
@@ -442,7 +599,19 @@ def run(args):
                     stable["peak_allocated_bytes"], stale["peak_allocated_bytes"]
                 ),
                 "private_file_open_count": 0,
+                "private_file_scope": "oracle_private_jsonl",
             }
+            if diagnostic_config is not None:
+                value["diagnostic_gt_mask_file_count"] = len(mask_inputs)
+                value["diagnostic_selectors"] = _combine_diagnostic_selectors(
+                    stable, stale
+                )
+                _validate_baseline_reproduction(
+                    value,
+                    diagnostic_config["paths"]["vggt_baseline_geometry"],
+                    diagnostic_config["tolerances"]["center_point_absolute"],
+                )
+                value["baseline_reproduction_pass"] = True
             _atomic_json(path, value)
             results.append(value)
             print(
@@ -477,6 +646,8 @@ def run(args):
         results,
         model_load_seconds,
     )
+    if diagnostic_config is not None:
+        manifest.update(_diagnostic_manifest_fields(diagnostic_config))
     _atomic_json(args.output / "manifest.json", manifest)
     return manifest
 
@@ -509,6 +680,7 @@ def _manifest(
         "complete": len(success) == len(groups) and not failures,
         "model_load_seconds_this_run": model_load_seconds,
         "private_file_open_count": 0,
+        "private_file_scope": "oracle_private_jsonl",
         "groups": [
             {
                 "group_id": value["group_id"],
@@ -520,6 +692,19 @@ def _manifest(
             }
             for value in sorted(results, key=lambda item: item["group_id"])
         ],
+    }
+
+
+def _diagnostic_manifest_fields(config):
+    return {
+        "adapter_version": config["backends"]["vggt"]["adapter_version"],
+        "diagnostic_only": True,
+        "qa_revealed": True,
+        "uses_gt_mask": True,
+        "diagnostic_gt_mask_access_declared": True,
+        "eligible_as_main_result": False,
+        "protocol_revision": config["protocol_revision"],
+        "diagnostic_config_sha256": config["_sha256"],
     }
 
 
@@ -546,6 +731,7 @@ def build_parser():
     parser.add_argument("--group-id")
     parser.add_argument("--max-groups", type=int)
     parser.add_argument("--continue-on-error", action="store_true")
+    parser.add_argument("--diagnostic-config", type=Path)
     return parser
 
 
