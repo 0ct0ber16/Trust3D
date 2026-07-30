@@ -14,8 +14,6 @@ NVIDIA_SMI=${PLAN2_NVIDIA_SMI:-nvidia-smi}
 INTERVAL=${PLAN2_WATCH_INTERVAL_SECONDS:-$(jq -r '.resources.watch_interval_seconds' "${CONFIG}")}
 MIN_FREE=$(jq -r '.resources.minimum_free_gpu_mib' "${CONFIG}")
 MAX_UTIL=$(jq -r '.resources.maximum_gpu_utilization_percent' "${CONFIG}")
-STABLE_CHECKS=${PLAN2_STABLE_CHECKS:-$(jq -r '.resources.stable_checks' "${CONFIG}")}
-STABLE_INTERVAL=${PLAN2_STABLE_CHECK_INTERVAL_SECONDS:-$(jq -r '.resources.stable_check_interval_seconds' "${CONFIG}")}
 
 mkdir -p "${OUTPUT}" "$(dirname "${STATE}")" /224010104/Jerry/logs/plan2
 cd "${ROOT}"
@@ -62,25 +60,6 @@ gpu_candidate() {
       ($2+0)>=min_free && ($3+0)<=max_util && (requested=="" || $1==requested) {print; exit}'
 }
 
-stable_candidate() {
-  local selected=''
-  local row index free_mib utilization check
-  for ((check=1; check<=STABLE_CHECKS; check++)); do
-    row=$(gpu_candidate "${selected}")
-    if [[ -z ${row} ]]; then
-      return 1
-    fi
-    IFS=, read -r index free_mib utilization <<< "${row}"
-    selected=${index}
-    printf '[%s] 稳定检查 %s/%s gpu=%s free_mib=%s utilization=%s\n' \
-      "$(date -Is)" "${check}" "${STABLE_CHECKS}" "${index}" "${free_mib}" "${utilization}" >&2
-    if (( check < STABLE_CHECKS )); then
-      sleep "${STABLE_INTERVAL}"
-    fi
-  done
-  printf '%s\n' "${selected}"
-}
-
 on_signal() {
   atomic_state interrupted 'GPU 监测器收到终止信号，checkpoint 保留。'
   exit 130
@@ -117,9 +96,9 @@ while true; do
 
   printf '[%s] GPU 快照\n' "$(date -Is)"
   "${NVIDIA_SMI}" --query-gpu=index,memory.used,memory.free,utilization.gpu,temperature.gpu --format=csv,noheader,nounits
-  selected=$(stable_candidate || true)
+  selected=$(gpu_candidate || true)
   if [[ -z ${selected} ]]; then
-    atomic_state waiting_for_gpu "没有 GPU 连续 ${STABLE_CHECKS} 次满足门槛。"
+    atomic_state waiting_for_gpu '当前没有 GPU 满足门槛。'
     if [[ ${PLAN2_WATCH_ONCE:-0} == 1 ]]; then
       exit 75
     fi
@@ -127,8 +106,10 @@ while true; do
     continue
   fi
 
+  IFS=, read -r selected free_mib utilization <<< "${selected}"
   atomic_state launching "GPU ${selected} 满足门槛，立即启动 Plan 2。" "${selected}"
-  printf '[%s] selected_gpu=%s，启动 scripts/run_plan2.sh resume\n' "$(date -Is)" "${selected}"
+  printf '[%s] selected_gpu=%s free_mib=%s utilization=%s，启动 scripts/run_plan2.sh resume\n' \
+    "$(date -Is)" "${selected}" "${free_mib}" "${utilization}"
   if [[ ${PLAN2_WATCH_DRY_RUN:-0} == 1 ]]; then
     atomic_state dry_run "GPU ${selected} 满足门槛；dry-run 未启动方案。" "${selected}" 0
     exit 0

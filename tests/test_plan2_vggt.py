@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 import numpy as np
 
@@ -38,6 +39,24 @@ def test_plan2_config_is_fully_locked():
     )
     assert config["center_crop_fraction"] == 0.12
     assert config["diagnostic_crop_fractions"] == [0.08, 0.18]
+
+
+def test_gpu_claim_uses_single_check_fast_path():
+    config = _load_config("configs/plan2_vggt.json")
+    resources = config["resources"]
+    assert resources["watch_interval_seconds"] == 1
+    assert "stable_checks" not in resources
+    assert "stable_check_interval_seconds" not in resources
+
+    watcher = Path("scripts/watch_plan2_gpu.sh").read_text(encoding="utf-8")
+    assert "stable_candidate" not in watcher
+    assert "STABLE_CHECKS" not in watcher
+
+    runner = Path("scripts/run_plan2.sh").read_text(encoding="utf-8")
+    preflight = runner.split("gpu_preflight() {", 1)[1].split("\n}", 1)[0]
+    assert preflight.count("gpu_row") == 1
+    assert "for check" not in preflight
+    assert "sleep" not in preflight
 
 
 def test_vggt_fingerprint_changes_with_an_input_hash():

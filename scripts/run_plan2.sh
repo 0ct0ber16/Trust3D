@@ -259,28 +259,16 @@ gpu_preflight() {
     return 73
   fi
   local requested=${PLAN2_SELECTED_GPU:-}
-  local selected=''
-  local check row index free_mib utilization
-  for check in 1 2 3; do
-    row=$(gpu_row "${requested}")
-    if [[ -z ${row} ]]; then
-      printf 'GPU 检查 %s/3 未找到合格设备。\n' "${check}"
-      return 75
-    fi
-    IFS=, read -r index free_mib utilization <<< "${row}"
-    if [[ -n ${selected} && ${selected} != "${index}" ]]; then
-      printf '%s\n' '连续检查未保持同一张 GPU，暂停。'
-      return 75
-    fi
-    selected=${index}
-    requested=${index}
-    printf 'GPU 检查 %s/3: index=%s free_mib=%s utilization=%s\n' \
-      "${check}" "${index}" "${free_mib}" "${utilization}"
-    if (( check < 3 )); then
-      sleep 10
-    fi
-  done
-  SELECTED_GPU=${selected}
+  local row index free_mib utilization
+  row=$(gpu_row "${requested}")
+  if [[ -z ${row} ]]; then
+    printf '%s\n' 'GPU 原子准入复核未找到合格设备。'
+    return 75
+  fi
+  IFS=, read -r index free_mib utilization <<< "${row}"
+  printf 'GPU 原子准入复核: index=%s free_mib=%s utilization=%s\n' \
+    "${index}" "${free_mib}" "${utilization}"
+  SELECTED_GPU=${index}
   export SELECTED_GPU
 }
 

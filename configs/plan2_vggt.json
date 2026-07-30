@@ -26,9 +26,7 @@
   "resources": {
     "minimum_free_gpu_mib": 60000,
     "maximum_gpu_utilization_percent": 10,
-    "stable_checks": 3,
-    "stable_check_interval_seconds": 10,
-    "watch_interval_seconds": 60,
+    "watch_interval_seconds": 1,
     "cpu_threads": 8
   }
 }
