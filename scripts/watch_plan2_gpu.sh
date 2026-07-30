@@ -8,12 +8,14 @@ OUTPUT=${ROOT}/outputs/plan2
 STATUS=${OUTPUT}/status.json
 STATE=${JERRY}/checkpoints/plan2/gpu-watch.json
 LOCK=${JERRY}/checkpoints/plan2/gpu-watch.lock
+RUNNER_LOCK=${JERRY}/checkpoints/plan2/runner.lock
 RUNNER=${ROOT}/scripts/run_plan2.sh
-INTERVAL=$(jq -r '.resources.watch_interval_seconds' "${CONFIG}")
+NVIDIA_SMI=${PLAN2_NVIDIA_SMI:-nvidia-smi}
+INTERVAL=${PLAN2_WATCH_INTERVAL_SECONDS:-$(jq -r '.resources.watch_interval_seconds' "${CONFIG}")}
 MIN_FREE=$(jq -r '.resources.minimum_free_gpu_mib' "${CONFIG}")
 MAX_UTIL=$(jq -r '.resources.maximum_gpu_utilization_percent' "${CONFIG}")
-STABLE_CHECKS=$(jq -r '.resources.stable_checks' "${CONFIG}")
-STABLE_INTERVAL=$(jq -r '.resources.stable_check_interval_seconds' "${CONFIG}")
+STABLE_CHECKS=${PLAN2_STABLE_CHECKS:-$(jq -r '.resources.stable_checks' "${CONFIG}")}
+STABLE_INTERVAL=${PLAN2_STABLE_CHECK_INTERVAL_SECONDS:-$(jq -r '.resources.stable_check_interval_seconds' "${CONFIG}")}
 
 mkdir -p "${OUTPUT}" "$(dirname "${STATE}")" /224010104/Jerry/logs/plan2
 cd "${ROOT}"
@@ -34,22 +36,26 @@ atomic_state() {
     '{schema_version:1,state:$state,message:$message,selected_gpu:($gpu|if .=="" then null else tonumber end),runner_exit_code:$runner_exit,updated_at:$updated_at,host:$host}' \
     > "${temporary}"
   mv "${temporary}" "${STATE}"
-  local status_tmp=${STATUS}.tmp.$$
-  jq -n \
-    --arg state "${state}" \
-    --arg stage gpu_watch \
-    --arg message "${message}" \
-    --arg current_log /224010104/Jerry/logs/plan2/gpu-watch.log \
-    --arg updated_at "$(date -Is)" \
-    --arg host "$(hostname)" \
-    '{schema_version:1,state:$state,stage:$stage,message:$message,current_log:$current_log,updated_at:$updated_at,host:$host}' \
-    > "${status_tmp}"
-  mv "${status_tmp}" "${STATUS}"
+  exec 8>"${RUNNER_LOCK}"
+  if flock -n 8; then
+    local status_tmp=${STATUS}.tmp.$$
+    jq -n \
+      --arg state "${state}" \
+      --arg stage gpu_watch \
+      --arg message "${message}" \
+      --arg current_log /224010104/Jerry/logs/plan2/gpu-watch.log \
+      --arg updated_at "$(date -Is)" \
+      --arg host "$(hostname)" \
+      '{schema_version:1,state:$state,stage:$stage,message:$message,current_log:$current_log,updated_at:$updated_at,host:$host}' \
+      > "${status_tmp}"
+    mv "${status_tmp}" "${STATUS}"
+    flock -u 8
+  fi
 }
 
 gpu_candidate() {
   local requested=${1:-}
-  nvidia-smi --query-gpu=index,memory.free,utilization.gpu --format=csv,noheader,nounits \
+  "${NVIDIA_SMI}" --query-gpu=index,memory.free,utilization.gpu --format=csv,noheader,nounits \
     | tr -d ' ' \
     | sort -t, -k2,2nr \
     | awk -F, -v requested="${requested}" -v min_free="${MIN_FREE}" -v max_util="${MAX_UTIL}" '
@@ -110,7 +116,7 @@ while true; do
   fi
 
   printf '[%s] GPU 快照\n' "$(date -Is)"
-  nvidia-smi --query-gpu=index,memory.used,memory.free,utilization.gpu,temperature.gpu --format=csv,noheader,nounits
+  "${NVIDIA_SMI}" --query-gpu=index,memory.used,memory.free,utilization.gpu,temperature.gpu --format=csv,noheader,nounits
   selected=$(stable_candidate || true)
   if [[ -z ${selected} ]]; then
     atomic_state waiting_for_gpu "没有 GPU 连续 ${STABLE_CHECKS} 次满足门槛。"

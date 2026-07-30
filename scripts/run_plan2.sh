@@ -17,6 +17,7 @@ MODEL_PART=${MODEL}.part
 BASE_PY=/224010104/Jerry/.conda/envs/cut3r/bin/python
 SIM_PY=/224010104/miniconda3/envs/trust3d-sim/bin/python
 MODE=${1:-status}
+NVIDIA_SMI=${PLAN2_NVIDIA_SMI:-nvidia-smi}
 
 export HOME=${JERRY}
 export TMPDIR=${JERRY}/.tmp
@@ -89,7 +90,7 @@ host_preflight() {
   uptime
   free -h
   df -h "${JERRY}"
-  nvidia-smi --query-gpu=index,memory.used,memory.free,utilization.gpu,temperature.gpu --format=csv,noheader,nounits
+  "${NVIDIA_SMI}" --query-gpu=index,memory.used,memory.free,utilization.gpu,temperature.gpu --format=csv,noheader,nounits
   local available_kib free_kib
   available_kib=$(awk '/MemAvailable/{print $2}' /proc/meminfo)
   free_kib=$(df -Pk "${JERRY}" | awk 'NR==2{print $4}')
@@ -245,7 +246,7 @@ run_bootstrap() {
 
 gpu_row() {
   local requested=${1:-}
-  nvidia-smi --query-gpu=index,memory.free,utilization.gpu --format=csv,noheader,nounits \
+  "${NVIDIA_SMI}" --query-gpu=index,memory.free,utilization.gpu --format=csv,noheader,nounits \
     | tr -d ' ' \
     | awk -F, -v requested="${requested}" -v min_free=60000 -v max_util=10 '
       ($2+0)>=min_free && ($3+0)<=max_util && (requested=="" || $1==requested) {print; exit}'
@@ -480,7 +481,7 @@ show_status() {
       printf '  %-10s pending\n' "${stage}"
     fi
   done
-  nvidia-smi --query-gpu=index,memory.used,memory.free,utilization.gpu --format=csv,noheader,nounits
+  "${NVIDIA_SMI}" --query-gpu=index,memory.used,memory.free,utilization.gpu --format=csv,noheader,nounits
 }
 
 dispatch() {
