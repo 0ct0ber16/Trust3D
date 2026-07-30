@@ -1,0 +1,23 @@
+{
+  "crop_purity_median": 0.0,
+  "diagnostic_only": true,
+  "main_crop_fraction": 0.12,
+  "main_result_overwritten": false,
+  "purity_accuracy_quartiles": {
+    "accuracy_gap": -0.07291666666666669,
+    "groups_per_quartile": 8,
+    "high_accuracy": 0.3645833333333333,
+    "high_purity_median": 0.02587429111531191,
+    "low_accuracy": 0.4375,
+    "low_purity_median": 0.0
+  },
+  "schema_version": 1,
+  "trigger_conditions": {
+    "accuracy_gap_at_least_20pp": false,
+    "crop_purity_median_below_0_90": true,
+    "main_qa_drop_above_10pp": true,
+    "purity_quartiles_separated": true
+  },
+  "triggered": false,
+  "variant_results": {}
+}

@@ -1,0 +1,30 @@
+{
+  "conditional_diagnostics_triggered": false,
+  "cut3r_accuracy": 0.5611111111111111,
+  "engineering_checks": {
+    "all_evaluator_criteria_except_quality": true,
+    "checkpoint_recovery_pass": true,
+    "movement_steps_unchanged": true,
+    "new_observation_count_unchanged": true
+  },
+  "gate7_vggt_pass": false,
+  "gate8_may_be_planned": false,
+  "gt_to_vggt_qa_drop": 0.55,
+  "original_gate7_cut3r_pass": false,
+  "original_gate7_preserved": true,
+  "paired_cut3r_comparison": {
+    "accuracy_difference": -0.1111111111111111,
+    "ci95": [
+      -0.21388888888888888,
+      -0.008333333333333338
+    ],
+    "group_count": 30,
+    "samples": 10000,
+    "seed": 20260730,
+    "unit": "group"
+  },
+  "posthoc_changes_main_result": false,
+  "result_status": "failure_analysis",
+  "schema_version": 1,
+  "vggt_accuracy": 0.45
+}

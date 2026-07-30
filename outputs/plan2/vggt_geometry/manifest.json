@@ -1,0 +1,199 @@
+{
+  "adapter_version": "plan2-vggt-depth-v1",
+  "backend_id": "vggt",
+  "checkpoint_path": "/224010104/Jerry/trust3d/external/vggt/model.safetensors",
+  "checkpoint_sha256": "f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e",
+  "complete": true,
+  "config_sha256": "8ea3e131dc315da8bcd34c8173ae0e0af1d04c93e749b63b96a85a41250d9556",
+  "created_at": "2026-07-30T07:18:52.296510+00:00",
+  "episodes_path": "data/episodes/spatial30/episodes_public.jsonl",
+  "episodes_sha256": "9d5cd67479fb1e1c8291effb0d77ed876b0cc27d6b7f9cd02eb43045f3022263",
+  "failure_group_count": 0,
+  "groups": [
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_02195803c5ebd4d3dcb170a7.json",
+      "fingerprint": "cfc26402975cdb3d691e54d66e6147bab874deadf10c422ba8c7b2ce1c42d0e4",
+      "group_id": "s_02195803c5ebd4d3dcb170a7",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_0b93c631a13c7f6c97350767.json",
+      "fingerprint": "0687d3c3bb7b55cce4e0a3e00dab5af91333a0382a4f40dae3810b85d5997130",
+      "group_id": "s_0b93c631a13c7f6c97350767",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_296a3a3a030619522f3f1a56.json",
+      "fingerprint": "c6d5b4c93a166f3ea559da9f8e3dd8e545181ffd4dc704de5b7e91c1537fc920",
+      "group_id": "s_296a3a3a030619522f3f1a56",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_2c117a1e691376ae4428389c.json",
+      "fingerprint": "5000f4f6656e3a48fa525d866437ce9bfe7d3cc8ca6c2a7e25fd0bbaa6c6052d",
+      "group_id": "s_2c117a1e691376ae4428389c",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_2e41a5aabaa9a4541c53cac4.json",
+      "fingerprint": "6c471045b391bb4ee91b387895468ff96c4daa31db8d9b31593900b0d2430f79",
+      "group_id": "s_2e41a5aabaa9a4541c53cac4",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_39ad630766a4d0f9dcbe9445.json",
+      "fingerprint": "0f83219561712a5bae6312a26ed65032b127e0ef780a218d081cc50751951207",
+      "group_id": "s_39ad630766a4d0f9dcbe9445",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_3a2c6f6b92fbd145f4f14c8a.json",
+      "fingerprint": "7885527860498b420c067aaeba484f1bd5bbc19feedb9c52837d3e516d22ec01",
+      "group_id": "s_3a2c6f6b92fbd145f4f14c8a",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_61d115c4b0b6f8daa23e3d7c.json",
+      "fingerprint": "9bfbdc02318a6c380163d2cf981ae4d15b378c2cfcff1a5e380db3ca3418dd39",
+      "group_id": "s_61d115c4b0b6f8daa23e3d7c",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_7c6df2ffd6ebbb22871f9f2e.json",
+      "fingerprint": "d1d61ebccee38507c40f53689c3c4438fb52879e85d41c52c2fe73fd8244200b",
+      "group_id": "s_7c6df2ffd6ebbb22871f9f2e",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_919a234db5a121ffdd6e4b23.json",
+      "fingerprint": "088f866dcf21d8fbdc92da6fa705a5d06dc4ce2e8f15fd239dd8d1f4c13ffb8d",
+      "group_id": "s_919a234db5a121ffdd6e4b23",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_97ea04e6478be3c0582b3214.json",
+      "fingerprint": "d6412db753020dccc81bcf816006559eda748c25094e132540a6e8a5d8154299",
+      "group_id": "s_97ea04e6478be3c0582b3214",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_a64eb2f278912097718f7f8d.json",
+      "fingerprint": "d24b7a99c55f1246ed1ae2f1ae2e944ab467ce8f0476d6bdf9d4dc3981cf6da0",
+      "group_id": "s_a64eb2f278912097718f7f8d",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_b203cd84c550d762a694adc4.json",
+      "fingerprint": "859f3676c0eb331153806dccc747ee9dccf366bcda1fa1efafc95f876d579161",
+      "group_id": "s_b203cd84c550d762a694adc4",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_b272ab5beb5c5603940920a3.json",
+      "fingerprint": "80a3a0dc5e402b4325fcec6dbab951165b992e1a6b1da637f41ce5d5c9f37eda",
+      "group_id": "s_b272ab5beb5c5603940920a3",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_b791db9e92e52dc67b9dc7ac.json",
+      "fingerprint": "188f4cf5468de0552fd5b32917f67c0c30d84b4fcc90351c4ead79135ab6660e",
+      "group_id": "s_b791db9e92e52dc67b9dc7ac",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_bae3bc59ea0b136f910c78ba.json",
+      "fingerprint": "a358a0e27a385123f154b6ad454924c0c3e2bc0499c9b48da1ccbec2d0161a18",
+      "group_id": "s_bae3bc59ea0b136f910c78ba",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_bdc5e8a42faf0c8378a5d7d3.json",
+      "fingerprint": "9b2579fd231ec770bd0b994c4e377b4b392bf57f57eaa9853e64439f4a4ef21e",
+      "group_id": "s_bdc5e8a42faf0c8378a5d7d3",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_bdfc3974c1d9e6684898c508.json",
+      "fingerprint": "7cf0a3484147eb81217c96f1c037d78f30d6179b1ad0001cecd6c586f2a37009",
+      "group_id": "s_bdfc3974c1d9e6684898c508",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_ca083d9add3fac512d4cef00.json",
+      "fingerprint": "b19ec69c326336a71ab7eadc0da9350b226b43a7292a8751da37196759ab8a50",
+      "group_id": "s_ca083d9add3fac512d4cef00",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_ca12ed41b575fd899e71378b.json",
+      "fingerprint": "a04e5fd3d3d3c8da940096b5352ed0329fd0cb491649934f738732c129bd320d",
+      "group_id": "s_ca12ed41b575fd899e71378b",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_cd85bb843aadb5708a2ea2d0.json",
+      "fingerprint": "669667d83b7e2fd057e2eb80a1030358d8b6afccbe7e528eab6ffd800efd9202",
+      "group_id": "s_cd85bb843aadb5708a2ea2d0",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_d2368a83036109d80329686c.json",
+      "fingerprint": "c194d1034476a3002838d1dca364f86c317290bfea4b7fefafd0d0289dfb091d",
+      "group_id": "s_d2368a83036109d80329686c",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_d9657d59f748312c18c1a657.json",
+      "fingerprint": "3e916a942ba8e8ffc3000b4a667b54f72b678481ab7550d29a1bd7c3382af3f5",
+      "group_id": "s_d9657d59f748312c18c1a657",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_e73f05a60c0f8025bf22c1a2.json",
+      "fingerprint": "39ec275d33475819092b072daed694a15470b83e804ec082d5462687bd7b8877",
+      "group_id": "s_e73f05a60c0f8025bf22c1a2",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_ef34bcabc8bf1b70e502d928.json",
+      "fingerprint": "fad3d9567c3698ca0a58754df24b4f453a16c4d4a389795c5a9cea0e1253e7e0",
+      "group_id": "s_ef34bcabc8bf1b70e502d928",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_f3c198ac4dd19b96a04a087b.json",
+      "fingerprint": "e008a7934b6154468619a248ee072df8a3b8afa69e2e61486d2dd3059a31d910",
+      "group_id": "s_f3c198ac4dd19b96a04a087b",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_f69085b2e36b2513d5aa4f06.json",
+      "fingerprint": "0d202c90cca4e9dcb71fc557350781cf911e07faaafc442597be1e067449e601",
+      "group_id": "s_f69085b2e36b2513d5aa4f06",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_f7b0e894cff823e146ff1be4.json",
+      "fingerprint": "899d6241a730d67975cc7f2dc8ee140b197b13bb846bada16525f42baa0683b6",
+      "group_id": "s_f7b0e894cff823e146ff1be4",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_fc4032ce5f961919bd096926.json",
+      "fingerprint": "1f0c88fdce047ef04cde12ddf6c1df58c516575fe170e1fe4c88b2a29533eec7",
+      "group_id": "s_fc4032ce5f961919bd096926",
+      "status": "success"
+    },
+    {
+      "checkpoint": "/224010104/Jerry/trust3d/outputs/plan2/vggt_geometry/checkpoints/s_fe37e8a6e561e49d9de7f1c2.json",
+      "fingerprint": "5f0cafda545546b787d4b0e89c6b02056793e19bcb5eb62d0f469533d4c13aef",
+      "group_id": "s_fe37e8a6e561e49d9de7f1c2",
+      "status": "success"
+    }
+  ],
+  "model_load_seconds_this_run": 13.901467138028238,
+  "private_file_open_count": 0,
+  "requested_group_count": 30,
+  "schema_version": 1,
+  "success_group_count": 30
+}

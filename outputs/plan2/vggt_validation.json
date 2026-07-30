@@ -1,0 +1,221 @@
+{
+  "backend_id": "vggt",
+  "branch_question_metrics": {
+    "fresh_stable/front_behind": {
+      "accuracy": 0.1,
+      "episode_count": 30
+    },
+    "fresh_stable/left_right": {
+      "accuracy": 0.6333333333333333,
+      "episode_count": 30
+    },
+    "fresh_stable/target_nearer": {
+      "accuracy": 0.5666666666666667,
+      "episode_count": 30
+    },
+    "fresh_stable/which_closer": {
+      "accuracy": 0.5666666666666667,
+      "episode_count": 30
+    },
+    "risk_stable/front_behind": {
+      "accuracy": 0.1,
+      "episode_count": 30
+    },
+    "risk_stable/left_right": {
+      "accuracy": 0.6333333333333333,
+      "episode_count": 30
+    },
+    "risk_stable/target_nearer": {
+      "accuracy": 0.5666666666666667,
+      "episode_count": 30
+    },
+    "risk_stable/which_closer": {
+      "accuracy": 0.5666666666666667,
+      "episode_count": 30
+    },
+    "risk_stale/front_behind": {
+      "accuracy": 0.13333333333333333,
+      "episode_count": 30
+    },
+    "risk_stale/left_right": {
+      "accuracy": 0.3333333333333333,
+      "episode_count": 30
+    },
+    "risk_stale/target_nearer": {
+      "accuracy": 0.6,
+      "episode_count": 30
+    },
+    "risk_stale/which_closer": {
+      "accuracy": 0.6,
+      "episode_count": 30
+    }
+  },
+  "camera_geometry_group_failure_rate": 0.0,
+  "checkpoint_sha256": "f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e",
+  "criteria": {
+    "all_requested_groups_completed": true,
+    "geometry_group_failure_rate_zero": true,
+    "private_leakage_count_zero": true,
+    "qa_drop_not_above_10pp": false,
+    "query_geometry_failure_rate_zero": true
+  },
+  "episode_count": 360,
+  "frame_sampling": "\u6bcf\u7ec4 stable/stale \u5404\u4e94\u5e27\uff1b518 pad\uff1bRGB-only",
+  "gate7_vggt_pass": false,
+  "geometry_diagnostics": {
+    "diagnostic_failures": [],
+    "latency": {
+      "amortized_seconds_per_question": 0.1464218609921065,
+      "per_question_rerun_estimated_seconds": 326.8178992490284,
+      "stable_sequence_seconds": {
+        "count": 30,
+        "mean": 0.9664201618366254,
+        "median": 0.7932879764994141,
+        "p95": 1.0686563650000598
+      },
+      "stale_sequence_seconds": {
+        "count": 30,
+        "mean": 0.7906421700686527,
+        "median": 0.7906928034790326,
+        "p95": 0.8238553603790932
+      },
+      "state_reuse_time_saving": 0.8387118022657841,
+      "state_reuse_total_seconds": 52.71186995715834
+    },
+    "movable_object_revisit_error": {
+      "count": 120,
+      "mean": 0.01421790571205758,
+      "median": 0.0026463102145641974,
+      "p95": 0.05276741803638932
+    },
+    "peak_allocated_bytes": 6942184960,
+    "static_structure_camera_revisit_error": {
+      "count": 120,
+      "mean": 0.009656415552922818,
+      "median": 0.00012622007117808314,
+      "p95": 0.02321302814903615
+    }
+  },
+  "grounding_boundary": "\u9a8c\u8bc1\u5e27\u89d2\u8272\u548c 12% \u4e2d\u5fc3\u533a\u57df\uff1b\u672a\u8bfb\u53d6 GT depth\u3001mask\u3001pose \u6216\u79c1\u6709\u7b54\u6848\u3002",
+  "group_count": 30,
+  "gt_3d_accuracy": 1.0,
+  "gt_to_vggt_qa_drop": 0.55,
+  "judgment": "VGGT \u53ea\u4f5c\u5931\u8d25\u5206\u6790\uff0c\u505c\u6b62\u5806\u53e0\u89c6\u89c9 backbone",
+  "metrics": {
+    "always_reobserve_vggt": {
+      "accuracy": 0.45,
+      "episode_count": 360,
+      "geometry_failure_count": 0,
+      "movement_steps": 3724,
+      "new_observation_count": 540,
+      "stale_accuracy": 0.4166666666666667
+    },
+    "persistent_3d_vggt": {
+      "accuracy": 0.4222222222222222,
+      "episode_count": 360,
+      "geometry_failure_count": 0,
+      "movement_steps": 0,
+      "new_observation_count": 0,
+      "stale_accuracy": 0.3333333333333333
+    },
+    "trust3d_gt_reference": {
+      "accuracy": 1.0,
+      "episode_count": 360,
+      "geometry_failure_count": 0,
+      "movement_steps": 2422,
+      "new_observation_count": 360,
+      "stale_accuracy": 1.0
+    },
+    "trust3d_rgbd_reference": {
+      "accuracy": 1.0,
+      "episode_count": 360,
+      "geometry_failure_count": 0,
+      "movement_steps": 2422,
+      "new_observation_count": 360,
+      "stale_accuracy": 1.0
+    },
+    "trust3d_vggt": {
+      "accuracy": 0.45,
+      "episode_count": 360,
+      "geometry_failure_count": 0,
+      "movement_steps": 2422,
+      "new_observation_count": 360,
+      "stale_accuracy": 0.4166666666666667
+    }
+  },
+  "object_type_metrics": {
+    "Box": {
+      "accuracy": 0.6666666666666666,
+      "episode_count": 12
+    },
+    "CellPhone": {
+      "accuracy": 0.4,
+      "episode_count": 60
+    },
+    "CreditCard": {
+      "accuracy": 0.08333333333333333,
+      "episode_count": 36
+    },
+    "DishSponge": {
+      "accuracy": 0.6666666666666666,
+      "episode_count": 12
+    },
+    "Egg": {
+      "accuracy": 0.5833333333333334,
+      "episode_count": 24
+    },
+    "Glassbottle": {
+      "accuracy": 0.4166666666666667,
+      "episode_count": 24
+    },
+    "HandTowel": {
+      "accuracy": 0.5833333333333334,
+      "episode_count": 12
+    },
+    "Newspaper": {
+      "accuracy": 0.16666666666666666,
+      "episode_count": 12
+    },
+    "PepperShaker": {
+      "accuracy": 0.5833333333333334,
+      "episode_count": 12
+    },
+    "SaltShaker": {
+      "accuracy": 0.75,
+      "episode_count": 12
+    },
+    "SoapBottle": {
+      "accuracy": 0.4166666666666667,
+      "episode_count": 12
+    },
+    "SprayBottle": {
+      "accuracy": 0.16666666666666666,
+      "episode_count": 12
+    },
+    "Statue": {
+      "accuracy": 0.6111111111111112,
+      "episode_count": 72
+    },
+    "Vase": {
+      "accuracy": 0.3958333333333333,
+      "episode_count": 48
+    }
+  },
+  "paired_cut3r_comparison": {
+    "accuracy_difference": -0.1111111111111111,
+    "ci95": [
+      -0.21388888888888888,
+      -0.008333333333333338
+    ],
+    "group_count": 30,
+    "samples": 10000,
+    "seed": 20260730,
+    "unit": "group"
+  },
+  "query_geometry_failure_rate": 0.0,
+  "result_status": "failure_analysis",
+  "route_private_leak_count": 0,
+  "schema_version": 1,
+  "vggt_accuracy": 0.45,
+  "vggt_adapter_version": "plan2-vggt-depth-v1"
+}

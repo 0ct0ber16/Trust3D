@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-07-30T07:15:03+00:00",
+  "git_commit": "6f8514de5dfef93e162e1a7a07e2d5ff728ab501",
+  "config_sha256": "8ea3e131dc315da8bcd34c8173ae0e0af1d04c93e749b63b96a85a41250d9556",
+  "adapter_sha256": "db0cad14a715a9ab544dd28b519a2e7cd01f65469aaa6a49cd9d478df278e4a1",
+  "evaluator_sha256": "29fbcef76c539dd636ebcbfa60b375b19938441054f451a752191b538b0bc3e6",
+  "model_sha256": "f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e",
+  "public_sha256": "9d5cd67479fb1e1c8291effb0d77ed876b0cc27d6b7f9cd02eb43045f3022263",
+  "routes_sha256": "057c60055eaa0ee59cf8d4d76d1db22a900c3697e2667c495e05ec07336cf888",
+  "qa_revealed": false
+}

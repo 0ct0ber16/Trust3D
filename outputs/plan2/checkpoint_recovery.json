@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "checkpoint_recovery_pass": true,
+  "all_hashes_match": true,
+  "checked_file_count": 32,
+  "checkpoint_count": 30,
+  "model_load_seconds_this_run": 0,
+  "before_sha256_file": "/224010104/Jerry/logs/plan2/recovery-before.sha256",
+  "after_sha256_file": "/224010104/Jerry/logs/plan2/recovery-after.sha256"
+}
