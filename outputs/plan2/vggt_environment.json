@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "repository_commit": "a288dd0f14786c93483e45524328726ab7b1b4ce",
+  "python": "3.11.9",
+  "torch": "2.3.1+cu121",
+  "license_sha256": "b94e46746792d1adfa0ebdbccada5d4576d244ae230be9de8a46b5868fff001b",
+  "readme_sha256": "56426b9aea25174ccbc4c2c37a3a22107fd8b5ac9dc5a8bf008e7457402ed3bd",
+  "environment_complete": true
+}
