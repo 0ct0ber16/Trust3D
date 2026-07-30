@@ -63,6 +63,23 @@ outputs/gate7/*
 !outputs/gate7/cut3r_geometry/manifest.json
 !outputs/gate7/cut3r_geometry/checkpoints/
 !outputs/gate7/cut3r_geometry/checkpoints/*.json
+!outputs/plan2/
+outputs/plan2/*
+!outputs/plan2/baseline.json
+!outputs/plan2/cut3r_diagnostics.json
+!outputs/plan2/vggt_environment.json
+!outputs/plan2/vggt_weights.json
+!outputs/plan2/protocol_lock.json
+!outputs/plan2/vggt_geometry/
+outputs/plan2/vggt_geometry/*
+!outputs/plan2/vggt_geometry/manifest.json
+!outputs/plan2/vggt_geometry/checkpoints/
+!outputs/plan2/vggt_geometry/checkpoints/*.json
+!outputs/plan2/vggt_predictions.jsonl
+!outputs/plan2/vggt_validation.json
+!outputs/plan2/checkpoint_recovery.json
+!outputs/plan2/conditional_diagnostics.json
+!outputs/plan2/final_decision.json
 
 **/__pycache__/
 *.py[cod]

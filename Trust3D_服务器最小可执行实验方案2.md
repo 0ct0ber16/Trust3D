@@ -149,9 +149,10 @@ QA drop (pp) = 100 * (Trust3D-GT accuracy - Trust3D-VGGT accuracy)
   "repository": "https://github.com/facebookresearch/vggt.git",
   "repository_commit": "a288dd0f14786c93483e45524328726ab7b1b4ce",
   "model_id": "facebook/VGGT-1B",
+  "model_revision": "860abec7937da0a4c03c41d3c269c366e82abdf9",
   "model_file": "model.safetensors",
   "model_file_bytes": 5026367224,
-  "model_sha256": "LOCK_BEFORE_SMOKE",
+  "model_sha256": "f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e",
   "image_size": 518,
   "image_preprocess": "pad",
   "dtype": "bfloat16",
@@ -234,6 +235,28 @@ tail -f "$(jq -r .current_log outputs/plan2/status.json)"
 ```
 
 `status` 不导入模型、不访问 GPU、不修改实验产物。
+
+### 2.5 自动等待 GPU
+
+使用以下幂等入口在当前主机的 `trust3d-<hostname>` tmux 会话中建立独立监测 window：
+
+```bash
+scripts/start_plan2_gpu_watch.sh
+```
+
+监测器 `scripts/watch_plan2_gpu.sh` 每 60 秒读取一次 `nvidia-smi`，不申请显存、不终止进程。只有同一张 GPU 连续 3 次满足空闲显存 `>=60000 MiB` 且利用率 `<=10%` 时，才把该物理 GPU 编号传给 `scripts/run_plan2.sh resume`；runner 在真正加载模型前再独立检查 3 次，防止检查与启动之间的资源竞态。
+
+监测器和 runner 分别使用 `/224010104/Jerry/checkpoints/plan2/` 下的 `flock` 文件，避免重复监测和重复执行。资源在启动前变化时 runner 返回 75，监测器继续等待；数据、哈希、泄漏或代码故障返回其他非零值，监测器停止自动重试并保留日志，不能用无限重试掩盖真实失败。
+
+固定状态和日志：
+
+```text
+/224010104/Jerry/checkpoints/plan2/gpu-watch.json
+/224010104/Jerry/logs/plan2/gpu-watch.log
+outputs/plan2/status.json
+```
+
+tmux 可防本地电脑断开，但不能跨服务器重启。服务器重启后再次执行幂等启动入口，监测器会从已验证的 stage/group checkpoint 继续。
 
 ---
 

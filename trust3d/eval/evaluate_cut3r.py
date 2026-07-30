@@ -395,6 +395,242 @@ def evaluate(
     return report
 
 
+def _build_backend_predictions(oracle, route, geometry, backend_id):
+    question_type = oracle["question_type"]
+    historical, historical_failure = _geometry_answer(
+        geometry, "historical", question_type
+    )
+    current, current_failure = _geometry_answer(
+        geometry, _current_scenario(oracle), question_type
+    )
+    reobserve = route["route"] == "reobserve"
+    routed = current if reobserve else historical
+    routed_failure = current_failure if reobserve else historical_failure
+    gt_answer = (
+        oracle["current_answer_gt"] if reobserve else oracle["historical_answer_gt"]
+    )
+    return [
+        _prediction(
+            oracle,
+            f"persistent_3d_{backend_id}",
+            historical,
+            historical_failure,
+        ),
+        _prediction(
+            oracle,
+            f"always_reobserve_{backend_id}",
+            current,
+            current_failure,
+            reobserve=True,
+        ),
+        _prediction(
+            oracle,
+            f"trust3d_{backend_id}",
+            routed,
+            routed_failure,
+            reobserve=reobserve,
+        ),
+        _prediction(
+            oracle,
+            "trust3d_gt_reference",
+            gt_answer,
+            False,
+            reobserve=reobserve,
+        ),
+        _prediction(
+            oracle,
+            "trust3d_rgbd_reference",
+            oracle["current_answer_rgbd"]
+            if reobserve
+            else oracle["historical_answer_rgbd"],
+            False,
+            reobserve=reobserve,
+        ),
+    ]
+
+
+def _stratified_metrics(predictions, method):
+    grouped = defaultdict(list)
+    for item in predictions:
+        if item["method"] == method:
+            grouped[(item["branch"], item["question_type"])].append(item)
+    return {
+        f"{branch}/{question_type}": {
+            "episode_count": len(records),
+            "accuracy": sum(item["correct"] for item in records) / len(records),
+        }
+        for (branch, question_type), records in sorted(grouped.items())
+    }
+
+
+def _backend_object_type_metrics(predictions, contexts, method):
+    grouped = defaultdict(list)
+    for item in predictions:
+        if item["method"] != method:
+            continue
+        context = contexts.get(item["group_id"], {})
+        grouped[context.get("target_object_type") or "unknown"].append(item)
+    return {
+        object_type: {
+            "episode_count": len(records),
+            "accuracy": sum(item["correct"] for item in records) / len(records),
+        }
+        for object_type, records in sorted(grouped.items())
+    }
+
+
+def _paired_group_bootstrap(predictions, reference_path, method, seed, samples):
+    reference = read_jsonl(reference_path)
+    candidate = {
+        item["episode_id"]: item
+        for item in predictions
+        if item["method"] == method
+    }
+    baseline = {
+        item["episode_id"]: item
+        for item in reference
+        if item["method"] == "trust3d_cut3r"
+    }
+    if set(candidate) != set(baseline):
+        raise ValueError("VGGT 与 CUT3R 配对 episode 不一致")
+    by_group = defaultdict(list)
+    for episode_id, item in candidate.items():
+        by_group[item["group_id"]].append(
+            float(item["correct"]) - float(baseline[episode_id]["correct"])
+        )
+    group_ids = sorted(by_group)
+    group_differences = np.asarray(
+        [np.mean(by_group[group_id]) for group_id in group_ids], dtype=np.float64
+    )
+    rng = np.random.default_rng(seed)
+    draws = rng.choice(
+        group_differences,
+        size=(samples, len(group_differences)),
+        replace=True,
+    ).mean(axis=1)
+    return {
+        "unit": "group",
+        "group_count": len(group_ids),
+        "seed": seed,
+        "samples": samples,
+        "accuracy_difference": float(np.mean(group_differences)),
+        "ci95": [float(value) for value in np.quantile(draws, [0.025, 0.975])],
+    }
+
+
+def evaluate_vggt(
+    public_path,
+    private_path,
+    routes_path,
+    geometry_root,
+    source_checkpoints,
+    predictions_path,
+    report_path,
+    reference_predictions,
+    bootstrap_seed=20260730,
+    bootstrap_samples=10000,
+):
+    """复用 Gate 7 协议评估 VGGT，不改变原 CUT3R 报告路径。"""
+    public = read_jsonl(public_path)
+    private = read_jsonl(private_path)
+    routes = read_jsonl(routes_path)
+    public_ids = {item["episode_id"] for item in public}
+    private_by_id = {item["episode_id"]: item for item in private}
+    if len(public_ids) != len(public) or len(private_by_id) != len(private):
+        raise ValueError("Plan 2 episode_id 必须唯一")
+    if public_ids != set(private_by_id):
+        raise ValueError("Plan 2 公开 episode 与私有真值不一一对应")
+
+    primary_routes = {}
+    for route in routes:
+        leaked = sorted(set(route) & FORBIDDEN_ROUTE_KEYS)
+        if leaked:
+            raise ValueError("路由输出包含私有字段: {}".format(", ".join(leaked)))
+        if route["policy_id"] == PRIMARY_ROUTE:
+            primary_routes[route["episode_id"]] = route
+    if set(primary_routes) != public_ids:
+        raise ValueError("Plan 2 主策略路由未覆盖全部 episode")
+
+    manifest, geometry = _geometry_groups(geometry_root)
+    contexts = _source_contexts(source_checkpoints)
+    predictions = []
+    for episode_id in sorted(public_ids):
+        oracle = private_by_id[episode_id]
+        predictions.extend(
+            _build_backend_predictions(
+                oracle,
+                primary_routes[episode_id],
+                geometry.get(oracle["group_id"]),
+                "vggt",
+            )
+        )
+    predictions.sort(key=lambda item: (item["method"], item["episode_id"]))
+    _atomic_jsonl(predictions_path, predictions)
+    metrics = _metrics(predictions)
+    method = "trust3d_vggt"
+    vggt_accuracy = metrics[method]["accuracy"]
+    gt_accuracy = metrics["trust3d_gt_reference"]["accuracy"]
+    qa_drop = gt_accuracy - vggt_accuracy
+    failed_groups = sum(
+        item.get("status") != "success" for item in geometry.values()
+    )
+    group_failure_rate = failed_groups / len(geometry) if geometry else 1.0
+    query_failure_rate = metrics[method]["geometry_failure_count"] / len(private)
+    if qa_drop <= 0.10:
+        result_status = "main_result"
+        judgment = "VGGT 达到 Gate 7 主结果门槛"
+    elif qa_drop <= 0.20:
+        result_status = "realistic_setting"
+        judgment = "VGGT 保留为现实设置，不自动进入 Gate 8"
+    else:
+        result_status = "failure_analysis"
+        judgment = "VGGT 只作失败分析，停止堆叠视觉 backbone"
+    criteria = {
+        "qa_drop_not_above_10pp": qa_drop <= 0.10,
+        "all_requested_groups_completed": manifest.get("complete") is True,
+        "geometry_group_failure_rate_zero": group_failure_rate == 0.0,
+        "query_geometry_failure_rate_zero": query_failure_rate == 0.0,
+        "private_leakage_count_zero": manifest.get("private_file_open_count", 0)
+        == 0,
+    }
+    paired = _paired_group_bootstrap(
+        predictions,
+        reference_predictions,
+        method,
+        bootstrap_seed,
+        bootstrap_samples,
+    )
+    report = {
+        "schema_version": 1,
+        "backend_id": "vggt",
+        "gate7_vggt_pass": all(criteria.values()),
+        "result_status": result_status,
+        "judgment": judgment,
+        "episode_count": len(private),
+        "group_count": len({item["group_id"] for item in private}),
+        "checkpoint_sha256": manifest["checkpoint_sha256"],
+        "vggt_adapter_version": manifest["adapter_version"],
+        "frame_sampling": "每组 stable/stale 各五帧；518 pad；RGB-only",
+        "grounding_boundary": "验证帧角色和 12% 中心区域；未读取 GT depth、mask、pose 或私有答案。",
+        "metrics": metrics,
+        "gt_3d_accuracy": gt_accuracy,
+        "vggt_accuracy": vggt_accuracy,
+        "gt_to_vggt_qa_drop": qa_drop,
+        "paired_cut3r_comparison": paired,
+        "branch_question_metrics": _stratified_metrics(predictions, method),
+        "object_type_metrics": _backend_object_type_metrics(
+            predictions, contexts, method
+        ),
+        "camera_geometry_group_failure_rate": group_failure_rate,
+        "query_geometry_failure_rate": query_failure_rate,
+        "geometry_diagnostics": _geometry_diagnostics(geometry),
+        "criteria": criteria,
+        "route_private_leak_count": 0,
+    }
+    _atomic_json(report_path, report)
+    return report
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--public", required=True, type=Path)
@@ -408,18 +644,44 @@ def main(argv=None):
     )
     parser.add_argument("--predictions", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
-    args = parser.parse_args(argv)
-    report = evaluate(
-        args.public,
-        args.private,
-        args.routes,
-        args.geometry,
-        args.source_checkpoints,
-        args.predictions,
-        args.output,
+    parser.add_argument(
+        "--backend-id", choices=("cut3r", "vggt"), default="cut3r"
     )
+    parser.add_argument(
+        "--reference-predictions",
+        type=Path,
+        default=Path("outputs/gate7/predictions.jsonl"),
+    )
+    parser.add_argument("--bootstrap-seed", type=int, default=20260730)
+    parser.add_argument("--bootstrap-samples", type=int, default=10000)
+    args = parser.parse_args(argv)
+    if args.backend_id == "cut3r":
+        report = evaluate(
+            args.public,
+            args.private,
+            args.routes,
+            args.geometry,
+            args.source_checkpoints,
+            args.predictions,
+            args.output,
+        )
+        passed = report["gate7_pass"]
+    else:
+        report = evaluate_vggt(
+            args.public,
+            args.private,
+            args.routes,
+            args.geometry,
+            args.source_checkpoints,
+            args.predictions,
+            args.output,
+            args.reference_predictions,
+            args.bootstrap_seed,
+            args.bootstrap_samples,
+        )
+        passed = report["gate7_vggt_pass"]
     print(json.dumps(report, ensure_ascii=False, sort_keys=True))
-    return 0 if report["gate7_pass"] else 1
+    return 0 if passed else 1
 
 
 if __name__ == "__main__":

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-07-30T04:42:49+00:00",
+  "git_commit": "c268855bc8dd41d7685a40631b9be89295f480fe",
+  "group_count": 30,
+  "episode_count": 360,
+  "cut3r_accuracy": 0.5611111111111111,
+  "gt_accuracy": 1,
+  "qa_drop": 0.4388888888888889,
+  "all_hashes_match": true,
+  "evaluator_regression_match": true,
+  "original_gate7_modified": false
+}

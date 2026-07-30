@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "seed": 20260730,
+  "adapter_version": "plan2-vggt-depth-v1",
+  "repository": "https://github.com/facebookresearch/vggt.git",
+  "repository_commit": "a288dd0f14786c93483e45524328726ab7b1b4ce",
+  "model_id": "facebook/VGGT-1B",
+  "model_revision": "860abec7937da0a4c03c41d3c269c366e82abdf9",
+  "model_file": "model.safetensors",
+  "model_file_bytes": 5026367224,
+  "model_sha256": "f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e",
+  "image_size": 518,
+  "image_preprocess": "pad",
+  "dtype": "bfloat16",
+  "geometry_source": "depth_unprojection",
+  "grounding": "center_crop",
+  "center_crop_fraction": 0.12,
+  "diagnostic_crop_fractions": [
+    0.08,
+    0.18
+  ],
+  "confidence_quantile": 0.5,
+  "smoke_group_id": "s_02195803c5ebd4d3dcb170a7",
+  "bootstrap_seed": 20260730,
+  "bootstrap_samples": 10000,
+  "resources": {
+    "minimum_free_gpu_mib": 60000,
+    "maximum_gpu_utilization_percent": 10,
+    "stable_checks": 3,
+    "stable_check_interval_seconds": 10,
+    "watch_interval_seconds": 60,
+    "cpu_threads": 8
+  }
+}
