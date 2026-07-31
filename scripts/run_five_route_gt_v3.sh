@@ -10,6 +10,8 @@ CHECKPOINT_ROOT=${JERRY}/checkpoints/parallel_v3/gt_five_route
 OUTPUT=${ROOT}/outputs/parallel_v3/gt_five_route
 LOCK=${CHECKPOINT_ROOT}/runner.lock
 SIMULATOR_LOCK=${JERRY}/checkpoints/parallel_v2/simulator.lock
+EVALUATION_LOCK=${CHECKPOINT_ROOT}/evaluation.lock
+PRIVATE_EVALUATOR_LOCK=${JERRY}/checkpoints/parallel_v2/private_evaluator.lock
 LOG_PATH=${LOG_ROOT}/gt-five-route-v3.log
 LOCAL_XVFB_ROOT=${JERRY}/.local/xvfb
 LOCAL_XVFB_LIB=${LOCAL_XVFB_ROOT}/root/usr/lib/x86_64-linux-gnu
@@ -84,6 +86,21 @@ set_online_command() {
 run_contract() {
   "${PYTHON}" -m pytest -q tests/test_five_route_v3.py || return $?
   run_python contract
+}
+
+run_evaluate() {
+  exec 7>"${EVALUATION_LOCK}"
+  exec 6>"${PRIVATE_EVALUATOR_LOCK}"
+  printf 'evaluation_wait_start=%s locks=%s,%s\n' \
+    "$(date -Is)" "${EVALUATION_LOCK}" "${PRIVATE_EVALUATOR_LOCK}"
+  flock 7
+  flock 6
+  printf 'evaluation_acquired=%s\n' "$(date -Is)"
+  run_python evaluate
+  local rc=$?
+  flock -u 6
+  flock -u 7
+  return "${rc}"
 }
 
 run_prepare() {
@@ -161,7 +178,7 @@ run_stage() {
     prepare) run_prepare ;;
     freeze) run_python freeze ;;
     infer) run_python infer ;;
-    evaluate) run_python evaluate ;;
+    evaluate) run_evaluate ;;
     recover) run_python recover ;;
     online) run_online ;;
     report) run_python report ;;
@@ -190,7 +207,8 @@ run_locked() {
     "$(date -Is)" "$(hostname)" "${TMUX}" "${TMUX_PANE:-}" "${PWD}" "$0 $*" \
     "${LOG_PATH}" "$(git rev-parse HEAD)" "$(git status --porcelain | wc -l)"
   case "${MODE}" in
-    preflight|freeze|infer|evaluate|recover|report) run_python "${MODE}" ;;
+    preflight|freeze|infer|recover|report) run_python "${MODE}" ;;
+    evaluate) run_evaluate ;;
     prepare) run_prepare ;;
     contract) run_contract ;;
     online) run_online ;;
