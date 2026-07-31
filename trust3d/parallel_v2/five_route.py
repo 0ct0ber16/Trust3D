@@ -153,6 +153,52 @@ def _power_audit(public, private):
     }
 
 
+def _write_underpowered_result(power):
+    generated_at = utc_now()
+    audit = {
+        "schema_version": 1,
+        "protocol_revision": "parallel-v2",
+        "stage": "gt5_pilot_power",
+        "complete": True,
+        "decision": "inconclusive_underpowered",
+        "generated_at": generated_at,
+        **power,
+    }
+    summary = {
+        "schema_version": 1,
+        "protocol_revision": "parallel-v2",
+        "status": "failed_scientific",
+        "complete": False,
+        "reason": "inconclusive_underpowered",
+        "pilot_route_contract_pass": True,
+        "power_audit": power,
+        "generated_at": generated_at,
+    }
+    atomic_json(OUTPUT / "power_audit.json", audit)
+    atomic_json(OUTPUT / "report.json", summary)
+    lines = [
+        "# Trust3D GT 五路路由实验报告",
+        "",
+        "- 实验状态：`failed_scientific`",
+        "- 停止原因：`inconclusive_underpowered`",
+        f"- pilot 配对准确率差标准差：{power['paired_accuracy_std']:.6f}",
+        f"- pilot 配对成本下降标准差：{power['paired_cost_reduction_std']:.6f}",
+        f"- 所需 final group 数：{power['required_final_groups']}",
+        f"- 当前可用独立 final group 数：{power['available_final_groups']}",
+        "",
+        "## 结论",
+        "",
+        "pilot 的五路选择全部匹配预注册 oracle，但按 pilot 方差估计，现有独立 final 样本不足以在 alpha=0.05、power>=0.8 下检验 2 个百分点非劣界。",
+        "本轮按协议在查看 final 指标前停止，不追加样本、不降低门槛，也不把统计功效不足解释为五路路由 idea 失败。Gate 7 修复线继续独立执行。",
+        "",
+    ]
+    atomic_bytes(
+        ROOT / "Trust3D_GT五路路由实验报告.md",
+        "\n".join(lines).encode("utf-8"),
+    )
+    return summary
+
+
 def pilot():
     public, private = _load_split("pilot")
     selected = [_route(item, "trust3d_five_route") for item in public]
@@ -164,6 +210,7 @@ def pilot():
         raise AssertionError("pilot route mismatch")
     power = _power_audit(public, private)
     if not power["adequately_powered"]:
+        _write_underpowered_result(power)
         raise RuntimeError("inconclusive_underpowered")
     lock = {
         "schema_version": 1,

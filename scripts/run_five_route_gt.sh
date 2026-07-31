@@ -86,7 +86,20 @@ run_unit() {
 
 run_pilot() {
   status running 'A2：冻结 pilot router 并执行功效审计。'
-  "${PYTHON}" -m trust3d.parallel_v2.five_route pilot || return $?
+  "${PYTHON}" -m trust3d.parallel_v2.five_route pilot
+  local rc=$?
+  if (( rc != 0 )); then
+    if jq -e '.status == "failed_scientific" and .reason == "inconclusive_underpowered"' \
+      "${OUTPUT}/report.json" >/dev/null 2>&1; then
+      "${PYTHON}" -m trust3d.parallel_v2.runtime mark \
+        gt5_pilot failed_scientific \
+        'pilot 功效不足，按预注册协议在 final 评测前停止。' \
+        --output outputs/parallel_v2/gt_five_route/power_audit.json \
+        --output outputs/parallel_v2/gt_five_route/report.json \
+        --next-checkpoint complete
+    fi
+    return "${rc}"
+  fi
   mark gt5_pilot outputs/parallel_v2/gt_five_route/router_lock.json gt5_offline
 }
 
@@ -180,6 +193,10 @@ rc=${PIPESTATUS[0]}
 set -e
 printf 'exit_code=%s end=%s next_checkpoint=%s\n' "${rc}" "$(date -Is)" "$(jq -r '.next_checkpoint // "unknown"' "${CHECKPOINT_ROOT}/stages/gt5_report.json" 2>/dev/null || printf unknown)" | tee -a "${LOG_PATH}"
 if (( rc != 0 )); then
-  status failed "GT 五路 runner 退出码 ${rc}，保留 checkpoint。" || true
+  if jq -e '.status == "failed_scientific"' "${OUTPUT}/report.json" >/dev/null 2>&1; then
+    status failed_scientific 'GT 五路 pilot 功效不足，按协议停止并保留审计报告。' || true
+  else
+    status failed "GT 五路 runner 退出码 ${rc}，保留 checkpoint。" || true
+  fi
 fi
 exit "${rc}"

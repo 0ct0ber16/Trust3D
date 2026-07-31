@@ -18,7 +18,7 @@ from trust3d.geometry.run_cut3r import (
     _install_inference_guard,
     _load_sequence_manifest,
 )
-from trust3d.parallel_v2 import integration
+from trust3d.parallel_v2 import five_route, integration
 from trust3d.parallel_v2.common import (
     _porcelain_has_relevant_changes,
     atomic_json,
@@ -152,6 +152,32 @@ def test_repository_dirty_ignores_only_untracked_parallel_runtime_outputs():
     assert _porcelain_has_relevant_changes(
         " M outputs/parallel_v2/gate7_fix/result.json\0"
     )
+
+
+def test_underpowered_pilot_writes_terminal_scientific_failure(tmp_path, monkeypatch):
+    monkeypatch.setattr(five_route, "OUTPUT", tmp_path / "output")
+    monkeypatch.setattr(five_route, "ROOT", tmp_path)
+    power = {
+        "alpha": 0.05,
+        "power": 0.8,
+        "paired_accuracy_std": 0.5,
+        "paired_cost_reduction_std": 0.25,
+        "required_accuracy_groups": 4904,
+        "required_cost_groups": 13,
+        "required_final_groups": 4904,
+        "available_final_groups": 60,
+        "adequately_powered": False,
+    }
+    result = five_route._write_underpowered_result(power)
+    assert result["status"] == "failed_scientific"
+    assert result["reason"] == "inconclusive_underpowered"
+    assert not result["complete"]
+    assert json.loads((five_route.OUTPUT / "power_audit.json").read_text())[
+        "decision"
+    ] == "inconclusive_underpowered"
+    assert "不把统计功效不足解释为五路路由 idea 失败" in (
+        tmp_path / "Trust3D_GT五路路由实验报告.md"
+    ).read_text()
 
 
 def test_rgb_sequence_manifest_is_hash_checked_and_private_paths_are_blocked(tmp_path):
