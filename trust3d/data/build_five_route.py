@@ -130,6 +130,21 @@ def _cost_loss(cost: dict[str, Any], protocol_value: dict[str, Any]) -> float:
     return sum(float(cost[key]) * float(weights[key]) for key in cost)
 
 
+def _reobserve_oracle_eligible(
+    public_records: list[dict[str, Any]],
+    config: dict[str, Any],
+    protocol_value: dict[str, Any],
+) -> bool:
+    reobserve_loss = _cost_loss(
+        _route_cost(config, "REOBSERVE", public_records[0]), protocol_value
+    )
+    abstain_loss = float(protocol_value["cost_weights"]["abstain"])
+    return (
+        abstain_loss - reobserve_loss
+        >= float(protocol_value["minimum_route_loss_margin"])
+    )
+
+
 def _record(
     split: str,
     index: int,
@@ -319,7 +334,7 @@ def build(config_path: Path):
         "pilot": int(counts["gt5_pilot_groups"]),
         "final": int(counts["gt5_final_groups"]),
     }
-    offsets = {"mvp": 0, "spatial": 0}
+    used_sources = {"mvp": set(), "spatial": set()}
     manifests = {}
     all_sources: dict[str, set[str]] = {}
     branch_by_route = {
@@ -342,10 +357,23 @@ def build(config_path: Path):
             source_ids_ordered = spatial_ids if source == "spatial" else mvp_ids
             public_groups = spatial_public if source == "spatial" else mvp_public
             private_groups = spatial_private if source == "spatial" else mvp_private
-            selected = source_ids_ordered[offsets[source] : offsets[source] + per_route]
+            available = [
+                source_group_id
+                for source_group_id in source_ids_ordered
+                if source_group_id not in used_sources[source]
+            ]
+            if route == "REOBSERVE":
+                available = [
+                    source_group_id
+                    for source_group_id in available
+                    if _reobserve_oracle_eligible(
+                        public_groups[source_group_id], config, protocol_value
+                    )
+                ]
+            selected = available[:per_route]
             if len(selected) != per_route:
                 raise RuntimeError(f"insufficient {source} source groups")
-            offsets[source] += per_route
+            used_sources[source].update(selected)
             for source_group_id in selected:
                 public_item, private_item = _choose_pair(
                     public_groups[source_group_id],

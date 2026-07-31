@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 
 from trust3d.agents.evidence import choose_route, validate_packet
+from trust3d.data.build_five_route import _reobserve_oracle_eligible
 from trust3d.eval.evaluate_gate7_fix import evaluate_sealed, seal_predictions
 from trust3d.geometry.camera_contract import (
     camera_to_world_to_world_to_camera,
@@ -18,7 +19,13 @@ from trust3d.geometry.run_cut3r import (
     _load_sequence_manifest,
 )
 from trust3d.parallel_v2 import integration
-from trust3d.parallel_v2.common import atomic_json, atomic_jsonl, load_jsonl, sha256_file
+from trust3d.parallel_v2.common import (
+    _porcelain_has_relevant_changes,
+    atomic_json,
+    atomic_jsonl,
+    load_jsonl,
+    sha256_file,
+)
 
 
 def packet(source, value, predicate="attribute", valid_until=20):
@@ -121,6 +128,30 @@ def test_parallel_protocol_config_is_frozen():
     assert value["minimum_coverage"] == 0.75
     assert value["bootstrap_groups"] == 10000
     assert value["resources"]["minimum_free_gpu_mib"] == 20480
+
+
+def test_reobserve_sources_respect_registered_abstain_margin():
+    root = Path(__file__).resolve().parents[1]
+    config = json.loads((root / "configs/five_route_gt_v1.json").read_text())
+    registered = json.loads(
+        (root / "configs/parallel_v2_protocol.json").read_text()
+    )
+    assert _reobserve_oracle_eligible(
+        [{"verification_cost": 17}], config, registered
+    )
+    assert not _reobserve_oracle_eligible(
+        [{"verification_cost": 18}], config, registered
+    )
+
+
+def test_repository_dirty_ignores_only_untracked_parallel_runtime_outputs():
+    runtime_output = "?? outputs/parallel_v2/gate7_fix/result.json\0"
+    assert not _porcelain_has_relevant_changes(runtime_output)
+    assert _porcelain_has_relevant_changes(runtime_output + "?? notes.txt\0")
+    assert _porcelain_has_relevant_changes(" M trust3d/parallel_v2/common.py\0")
+    assert _porcelain_has_relevant_changes(
+        " M outputs/parallel_v2/gate7_fix/result.json\0"
+    )
 
 
 def test_rgb_sequence_manifest_is_hash_checked_and_private_paths_are_blocked(tmp_path):

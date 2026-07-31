@@ -122,11 +122,23 @@ def repository_commit() -> str:
     ).strip()
 
 
+def _porcelain_has_relevant_changes(output: str) -> bool:
+    for entry in output.split("\0"):
+        if not entry:
+            continue
+        if entry.startswith("?? outputs/parallel_v2/"):
+            continue
+        return True
+    return False
+
+
 def repository_dirty() -> bool:
     output = subprocess.check_output(
-        ["git", "status", "--porcelain"], cwd=ROOT, text=True
+        ["git", "status", "--porcelain=v1", "-z", "--untracked-files=all"],
+        cwd=ROOT,
+        text=True,
     )
-    return bool(output.strip())
+    return _porcelain_has_relevant_changes(output)
 
 
 def path_manifest(paths: Iterable[Union[os.PathLike, str]]) -> list[dict[str, Any]]:
