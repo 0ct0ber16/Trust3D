@@ -1,7 +1,9 @@
 """仅用 RGB 流运行 CUT3R，并按 group 持久化可恢复几何结果。"""
 
 import argparse
+import builtins
 import hashlib
+import io
 import json
 import os
 import random
@@ -20,6 +22,7 @@ from trust3d.geometry.diagnostic_grounding import (
     role_mask_paths,
     summarize_stage,
 )
+from trust3d.geometry.rgb_grounding import saliency_box
 
 
 SCHEMA_VERSION = 1
@@ -124,6 +127,37 @@ def centered_point(points, confidence, crop_fraction=0.12, confidence_quantile=0
     }
 
 
+def boxed_point(points, confidence, box, confidence_quantile=0.5):
+    points = np.asarray(points, dtype=np.float64)
+    confidence = np.asarray(confidence, dtype=np.float64)
+    x0, y0, x1, y1 = [int(value) for value in box]
+    if points.ndim != 3 or points.shape[-1] != 3:
+        raise ValueError("points 必须是 HxWx3")
+    if confidence.shape != points.shape[:2]:
+        raise ValueError("confidence 与 points 空间尺寸不一致")
+    height, width = confidence.shape
+    if not (0 <= x0 < x1 <= width and 0 <= y0 < y1 <= height):
+        raise ValueError("RGB grounding box 越界")
+    crop_points = points[y0:y1, x0:x1]
+    crop_confidence = confidence[y0:y1, x0:x1]
+    valid = np.isfinite(crop_points).all(axis=-1) & np.isfinite(crop_confidence)
+    if not np.any(valid):
+        raise ValueError("RGB grounding 区域没有有效三维点")
+    threshold = float(np.quantile(crop_confidence[valid], confidence_quantile))
+    selected = valid & (crop_confidence >= threshold)
+    if np.count_nonzero(selected) < 3:
+        selected = valid
+    point = np.median(crop_points[selected], axis=0)
+    if not np.isfinite(point).all():
+        raise ValueError("RGB grounding 三维点不是有限值")
+    return {
+        "world": [float(value) for value in point],
+        "selected_pixel_count": int(np.count_nonzero(selected)),
+        "confidence_median": float(np.median(crop_confidence[selected])),
+        "crop_xyxy": [x0, y0, x1, y1],
+    }
+
+
 def point_in_camera(point_world, camera_to_world):
     point_world = np.asarray(point_world, dtype=np.float64)
     camera_to_world = np.asarray(camera_to_world, dtype=np.float64)
@@ -194,6 +228,95 @@ def _source_contexts(root):
     return contexts
 
 
+class _InferenceAccessGuard:
+    def __init__(self, forbidden_paths):
+        self.forbidden_paths = tuple(Path(path).resolve() for path in forbidden_paths)
+        self.forbidden_open_attempts = []
+
+    def install(self):
+        def check(raw_path):
+            if not isinstance(raw_path, (str, bytes, os.PathLike)):
+                return
+            candidate = Path(os.fsdecode(raw_path)).resolve()
+            for forbidden in self.forbidden_paths:
+                if candidate == forbidden or forbidden in candidate.parents:
+                    self.forbidden_open_attempts.append(str(candidate))
+                    raise PermissionError(f"inference access guard blocked: {candidate}")
+
+        def audit(event, arguments):
+            if event != "open" or not arguments:
+                return
+            check(arguments[0])
+
+        if hasattr(sys, "addaudithook"):
+            sys.addaudithook(audit)
+        else:
+            original_builtin_open = builtins.open
+            original_io_open = io.open
+
+            def guarded_builtin_open(file, *args, **kwargs):
+                check(file)
+                return original_builtin_open(file, *args, **kwargs)
+
+            def guarded_io_open(file, *args, **kwargs):
+                check(file)
+                return original_io_open(file, *args, **kwargs)
+
+            builtins.open = guarded_builtin_open
+            io.open = guarded_io_open
+        return self
+
+
+def _load_sequence_manifest(path):
+    manifest_path = Path(path)
+    value = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if value.get("input_mode") != "rgb_only_counterfactual_sequences":
+        raise ValueError("RGB sequence manifest input mode is invalid")
+    groups = {}
+    for group in value.get("groups", []):
+        scenario_records = {
+            item["scenario_id"]: item for item in group.get("scenarios", [])
+        }
+        if set(scenario_records) != {"scenario_0", "scenario_1"}:
+            raise ValueError("RGB sequence manifest must contain two anonymous scenarios")
+        sequences = {}
+        for internal_name, scenario_id in (
+            ("stable", "scenario_0"),
+            ("stale", "scenario_1"),
+        ):
+            frames = scenario_records[scenario_id].get("frames", [])
+            if len(frames) != 5:
+                raise ValueError("each RGB sequence must contain exactly five frames")
+            paths = []
+            for frame in frames:
+                frame_path = Path(frame["path"])
+                if not frame_path.is_absolute():
+                    frame_path = Path.cwd() / frame_path
+                frame_path = frame_path.resolve()
+                if "inference_rgb" not in frame_path.parts or not frame_path.is_file():
+                    raise ValueError(f"sequence frame is outside sanitized RGB root: {frame_path}")
+                if _sha256_file(frame_path) != frame["sha256"]:
+                    raise ValueError(f"sequence frame hash mismatch: {frame_path}")
+                paths.append(frame_path)
+            sequences[internal_name] = paths
+        groups[group["group_id"]] = sequences
+    if len(groups) != value.get("group_count"):
+        raise ValueError("RGB sequence manifest group count mismatch")
+    return groups
+
+
+def _install_inference_guard(dataset_root, source_checkpoints):
+    dataset_root = Path(dataset_root)
+    forbidden = [
+        dataset_root / "oracle_private.jsonl",
+        source_checkpoints,
+        dataset_root / "cache/depth",
+        dataset_root / "cache/instance",
+        dataset_root / "cache/masks",
+    ]
+    return _InferenceAccessGuard(forbidden).install()
+
+
 def _observation_rgb(dataset_root, observation):
     path = Path(dataset_root) / observation["rgb"]
     if not path.is_file():
@@ -224,6 +347,8 @@ def _fingerprint(
     checkpoint_sha256,
     image_size,
     crop_fraction,
+    grounding,
+    grounding_parameters,
     diagnostic=None,
 ):
     inputs = []
@@ -243,6 +368,8 @@ def _fingerprint(
         "checkpoint_sha256": checkpoint_sha256,
         "image_size": image_size,
         "crop_fraction": crop_fraction,
+        "grounding": grounding,
+        "grounding_parameters": grounding_parameters,
         "inputs": inputs,
     }
     if diagnostic is not None:
@@ -331,6 +458,8 @@ def _run_sequence(
     device,
     image_size,
     crop_fraction,
+    grounding="center_crop",
+    grounding_parameters=None,
     diagnostic_masks=None,
     diagnostic_config=None,
 ):
@@ -364,13 +493,29 @@ def _run_sequence(
         world_maps.append(points_world.cpu().numpy())
         confidences.append(prediction["conf_self"][0].cpu().numpy())
 
+    grounding_parameters = grounding_parameters or {}
+
+    def grounded(index):
+        if grounding == "center_crop":
+            return centered_point(world_maps[index], confidences[index], crop_fraction)
+        if grounding != "rgb_saliency_v1":
+            raise ValueError(f"不支持的 RGB grounding: {grounding}")
+        specification = saliency_box(
+            paths[index],
+            confidences[index].shape,
+            quantile=float(grounding_parameters.get("saliency_quantile", 0.82)),
+            minimum_fraction=float(grounding_parameters.get("minimum_fraction", 0.08)),
+            maximum_fraction=float(grounding_parameters.get("maximum_fraction", 0.30)),
+        )
+        point = boxed_point(
+            world_maps[index], confidences[index], specification["box_xyxy"]
+        )
+        point["grounding"] = specification
+        return point
+
     def geometry(target_index, donor_index):
-        target = centered_point(
-            world_maps[target_index], confidences[target_index], crop_fraction
-        )
-        donor = centered_point(
-            world_maps[donor_index], confidences[donor_index], crop_fraction
-        )
+        target = grounded(target_index)
+        donor = grounded(donor_index)
         target["query_camera"] = point_in_camera(target["world"], poses[2])
         donor["query_camera"] = point_in_camera(donor["world"], poses[2])
         return {
@@ -514,6 +659,8 @@ def run(args):
         raise ValueError("device 只支持 cpu 或 cuda")
 
     diagnostic_config = _load_diagnostic_config(args.diagnostic_config, "cut3r")
+    if args.sequence_manifest is not None and diagnostic_config is not None:
+        raise ValueError("diagnostic GT mode cannot use the sealed RGB-only manifest")
     if diagnostic_config is not None:
         _assert_diagnostic_output(args.output, diagnostic_config)
     checkpoint_sha256 = _sha256_file(args.checkpoint)
@@ -524,7 +671,16 @@ def run(args):
         if checkpoint_sha256 != expected_sha:
             raise ValueError("CUT3R 权重与诊断配置不一致")
     public_sha256 = _sha256_file(args.episodes)
-    contexts = _source_contexts(args.source_checkpoints)
+    access_guard = None
+    sequence_groups = None
+    if args.sequence_manifest is not None:
+        access_guard = _install_inference_guard(
+            args.dataset_root, args.source_checkpoints
+        )
+        sequence_groups = _load_sequence_manifest(args.sequence_manifest)
+        contexts = {}
+    else:
+        contexts = _source_contexts(args.source_checkpoints)
     groups = _public_groups(args.episodes, args.group_id, args.max_groups)
     if diagnostic_config is not None and args.group_id is None:
         pilot = diagnostic_config["pilot_group_ids"]
@@ -535,15 +691,23 @@ def run(args):
     prepared = []
     results = []
     for group_id, public, episode_count in groups:
-        context = contexts.get(group_id)
-        if context is None:
-            raise ValueError(f"缺少 group {group_id} 的 Gate 6 context checkpoint")
-        sequences = {
-            "stable": _sequence_paths(
-                public, context, args.dataset_root, "risk_stable"
-            ),
-            "stale": _sequence_paths(public, context, args.dataset_root, "risk_stale"),
-        }
+        if sequence_groups is not None:
+            context = None
+            sequences = sequence_groups.get(group_id)
+            if sequences is None:
+                raise ValueError(f"RGB sequence manifest is missing group {group_id}")
+        else:
+            context = contexts.get(group_id)
+            if context is None:
+                raise ValueError(f"缺少 group {group_id} 的 Gate 6 context checkpoint")
+            sequences = {
+                "stable": _sequence_paths(
+                    public, context, args.dataset_root, "risk_stable"
+                ),
+                "stale": _sequence_paths(
+                    public, context, args.dataset_root, "risk_stale"
+                ),
+            }
         masks = (
             _diagnostic_mask_bundle(context, args.dataset_root)
             if diagnostic_config is not None
@@ -573,6 +737,12 @@ def run(args):
             checkpoint_sha256,
             args.image_size,
             args.center_crop_fraction,
+            args.grounding,
+            {
+                "saliency_quantile": args.saliency_quantile,
+                "minimum_fraction": args.grounding_minimum_fraction,
+                "maximum_fraction": args.grounding_maximum_fraction,
+            },
             diagnostic_fingerprint,
         )
         path = checkpoint_root / f"{group_id}.json"
@@ -634,8 +804,9 @@ def run(args):
             "checkpoint_sha256": checkpoint_sha256,
             "image_size": args.image_size,
             "center_crop_fraction": args.center_crop_fraction,
-            "input_mode": "rgb_only_centered_verification_frame",
-            "grounding_note": "只使用目标居中验证帧的角色和中心区域，不读取 depth、instance mask 或私有答案。",
+            "grounding": args.grounding,
+            "input_mode": "rgb_only_verification_frame",
+            "grounding_note": "只读取 RGB；不读取 depth、instance mask、GT bbox 或私有答案。",
             "inputs": inputs,
         }
         if diagnostic_config is not None:
@@ -657,6 +828,12 @@ def run(args):
                 args.device,
                 args.image_size,
                 args.center_crop_fraction,
+                args.grounding,
+                {
+                    "saliency_quantile": args.saliency_quantile,
+                    "minimum_fraction": args.grounding_minimum_fraction,
+                    "maximum_fraction": args.grounding_maximum_fraction,
+                },
                 masks["stable"] if masks is not None else None,
                 diagnostic_config,
             )
@@ -666,6 +843,12 @@ def run(args):
                 args.device,
                 args.image_size,
                 args.center_crop_fraction,
+                args.grounding,
+                {
+                    "saliency_quantile": args.saliency_quantile,
+                    "minimum_fraction": args.grounding_minimum_fraction,
+                    "maximum_fraction": args.grounding_maximum_fraction,
+                },
                 masks["stale"] if masks is not None else None,
                 diagnostic_config,
             )
@@ -750,6 +933,12 @@ def run(args):
         "failure_group_count": len(failures),
         "complete": len(success) == len(groups) and not failures,
         "model_load_seconds_this_run": model_load_seconds,
+        "sequence_manifest_path": str(args.sequence_manifest)
+        if args.sequence_manifest is not None
+        else None,
+        "sequence_manifest_sha256": _sha256_file(args.sequence_manifest)
+        if args.sequence_manifest is not None
+        else None,
         "groups": [
             {
                 "group_id": value["group_id"],
@@ -772,6 +961,23 @@ def run(args):
             }
         )
     _atomic_json(args.output / "manifest.json", manifest)
+    if access_guard is not None:
+        _atomic_json(
+            args.output / "inference_access_audit.json",
+            {
+                "schema_version": 1,
+                "guard": "python_audit_hook_v1",
+                "guard_installed": True,
+                "private_file_open_count": len(
+                    access_guard.forbidden_open_attempts
+                ),
+                "forbidden_open_attempt_count": len(
+                    access_guard.forbidden_open_attempts
+                ),
+                "forbidden_open_attempts": access_guard.forbidden_open_attempts,
+                "sequence_manifest_sha256": _sha256_file(args.sequence_manifest),
+            },
+        )
     return manifest
 
 
@@ -788,12 +994,19 @@ def build_parser():
     parser.add_argument(
         "--dataset-root", type=Path, default=Path("data/episodes/spatial30")
     )
+    parser.add_argument("--sequence-manifest", type=Path)
     parser.add_argument(
         "--cut3r-root", type=Path, default=Path("external/cut3r")
     )
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--image-size", type=int, default=512)
     parser.add_argument("--center-crop-fraction", type=float, default=0.12)
+    parser.add_argument(
+        "--grounding", choices=("center_crop", "rgb_saliency_v1"), default="center_crop"
+    )
+    parser.add_argument("--saliency-quantile", type=float, default=0.82)
+    parser.add_argument("--grounding-minimum-fraction", type=float, default=0.08)
+    parser.add_argument("--grounding-maximum-fraction", type=float, default=0.30)
     parser.add_argument("--group-id")
     parser.add_argument("--max-groups", type=int)
     parser.add_argument("--continue-on-error", action="store_true")

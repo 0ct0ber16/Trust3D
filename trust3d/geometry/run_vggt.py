@@ -19,16 +19,20 @@ from trust3d.geometry.run_cut3r import (
     _combine_diagnostic_selectors,
     _decorate_diagnostic_stage,
     _diagnostic_mask_bundle,
+    _install_inference_guard,
     _load_diagnostic_config,
+    _load_sequence_manifest,
     _public_groups,
     _sequence_paths,
     _source_contexts,
     _validate_baseline_reproduction,
+    boxed_point,
     centered_point,
     point_in_camera,
     spatial_answers,
 )
 from trust3d.geometry.diagnostic_grounding import mask_input_records, summarize_stage
+from trust3d.geometry.rgb_grounding import saliency_box
 
 
 SCHEMA_VERSION = 1
@@ -214,13 +218,45 @@ def _load_model(vggt_root, checkpoint, device):
     return model, time.perf_counter() - started
 
 
-def _geometry(world_maps, confidences, poses, target_index, donor_index, fraction, quantile):
-    target = centered_point(
-        world_maps[target_index], confidences[target_index], fraction, quantile
-    )
-    donor = centered_point(
-        world_maps[donor_index], confidences[donor_index], fraction, quantile
-    )
+def _geometry(
+    world_maps,
+    confidences,
+    poses,
+    target_index,
+    donor_index,
+    fraction,
+    quantile,
+    paths=None,
+    grounding="center_crop",
+    grounding_config=None,
+):
+    grounding_config = grounding_config or {}
+
+    def grounded(index):
+        if grounding == "center_crop":
+            return centered_point(
+                world_maps[index], confidences[index], fraction, quantile
+            )
+        if grounding != "rgb_saliency_v1" or paths is None:
+            raise ValueError(f"不支持的 VGGT grounding: {grounding}")
+        specification = saliency_box(
+            paths[index],
+            confidences[index].shape,
+            quantile=float(grounding_config.get("saliency_quantile", 0.82)),
+            minimum_fraction=float(grounding_config.get("minimum_fraction", 0.08)),
+            maximum_fraction=float(grounding_config.get("maximum_fraction", 0.30)),
+        )
+        point = boxed_point(
+            world_maps[index],
+            confidences[index],
+            specification["box_xyxy"],
+            quantile,
+        )
+        point["grounding"] = specification
+        return point
+
+    target = grounded(target_index)
+    donor = grounded(donor_index)
     target["query_camera"] = point_in_camera(target["world"], poses[2])
     donor["query_camera"] = point_in_camera(donor["world"], poses[2])
     return {
@@ -286,12 +322,32 @@ def _run_sequence(
 
     quantile = config["confidence_quantile"]
     main_fraction = config["center_crop_fraction"]
+    main_grounding = config.get("grounding", "center_crop")
+    grounding_config = config.get("grounding_config", {})
     main = {
         "historical": _geometry(
-            world_maps, confidence, poses, 0, 1, main_fraction, quantile
+            world_maps,
+            confidence,
+            poses,
+            0,
+            1,
+            main_fraction,
+            quantile,
+            paths,
+            main_grounding,
+            grounding_config,
         ),
         "current": _geometry(
-            world_maps, confidence, poses, 3, 4, main_fraction, quantile
+            world_maps,
+            confidence,
+            poses,
+            3,
+            4,
+            main_fraction,
+            quantile,
+            paths,
+            main_grounding,
+            grounding_config,
         ),
     }
     diagnostics = {}
@@ -359,6 +415,8 @@ def run(args):
         raise RuntimeError("Plan 2 VGGT 只能在 tmux 中执行")
     config = _load_config(args.config)
     diagnostic_config = _load_diagnostic_config(args.diagnostic_config, "vggt")
+    if args.sequence_manifest is not None and diagnostic_config is not None:
+        raise ValueError("diagnostic GT mode cannot use the sealed RGB-only manifest")
     if diagnostic_config is not None:
         _assert_diagnostic_output(args.output, diagnostic_config)
     if Path(args.checkpoint).stat().st_size != config["model_file_bytes"]:
@@ -373,7 +431,16 @@ def run(args):
     config_sha256 = _sha256_file(args.config)
     public_sha256 = _sha256_file(args.episodes)
     routes_sha256 = _sha256_file(args.routes)
-    contexts = _source_contexts(args.source_checkpoints)
+    access_guard = None
+    sequence_groups = None
+    if args.sequence_manifest is not None:
+        access_guard = _install_inference_guard(
+            args.dataset_root, args.source_checkpoints
+        )
+        sequence_groups = _load_sequence_manifest(args.sequence_manifest)
+        contexts = {}
+    else:
+        contexts = _source_contexts(args.source_checkpoints)
     groups = _public_groups(args.episodes, args.group_id, args.max_groups)
     if diagnostic_config is not None and args.group_id is None:
         pilot = diagnostic_config["pilot_group_ids"]
@@ -384,19 +451,26 @@ def run(args):
     prepared = []
     results = []
     for group_id, public, episode_count in groups:
-        context = contexts.get(group_id)
-        if context is None:
-            raise ValueError(f"缺少 group {group_id} 的 Gate 6 context checkpoint")
-        sequences = {
-            "stable": _sequence_paths(
-                public, context, args.dataset_root, "risk_stable"
-            ),
-            "stale": _sequence_paths(
-                public, context, args.dataset_root, "risk_stale"
-            ),
-        }
+        if sequence_groups is not None:
+            context = None
+            sequences = sequence_groups.get(group_id)
+            if sequences is None:
+                raise ValueError(f"RGB sequence manifest is missing group {group_id}")
+        else:
+            context = contexts.get(group_id)
+            if context is None:
+                raise ValueError(f"缺少 group {group_id} 的 Gate 6 context checkpoint")
+            sequences = {
+                "stable": _sequence_paths(
+                    public, context, args.dataset_root, "risk_stable"
+                ),
+                "stale": _sequence_paths(
+                    public, context, args.dataset_root, "risk_stale"
+                ),
+            }
         inputs = _input_records(sequences)
-        _assert_cut3r_inputs(group_id, inputs, args.cut3r_geometry)
+        if sequence_groups is None:
+            _assert_cut3r_inputs(group_id, inputs, args.cut3r_geometry)
         masks = (
             _diagnostic_mask_bundle(context, args.dataset_root)
             if diagnostic_config is not None
@@ -475,6 +549,25 @@ def run(args):
         if diagnostic_config is not None:
             manifest.update(_diagnostic_manifest_fields(diagnostic_config))
         _atomic_json(args.output / "manifest.json", manifest)
+        if access_guard is not None:
+            _atomic_json(
+                args.output / "inference_access_audit.json",
+                {
+                    "schema_version": 1,
+                    "guard": "python_audit_hook_v1",
+                    "guard_installed": True,
+                    "private_file_open_count": len(
+                        access_guard.forbidden_open_attempts
+                    ),
+                    "forbidden_open_attempt_count": len(
+                        access_guard.forbidden_open_attempts
+                    ),
+                    "forbidden_open_attempts": access_guard.forbidden_open_attempts,
+                    "sequence_manifest_sha256": _sha256_file(
+                        args.sequence_manifest
+                    ),
+                },
+            )
         return manifest
 
     if str(args.device).split(":", 1)[0] != "cuda":
@@ -515,8 +608,9 @@ def run(args):
             "geometry_source": config["geometry_source"],
             "center_crop_fraction": config["center_crop_fraction"],
             "confidence_quantile": config["confidence_quantile"],
-            "input_mode": "rgb_only_centered_verification_frame",
-            "grounding_note": "只使用目标居中验证帧中心区域，不读取 GT 或私有答案。",
+            "grounding": config.get("grounding", "center_crop"),
+            "input_mode": "rgb_only_verification_frame",
+            "grounding_note": "只读取 RGB；不读取 depth、instance mask、GT bbox 或私有答案。",
             "inputs": inputs,
         }
         if diagnostic_config is not None:
@@ -649,6 +743,21 @@ def run(args):
     if diagnostic_config is not None:
         manifest.update(_diagnostic_manifest_fields(diagnostic_config))
     _atomic_json(args.output / "manifest.json", manifest)
+    if access_guard is not None:
+        _atomic_json(
+            args.output / "inference_access_audit.json",
+            {
+                "schema_version": 1,
+                "guard": "python_audit_hook_v1",
+                "guard_installed": True,
+                "private_file_open_count": len(access_guard.forbidden_open_attempts),
+                "forbidden_open_attempt_count": len(
+                    access_guard.forbidden_open_attempts
+                ),
+                "forbidden_open_attempts": access_guard.forbidden_open_attempts,
+                "sequence_manifest_sha256": _sha256_file(args.sequence_manifest),
+            },
+        )
     return manifest
 
 
@@ -681,6 +790,12 @@ def _manifest(
         "model_load_seconds_this_run": model_load_seconds,
         "private_file_open_count": 0,
         "private_file_scope": "oracle_private_jsonl",
+        "sequence_manifest_path": str(args.sequence_manifest)
+        if args.sequence_manifest is not None
+        else None,
+        "sequence_manifest_sha256": _sha256_file(args.sequence_manifest)
+        if args.sequence_manifest is not None
+        else None,
         "groups": [
             {
                 "group_id": value["group_id"],
@@ -723,6 +838,7 @@ def build_parser():
     parser.add_argument(
         "--dataset-root", type=Path, default=Path("data/episodes/spatial30")
     )
+    parser.add_argument("--sequence-manifest", type=Path)
     parser.add_argument("--vggt-root", type=Path, default=Path("external/vggt"))
     parser.add_argument(
         "--cut3r-geometry", type=Path, default=Path("outputs/gate7/cut3r_geometry")

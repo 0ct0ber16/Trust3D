@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "trust3d/evidence_packet_v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "episode_id",
+    "query_id",
+    "object_id",
+    "predicate",
+    "value",
+    "source",
+    "observed_at",
+    "valid_until",
+    "reference_frame",
+    "pose_convention",
+    "confidence",
+    "is_observed",
+    "provenance",
+    "cost"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "episode_id": {"type": "string", "minLength": 1},
+    "query_id": {"type": "string", "minLength": 1},
+    "object_id": {"type": "string", "minLength": 1},
+    "predicate": {"enum": ["left_right", "front_behind", "distance", "attribute"]},
+    "value": {},
+    "source": {"enum": ["current_view", "history", "gt_3d", "rgb_3d", "reobserve"]},
+    "observed_at": {"type": "integer", "minimum": 0},
+    "valid_until": {"type": "integer", "minimum": 0},
+    "reference_frame": {"enum": ["world", "current_egocentric"]},
+    "pose_convention": {"const": "camera_to_world"},
+    "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+    "is_observed": {"type": "boolean"},
+    "provenance": {"type": "array", "items": {"type": "object"}},
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["move_steps", "new_observations", "vlm_calls", "geometry_calls", "wall_seconds"],
+      "properties": {
+        "move_steps": {"type": "integer", "minimum": 0},
+        "new_observations": {"type": "integer", "minimum": 0},
+        "vlm_calls": {"type": "integer", "minimum": 0},
+        "geometry_calls": {"type": "integer", "minimum": 0},
+        "wall_seconds": {"type": "number", "minimum": 0.0}
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "adapter_revision": "gt-five-route-v1",
+  "protocol": "configs/parallel_v2_protocol.json",
+  "mvp_public": "data/episodes/mvp/episodes_public.jsonl",
+  "mvp_private": "data/episodes/mvp/oracle_private.jsonl",
+  "spatial_public": "data/episodes/spatial30/episodes_public.jsonl",
+  "spatial_private": "data/episodes/spatial30/oracle_private.jsonl",
+  "output_root": "data/episodes/parallel_v2/gt5",
+  "online_executor": "ai2thor_shortest_visible_pose",
+  "route_costs": {
+    "USE_CURRENT_VIEW": {
+      "move_steps": 0,
+      "new_observations": 0,
+      "vlm_calls": 1,
+      "geometry_calls": 0,
+      "wall_seconds": 0.05
+    },
+    "RETRIEVE_HISTORY": {
+      "move_steps": 0,
+      "new_observations": 0,
+      "vlm_calls": 0,
+      "geometry_calls": 0,
+      "wall_seconds": 0.01
+    },
+    "QUERY_3D_MEMORY": {
+      "move_steps": 0,
+      "new_observations": 0,
+      "vlm_calls": 0,
+      "geometry_calls": 1,
+      "wall_seconds": 0.03
+    },
+    "REOBSERVE": {
+      "move_steps": 10,
+      "new_observations": 1,
+      "vlm_calls": 1,
+      "geometry_calls": 0,
+      "wall_seconds": 1.0
+    },
+    "ABSTAIN": {
+      "move_steps": 0,
+      "new_observations": 0,
+      "vlm_calls": 0,
+      "geometry_calls": 0,
+      "wall_seconds": 0.0
+    }
+  }
+}

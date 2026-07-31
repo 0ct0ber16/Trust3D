@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "adapter_revision": "gate7-fix-v1",
+  "protocol": "configs/parallel_v2_protocol.json",
+  "task_heads": {
+    "legacy": "gate7-camera-z-v1",
+    "contract_valid": "gate7-planar-yaw-v1"
+  },
+  "grounding": {
+    "candidate": "rgb_saliency_v1",
+    "baseline": "center_crop_0.12",
+    "minimum_fraction": 0.08,
+    "maximum_fraction": 0.3,
+    "saliency_quantile": 0.82
+  },
+  "confidence": {
+    "aggregation": "geometric_mean",
+    "calibration": "equal_width_5_bin",
+    "minimum_component": 0.001
+  },
+  "backends": {
+    "cut3r": {
+      "checkpoint": "external/cut3r/src/cut3r_512_dpt_4_64.pth",
+      "checkpoint_sha256": "45f7e98a0a64dbeb54901ae2b878cd8cd125f20a4497316483f0bd6f109f8103",
+      "python": "/224010104/Jerry/.conda/envs/cut3r/bin/python",
+      "image_size": 512
+    },
+    "vggt": {
+      "checkpoint": "external/vggt/model.safetensors",
+      "checkpoint_sha256": "f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e",
+      "python": "/224010104/Jerry/.conda/envs/vggt/bin/python",
+      "config": "configs/plan2_vggt.json",
+      "image_size": 518
+    }
+  },
+  "legacy_public": "data/episodes/spatial30/episodes_public.jsonl",
+  "legacy_private": "data/episodes/spatial30/oracle_private.jsonl",
+  "source_selection": "data/episodes/mvp/selection.json",
+  "alfred_json": "external/alfred/data/json_2.1.0",
+  "dataset_root": "data/episodes/parallel_v2/gate7_fix",
+  "output_root": "outputs/parallel_v2/gate7_fix"
+}

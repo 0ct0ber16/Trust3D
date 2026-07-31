@@ -478,6 +478,10 @@ def _verification_cost(context, branch, question_type):
 def _render_records(contexts, output, seed):
     public = []
     private = []
+    try:
+        dataset_prefix = output.relative_to(Path.cwd()).as_posix()
+    except ValueError:
+        dataset_prefix = output.as_posix()
     for context in contexts:
         query_pose = context["query_pose"]
         for branch in BRANCHES:
@@ -510,7 +514,7 @@ def _render_records(contexts, output, seed):
                         },
                         "history_observations": {
                             role: {
-                                key: "data/episodes/spatial30/" + value
+                                key: dataset_prefix + "/" + value
                                 for key, value in observation.items()
                                 if key != "masks"
                             }
@@ -519,7 +523,7 @@ def _render_records(contexts, output, seed):
                             ].items()
                         },
                         "query_observation": {
-                            key: "data/episodes/spatial30/" + value
+                            key: dataset_prefix + "/" + value
                             for key, value in context["query_observations"][branch].items()
                             if key == "rgb"
                         },

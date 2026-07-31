@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "protocol_revision": "parallel-v2",
+  "seed": 20260731,
+  "max_error_probability": 0.05,
+  "minimum_coverage": 0.75,
+  "accuracy_noninferiority_margin_pp": 2.0,
+  "minimum_cost_reduction": 0.2,
+  "minimum_route_loss_margin": 0.01,
+  "bootstrap_groups": 10000,
+  "route_tie_break": [
+    "USE_CURRENT_VIEW",
+    "RETRIEVE_HISTORY",
+    "QUERY_3D_MEMORY",
+    "REOBSERVE",
+    "ABSTAIN"
+  ],
+  "cost_weights": {
+    "move_steps": 0.01,
+    "new_observations": 0.04,
+    "vlm_calls": 0.02,
+    "geometry_calls": 0.03,
+    "wall_seconds": 0.0001,
+    "answer_error": 1.0,
+    "abstain": 0.25
+  },
+  "resources": {
+    "maximum_cpu_load_fraction": 0.8,
+    "minimum_available_memory_gib": 64,
+    "minimum_available_disk_gib": 100,
+    "minimum_free_gpu_mib": 20480,
+    "maximum_gpu_utilization_percent": 10,
+    "watch_interval_seconds": 1,
+    "cpu_threads": 8
+  },
+  "datasets": {
+    "gt5_pilot_groups": 20,
+    "gt5_final_groups": 60,
+    "gate7_pilot_groups": 10,
+    "gate7_holdout_groups": 30,
+    "integration_groups": 30
+  }
+}
