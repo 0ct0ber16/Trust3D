@@ -1,7 +1,11 @@
 import inspect
 import json
 
-from trust3d.agents.online_episode import _build_units, run_online
+from trust3d.agents.online_episode import (
+    _build_units,
+    _history_frame_path,
+    run_online,
+)
 from trust3d.data.build_branches import _episode_id, _group_id
 from trust3d.eval.validate_online import validate
 
@@ -42,6 +46,38 @@ def test_environment_mapping_covers_public_without_private_records(tmp_path):
 
     assert len(units) == 3
     assert sum(len(item["public_records"]) for item in units) == 6
+
+
+def test_environment_mapping_accepts_legacy_single_question_manifest(tmp_path):
+    candidate = {"candidate_id": "c" * 64}
+    public = [
+        {
+            "episode_id": _episode_id(candidate["candidate_id"], branch, 19, 0)
+        }
+        for branch in ("fresh_stable", "risk_stable", "risk_stale")
+    ]
+
+    units = _build_units(
+        public,
+        {"candidates": [candidate]},
+        {"seed": 19, "excluded_group_ids": []},
+        {"group_ids": []},
+        tmp_path,
+    )
+
+    assert len(units) == 3
+    assert sum(len(item["public_records"]) for item in units) == 3
+
+
+def test_history_frame_path_supports_both_public_schemas():
+    assert (
+        _history_frame_path({"history_observation": {"rgb": "old.png"}})
+        == "old.png"
+    )
+    assert (
+        _history_frame_path({"history_frames": ["first.png", "latest.png"]})
+        == "latest.png"
+    )
 
 
 def test_gate5_validation_accepts_evidence_grounded_online_traces(tmp_path):

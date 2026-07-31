@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import itertools
+import json
 
 import pytest
 
@@ -20,6 +21,7 @@ from trust3d.parallel_v2.common import ROOT, load_jsonl
 from trust3d.parallel_v2.common import load_json
 from trust3d.parallel_v3.five_route import (
     _contract_case,
+    _online_source_costs,
     _private_access_guard,
     protocol,
 )
@@ -66,6 +68,36 @@ def test_negative_cost_mutation_is_killed():
     }
     with pytest.raises(ValueError):
         cost_scalar(value, protocol())
+
+
+def test_online_cost_ledger_uses_executed_round_zero_path(tmp_path):
+    checkpoint = tmp_path / "source/checkpoints/candidate"
+    checkpoint.mkdir(parents=True)
+    (checkpoint / "risk_stale.round-0.json").write_text(
+        json.dumps(
+            {
+                "episode_id": "episode-0",
+                "branch": "risk_stale",
+                "verification": {"cost": 7},
+            }
+        )
+    )
+    (checkpoint / "risk_stale.round-1.json").write_text(
+        json.dumps(
+            {
+                "episode_id": "episode-1",
+                "branch": "risk_stale",
+                "verification": {"cost": 99},
+            }
+        )
+    )
+
+    costs = _online_source_costs({"sealed": tmp_path / "source"})
+
+    assert costs == {
+        "episode-0": ("sealed", 7),
+        "episode-1": ("sealed", 7),
+    }
 
 
 def test_exact_and_paired_statistics_references():

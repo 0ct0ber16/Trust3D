@@ -947,6 +947,25 @@ def recover() -> dict[str, Any]:
     return result
 
 
+def _online_source_costs(
+    source_roots: dict[str, Path],
+) -> dict[str, tuple[str, int]]:
+    costs: dict[str, tuple[str, int]] = {}
+    for source_name, source_root in source_roots.items():
+        for path in sorted((source_root / "checkpoints").glob("*/*.round-*.json")):
+            checkpoint = load_json(path)
+            episode_id = checkpoint.get("episode_id")
+            branch = checkpoint.get("branch")
+            if not episode_id or not branch:
+                continue
+            round_zero = load_json(path.parent / f"{branch}.round-0.json")
+            value = (source_name, int(round_zero["verification"]["cost"]))
+            if episode_id in costs and costs[episode_id] != value:
+                raise ValueError(f"conflicting online cost ledger: {episode_id}")
+            costs[episode_id] = value
+    return costs
+
+
 def prepare_online() -> dict[str, Any]:
     metrics = load_json(OUTPUT / "metrics.json")
     if not metrics["offline_pass"]:
@@ -967,6 +986,7 @@ def prepare_online() -> dict[str, Any]:
         for name, records in source_records.items()
         for item in records
     }
+    source_costs = _online_source_costs(source_roots)
     predictions = [
         item
         for item in load_jsonl(OUTPUT / "predictions.jsonl")
@@ -987,16 +1007,24 @@ def prepare_online() -> dict[str, Any]:
             if source_id not in source_public:
                 raise ValueError(f"online source episode missing: {source_id}")
             source_name, source_item = source_public[source_id]
+            if source_id not in source_costs:
+                raise ValueError(f"online source cost missing: {source_id}")
+            cost_source_name, expected_move_steps = source_costs[source_id]
+            if cost_source_name != source_name:
+                raise ValueError(f"online source cost batch mismatch: {source_id}")
             reobserve_sources[source_name].append(source_item)
             reobserve_groups[source_name].add(source_item["group_id"])
+            estimated_move_steps = public["candidate_costs"]["REOBSERVE"][
+                "move_steps"
+            ]
             mapping.append(
                 {
                     "parallel_episode_id": public["episode_id"],
                     "source_episode_id": source_id,
                     "source_batch": source_name,
-                    "expected_move_steps": public["candidate_costs"]["REOBSERVE"][
-                        "move_steps"
-                    ],
+                    "expected_move_steps": expected_move_steps,
+                    "offline_estimated_move_steps": estimated_move_steps,
+                    "estimate_delta": expected_move_steps - estimated_move_steps,
                 }
             )
         else:
@@ -1151,6 +1179,9 @@ def validate_online(traces_path: Path) -> dict[str, Any]:
         "ai2thor_reobserve_group_count": len(source_ids),
         "deterministic_non_reobserve_group_count": non_reobserve["group_count"],
         "checks": checks,
+        "public_cost_estimate_mismatch_count": sum(
+            int(item.get("estimate_delta", 0) != 0) for item in mapping
+        ),
         "interruption_recovery": interruption,
         "traces_sha256": sha256_file(traces_path),
         "checked_at": utc_now(),
@@ -1256,6 +1287,7 @@ def report() -> dict[str, Any]:
         "## 7. 在线执行与恢复",
         "",
         f"- AI2-THOR REOBSERVE：{online['ai2thor_reobserve_group_count']} groups，全部通过",
+        f"- 实际 source ledger 与公开成本估计不一致：{online['public_cost_estimate_mismatch_count']}/20；验收按实际执行 ledger，不用估计值替代",
         f"- 其余四路确定性副作用：{online['deterministic_non_reobserve_group_count']} groups，全部通过",
         f"- confirmatory100 在线覆盖：{online['confirmatory_group_count']}/100",
         f"- 人为中断退出码：{online['interruption_recovery']['interrupted_exit_code']}，随后从 checkpoint 恢复",

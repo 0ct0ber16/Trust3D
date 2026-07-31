@@ -39,7 +39,7 @@ from trust3d.sim.visibility_oracle import (
 )
 
 
-ONLINE_BUILD_VERSION = 1
+ONLINE_BUILD_VERSION = 2
 
 
 def _online_unit_id(candidate_id, branch):
@@ -51,36 +51,44 @@ def _checkpoint_path(output, candidate_id, branch):
     return output / "checkpoints" / candidate_id / (branch + ".json")
 
 
-def _source_checkpoint(source_root, candidate_id, branch, trajectory_sha, seed):
+def _source_checkpoint(
+    source_root, candidate_id, branch, trajectory_sha, seed, cache_modalities=None
+):
+    expected = {
+        "kind": "branch_round",
+        "build_version": BUILD_VERSION,
+        "candidate_id": candidate_id,
+        "trajectory_sha256": trajectory_sha,
+        "branch": branch,
+        "replay_round": 0,
+        "seed": seed,
+    }
+    if cache_modalities is not None:
+        expected["cache_modalities"] = list(cache_modalities)
     return _load_checkpoint(
         source_root
         / "checkpoints"
         / candidate_id
         / (branch + ".round-0.json"),
-        {
-            "kind": "branch_round",
-            "build_version": BUILD_VERSION,
-            "candidate_id": candidate_id,
-            "trajectory_sha256": trajectory_sha,
-            "branch": branch,
-            "replay_round": 0,
-            "seed": seed,
-            "cache_modalities": ["rgb", "depth", "instance"],
-        },
+        expected,
     )
 
 
-def _context_checkpoint(source_root, candidate_id, trajectory_sha, seed):
+def _context_checkpoint(
+    source_root, candidate_id, trajectory_sha, seed, cache_modalities=None
+):
+    expected = {
+        "kind": "context",
+        "build_version": BUILD_VERSION,
+        "candidate_id": candidate_id,
+        "trajectory_sha256": trajectory_sha,
+        "seed": seed,
+    }
+    if cache_modalities is not None:
+        expected["cache_modalities"] = list(cache_modalities)
     return _load_checkpoint(
         source_root / "checkpoints" / candidate_id / "context.json",
-        {
-            "kind": "context",
-            "build_version": BUILD_VERSION,
-            "candidate_id": candidate_id,
-            "trajectory_sha256": trajectory_sha,
-            "seed": seed,
-            "cache_modalities": ["rgb", "depth", "instance"],
-        },
+        expected,
     )
 
 
@@ -96,6 +104,16 @@ def _reason_codes(route, episode):
     return ["NO_INTERVENTION_WINDOW", "FRESH_FACT"]
 
 
+def _history_frame_path(episode):
+    observation = episode.get("history_observation")
+    if isinstance(observation, dict) and observation.get("rgb"):
+        return observation["rgb"]
+    frames = episode.get("history_frames", [])
+    if frames:
+        return frames[-1]
+    raise ValueError("public episode has no historical RGB evidence")
+
+
 def _execute_unit(
     controller,
     unit,
@@ -105,14 +123,22 @@ def _execute_unit(
     alfred_json,
     seed,
     config_sha256,
+    cache_modalities,
 ):
     candidate = unit["candidate"]
     candidate_id = candidate["candidate_id"]
     branch = unit["branch"]
     trajectory, trajectory_sha = _load_trajectory(alfred_json, candidate)
-    context = _context_checkpoint(source_root, candidate_id, trajectory_sha, seed)
+    context = _context_checkpoint(
+        source_root, candidate_id, trajectory_sha, seed, cache_modalities
+    )
     source = _source_checkpoint(
-        source_root, candidate_id, branch, trajectory_sha, seed
+        source_root,
+        candidate_id,
+        branch,
+        trajectory_sha,
+        seed,
+        cache_modalities,
     )
     if context is None or source is None:
         raise RuntimeError("Gate 3 source checkpoint is invalid")
@@ -226,13 +252,19 @@ def _execute_unit(
     for episode, route in zip(unit["public_records"], routes):
         if selected_route == "reobserve":
             new_frames = [
-                "data/episodes/online/" + online_observation["rgb"]
+                os.path.relpath(
+                    str(online_root / online_observation["rgb"]),
+                    str(Path.cwd()),
+                )
             ]
             evidence = list(new_frames)
         else:
             new_frames = []
             evidence = [
-                "data/episodes/mvp/" + episode["history_observation"]["rgb"]
+                os.path.relpath(
+                    str(source_root / _history_frame_path(episode)),
+                    str(Path.cwd()),
+                )
             ]
         traces.append(
             {
@@ -295,7 +327,10 @@ def _execute_unit(
 
 def _build_units(public, selection, source_manifest, exclusions, source_root):
     public_by_id = {item["episode_id"]: item for item in public}
-    questions_per_branch = int(source_manifest["questions_per_branch"])
+    # Single-question source manifests predate this explicit field.
+    questions_per_branch = int(source_manifest.get("questions_per_branch", 1))
+    if questions_per_branch < 1:
+        raise ValueError("questions_per_branch must be positive")
     excluded = set(exclusions.get("group_ids", []))
     if excluded != set(source_manifest.get("excluded_group_ids", [])):
         raise ValueError("Gate 3 manifest and exclusion config disagree")
@@ -361,6 +396,7 @@ def run_online(
         public, selection, source_manifest, exclusions, source_root
     )
     seed = int(source_manifest["seed"])
+    cache_modalities = source_manifest.get("cache_modalities")
 
     completed = {}
     pending = []
@@ -370,7 +406,12 @@ def run_online(
         trajectory, trajectory_sha = _load_trajectory(alfred_json, unit["candidate"])
         del trajectory
         source = _source_checkpoint(
-            source_root, candidate_id, branch, trajectory_sha, seed
+            source_root,
+            candidate_id,
+            branch,
+            trajectory_sha,
+            seed,
+            cache_modalities,
         )
         if source is None:
             raise RuntimeError("source branch checkpoint is unavailable")
@@ -431,6 +472,7 @@ def run_online(
                         alfred_json,
                         seed,
                         config_sha256,
+                        cache_modalities,
                     )
                     completed[(candidate_id, branch)] = checkpoint
                     print(
