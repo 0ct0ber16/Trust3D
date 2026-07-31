@@ -8,6 +8,8 @@
 !Trust3D_最小可执行实验详细报告.md
 !Trust3D_GT五路路由与Gate7修复并行执行计划.md
 !Trust3D_GT五路路由实验报告.md
+!Trust3D_GT五路路由可行性验证报告_v3.md
+!Trust3D_GT五路路由可行性验证报告_v3.md
 !Trust3D_Gate7修复实验报告.md
 !Trust3D_GT五路与RGB几何联合实验报告.md
 !pyproject.toml
@@ -124,6 +126,27 @@ outputs/parallel_v2/integration/*
 !outputs/parallel_v2/integration/report.json
 !outputs/parallel_v2/final_decision.json
 !outputs/parallel_v2/status.json
+!outputs/parallel_v3/
+outputs/parallel_v3/*
+!outputs/parallel_v3/gt_five_route/
+outputs/parallel_v3/gt_five_route/*
+!outputs/parallel_v3/gt_five_route/preflight.json
+!outputs/parallel_v3/gt_five_route/sealed_audit.json
+!outputs/parallel_v3/gt_five_route/contract.json
+!outputs/parallel_v3/gt_five_route/fresh_source_plan.json
+!outputs/parallel_v3/gt_five_route/fresh_source_audit.json
+!outputs/parallel_v3/gt_five_route/prepare.json
+!outputs/parallel_v3/gt_five_route/confirmatory100_lock.json
+!outputs/parallel_v3/gt_five_route/router_lock.json
+!outputs/parallel_v3/gt_five_route/statistics_lock.json
+!outputs/parallel_v3/gt_five_route/code_lock.json
+!outputs/parallel_v3/gt_five_route/power_design.json
+!outputs/parallel_v3/gt_five_route/predictions_seal.json
+!outputs/parallel_v3/gt_five_route/evaluation_complete.json
+!outputs/parallel_v3/gt_five_route/metrics.json
+!outputs/parallel_v3/gt_five_route/checkpoint_recovery.json
+!outputs/parallel_v3/gt_five_route/online_validation.json
+!outputs/parallel_v3/gt_five_route/final_decision.json
 
 **/__pycache__/
 *.py[cod]

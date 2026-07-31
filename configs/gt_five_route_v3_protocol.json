@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "protocol_revision": "gt-five-route-v3",
+  "seed": 20260731,
+  "development_groups": 20,
+  "sealed_confirmatory_groups": 60,
+  "fresh_replication_groups": 40,
+  "confirmatory_groups": 100,
+  "groups_per_route": 20,
+  "replication_groups_per_route": 8,
+  "fresh_mvp_candidate_pool": 40,
+  "fresh_spatial_candidate_pool": 12,
+  "max_error_probability": 0.05,
+  "minimum_coverage": 0.75,
+  "accuracy_noninferiority_margin": -0.02,
+  "minimum_cost_reduction": 0.2,
+  "minimum_route_loss_margin": 0.01,
+  "unavailable_route_loss": 1.5,
+  "bootstrap_resamples": 100000,
+  "route_tie_break": [
+    "USE_CURRENT_VIEW",
+    "RETRIEVE_HISTORY",
+    "QUERY_3D_MEMORY",
+    "REOBSERVE",
+    "ABSTAIN"
+  ],
+  "cost_weights": {
+    "move_steps": 0.01,
+    "new_observations": 0.04,
+    "vlm_calls": 0.02,
+    "geometry_calls": 0.03,
+    "wall_seconds": 0.0001,
+    "answer_error": 1.0,
+    "abstain": 0.25
+  },
+  "sealed_hashes": {
+    "public": "8a301d2a27b431ca9fc1df2326bdc1e47f6b1b33c3d61d7eb1987fcf1b4c6884",
+    "private": "138748543e9847ae703b9f81ce62a841d4a5a3ef7742c5bf8fbebeadc4312d12"
+  },
+  "resources": {
+    "maximum_cpu_load_fraction": 0.8,
+    "minimum_available_memory_gib": 64,
+    "minimum_available_disk_gib": 100,
+    "cpu_threads": 8
+  }
+}
