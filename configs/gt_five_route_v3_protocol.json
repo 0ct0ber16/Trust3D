@@ -9,7 +9,7 @@
   "groups_per_route": 20,
   "replication_groups_per_route": 8,
   "fresh_mvp_candidate_pool": 40,
-  "fresh_spatial_candidate_pool": 12,
+  "fresh_spatial_candidate_pool": 24,
   "max_error_probability": 0.05,
   "minimum_coverage": 0.75,
   "accuracy_noninferiority_margin": -0.02,

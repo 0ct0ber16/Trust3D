@@ -119,5 +119,5 @@ def test_fresh_source_plan_excludes_gate7_and_separates_pools():
         }
     assert not selected_ids & set(excluded)
     assert len(mvp) == 40
-    assert len(spatial) == 12
+    assert len(spatial) == 24
     assert result["fresh_source_overlap_count"] == 0
