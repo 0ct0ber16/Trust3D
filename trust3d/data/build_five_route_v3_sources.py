@@ -8,6 +8,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from trust3d.data.select_events import select_candidates
 from trust3d.parallel_v2.common import (
     ROOT,
     atomic_json,
@@ -135,8 +136,10 @@ def plan() -> dict[str, Any]:
         if item["candidate_id"] not in excluded_ids
         and item["source_json"] not in excluded_source_json
     ]
-    mvp_candidates = _round_robin_scenes(
-        eligible, int(protocol["fresh_mvp_candidate_pool"]), "gt5-v3-fresh-mvp"
+    mvp_candidates = select_candidates(
+        eligible,
+        int(protocol["fresh_mvp_candidate_pool"]),
+        int(protocol["seed"]),
     )
     mvp_sources = {item["source_json"] for item in mvp_candidates}
     spatial_candidates = _round_robin_scenes(
