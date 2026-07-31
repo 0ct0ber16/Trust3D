@@ -966,6 +966,13 @@ def _online_source_costs(
     return costs
 
 
+def _source_checkpoint_episode_id(source_item: dict[str, Any]) -> str:
+    stem = Path(source_item["query_frame"]).stem
+    if not stem.endswith("_query"):
+        raise ValueError(f"invalid source query frame: {source_item['query_frame']}")
+    return stem[: -len("_query")]
+
+
 def prepare_online() -> dict[str, Any]:
     metrics = load_json(OUTPUT / "metrics.json")
     if not metrics["offline_pass"]:
@@ -1007,9 +1014,14 @@ def prepare_online() -> dict[str, Any]:
             if source_id not in source_public:
                 raise ValueError(f"online source episode missing: {source_id}")
             source_name, source_item = source_public[source_id]
-            if source_id not in source_costs:
-                raise ValueError(f"online source cost missing: {source_id}")
-            cost_source_name, expected_move_steps = source_costs[source_id]
+            checkpoint_episode_id = _source_checkpoint_episode_id(source_item)
+            if checkpoint_episode_id not in source_costs:
+                raise ValueError(
+                    f"online source cost missing: {source_id} -> {checkpoint_episode_id}"
+                )
+            cost_source_name, expected_move_steps = source_costs[
+                checkpoint_episode_id
+            ]
             if cost_source_name != source_name:
                 raise ValueError(f"online source cost batch mismatch: {source_id}")
             reobserve_sources[source_name].append(source_item)
@@ -1021,6 +1033,7 @@ def prepare_online() -> dict[str, Any]:
                 {
                     "parallel_episode_id": public["episode_id"],
                     "source_episode_id": source_id,
+                    "source_checkpoint_episode_id": checkpoint_episode_id,
                     "source_batch": source_name,
                     "expected_move_steps": expected_move_steps,
                     "offline_estimated_move_steps": estimated_move_steps,

@@ -23,6 +23,7 @@ from trust3d.parallel_v3.five_route import (
     _contract_case,
     _online_source_costs,
     _private_access_guard,
+    _source_checkpoint_episode_id,
     protocol,
 )
 from trust3d.parallel_v3.router import choose_route
@@ -98,6 +99,12 @@ def test_online_cost_ledger_uses_executed_round_zero_path(tmp_path):
         "episode-0": ("sealed", 7),
         "episode-1": ("sealed", 7),
     }
+    assert (
+        _source_checkpoint_episode_id(
+            {"query_frame": "cache/rgb/episode-1_query.png"}
+        )
+        == "episode-1"
+    )
 
 
 def test_exact_and_paired_statistics_references():
