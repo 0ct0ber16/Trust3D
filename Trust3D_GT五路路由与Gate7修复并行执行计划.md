@@ -1251,16 +1251,18 @@ bash scripts/run_five_route_gt_v3.sh resume
 
 ### B 线
 
-- [ ] legacy30 回归锁定
-- [ ] 任务头/坐标契约测试通过
-- [ ] RGB-only grounding 与几何阶段已分离
-- [ ] adapter pilot 与 holdout 不重叠
-- [ ] adapter 和 confidence lock 已冻结且只使用 pilot
-- [ ] CUT3R/VGGT holdout 前向完成
-- [ ] predictions 已在 private evaluator 打开前封存
-- [ ] private leak 和 geometry failure 均为 0
-- [ ] CPU checkpoint recovery 完成
-- [ ] `Trust3D_Gate7修复实验报告.md` 已生成
+B 线于 2026-08-02 完成全部执行阶段；最佳 holdout QA drop 为 48.89 个百分点，科学等级为 `failed_scientific`，因此按预注册门槛不启动 C 线主实验。
+
+- [x] legacy30 回归锁定
+- [x] 任务头/坐标契约测试通过
+- [x] RGB-only grounding 与几何阶段已分离
+- [x] adapter pilot 与 holdout 不重叠
+- [x] adapter 和 confidence lock 已冻结且只使用 pilot
+- [x] CUT3R/VGGT holdout 前向完成
+- [x] predictions 已在 private evaluator 打开前封存
+- [x] private leak 和 geometry failure 均为 0
+- [x] CPU checkpoint recovery 完成
+- [x] `Trust3D_Gate7修复实验报告.md` 已生成
 
 ### C 线
 

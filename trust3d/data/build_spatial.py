@@ -40,7 +40,7 @@ from trust3d.sim.spatial_intervention import (
     scene_pairs,
     swap_objects,
 )
-from trust3d.sim.state_hash import canonical_pose, find_object
+from trust3d.sim.state_hash import canonical_pose, find_object, find_object_by_name
 from trust3d.sim.visibility_oracle import (
     _reachable_positions,
     find_verification_pose,
@@ -300,8 +300,8 @@ def _build_context(controller, candidate, trajectory, trajectory_sha, output, se
             history_event = _restore_history(
                 controller, trajectory, candidate["action_index"]
             )
-        target = find_object(history_event.metadata, pair[0]["objectId"])
-        donor = find_object(history_event.metadata, pair[1]["objectId"])
+        target = find_object_by_name(history_event.metadata, pair[0]["name"])
+        donor = find_object_by_name(history_event.metadata, pair[1]["name"])
         object_ids = {"target": target["objectId"], "donor": donor["objectId"]}
         initial_points = {
             "target": object_center(target),
@@ -366,14 +366,36 @@ def _build_context(controller, candidate, trajectory, trajectory_sha, output, se
     stable_observations = history_observations
     stable_oracles = history_oracles
 
-    _restore_history(controller, trajectory, candidate["action_index"])
-    _, swap = swap_objects(controller, target["objectId"], donor["objectId"])
+    stale_history_event = _restore_history(
+        controller, trajectory, candidate["action_index"]
+    )
+    stale_target = find_object_by_name(stale_history_event.metadata, target["name"])
+    stale_donor = find_object_by_name(stale_history_event.metadata, donor["name"])
+    stale_object_ids = {
+        "target": stale_target["objectId"],
+        "donor": stale_donor["objectId"],
+    }
+    _, swap = swap_objects(
+        controller,
+        stale_object_ids["target"],
+        stale_object_ids["donor"],
+    )
     stale_query_event = teleport_to_pose(controller, query_pose)
+    stale_objects = {
+        "target": find_object_by_name(
+            stale_query_event.metadata, target["name"]
+        ),
+        "donor": find_object_by_name(
+            stale_query_event.metadata, donor["name"]
+        ),
+    }
     if any(
-        find_object(stale_query_event.metadata, object_id).get("visible", False)
-        for object_id in object_ids.values()
+        obj.get("visible", False) for obj in stale_objects.values()
     ):
         raise RuntimeError("陈旧分支查询帧泄漏目标")
+    stale_object_ids = {
+        role: obj["objectId"] for role, obj in stale_objects.items()
+    }
     query_visual_difference = _query_visual_difference(
         stable_pixels, stale_query_event
     )
@@ -392,7 +414,7 @@ def _build_context(controller, candidate, trajectory, trajectory_sha, output, se
     )
     artifacts.extend(query_artifacts)
     stale = _verification_geometry(
-        controller, output, group_id + "_stale", query_pose, object_ids
+        controller, output, group_id + "_stale", query_pose, stale_object_ids
     )
     stale_points, stale_rgbd, stale_observations, stale_oracles, stale_artifacts = stale
     artifacts.extend(stale_artifacts)

@@ -11,6 +11,16 @@ else
   mapfile -t files < <(git ls-files)
 fi
 
+contains_pattern() {
+  local pattern=$1
+  local path=$2
+  if command -v rg >/dev/null 2>&1; then
+    rg -n -i -- "${pattern}" "${path}"
+  else
+    grep -n -I -E -i -- "${pattern}" "${path}"
+  fi
+}
+
 failures=0
 for path in "${files[@]}"; do
   [[ -f ${path} ]] || continue
@@ -20,14 +30,14 @@ for path in "${files[@]}"; do
     failures=$((failures + 1))
   fi
   if [[ ${path} != scripts/audit_parallel_artifacts.sh ]] \
-    && rg -n -i \
+    && contains_pattern \
     'OPENAI_API_KEY|CRS_OAI_KEY|BEGIN (RSA |OPENSSH )?PRIVATE KEY|github_pat_[A-Za-z0-9_]+|ghp_[A-Za-z0-9]+' \
     "${path}" >/dev/null 2>&1; then
     printf '拒绝：检测到凭据模式：%s\n' "${path}"
     failures=$((failures + 1))
   fi
   if [[ ${path} == outputs/parallel_v2/* ]] \
-    && rg -n 'private_answer|oracle_best_route|route_losses|current_answer_gt|historical_answer_gt' "${path}" >/dev/null 2>&1; then
+    && contains_pattern 'private_answer|oracle_best_route|route_losses|current_answer_gt|historical_answer_gt' "${path}" >/dev/null 2>&1; then
     case "${path}" in
       *protocol*|*metrics*|*report*|*final_decision*) ;;
       *) printf '拒绝：公开跟踪产物疑似包含 private 字段：%s\n' "${path}"; failures=$((failures + 1)) ;;

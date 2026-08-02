@@ -36,6 +36,21 @@ def find_object(metadata, object_id):
     raise KeyError("object not found in metadata: {}".format(object_id))
 
 
+def find_object_by_name(metadata, object_name):
+    matches = [
+        obj
+        for obj in metadata.get("objects", [])
+        if obj.get("name") == object_name
+    ]
+    if len(matches) != 1:
+        raise KeyError(
+            "object name must resolve uniquely: {} (matches={})".format(
+                object_name, len(matches)
+            )
+        )
+    return matches[0]
+
+
 def canonical_pose(metadata):
     agent = metadata["agent"]
     return _canonical(

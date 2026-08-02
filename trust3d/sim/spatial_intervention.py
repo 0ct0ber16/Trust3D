@@ -4,7 +4,7 @@ import math
 
 import numpy as np
 
-from trust3d.sim.state_hash import find_object
+from trust3d.sim.state_hash import find_object, find_object_by_name
 
 
 class SpatialInterventionError(RuntimeError):
@@ -115,8 +115,10 @@ def _pose_record(obj, position):
     }
 
 
-def _position_error(event, object_id, expected):
-    return distance(find_object(event.metadata, object_id)["position"], expected)
+def _position_error(event, object_name, expected):
+    return distance(
+        find_object_by_name(event.metadata, object_name)["position"], expected
+    )
 
 
 def _teleport_object(controller, obj, position):
@@ -144,6 +146,8 @@ def swap_objects(controller, target_id, donor_id, tolerance=0.05):
     objects = controller.last_event.metadata.get("objects", [])
     target = find_object(controller.last_event.metadata, target_id)
     donor = find_object(controller.last_event.metadata, donor_id)
+    target_name = target["name"]
+    donor_name = donor["name"]
     target_position = dict(target["position"])
     donor_position = dict(donor["position"])
     object_poses = []
@@ -173,17 +177,20 @@ def swap_objects(controller, target_id, donor_id, tolerance=0.05):
                 event.metadata.get("errorMessage", "")
             )
         )
-    target_error = _position_error(event, target_id, donor_position)
-    donor_error = _position_error(event, donor_id, target_position)
+    target_error = _position_error(event, target_name, donor_position)
+    donor_error = _position_error(event, donor_name, target_position)
     method = "SetObjectPoses"
     if target_error > tolerance or donor_error > tolerance:
         temporary = dict(target_position)
         temporary["y"] = float(temporary["y"]) + 2.0
+        target = find_object_by_name(controller.last_event.metadata, target_name)
         _teleport_object(controller, target, temporary)
+        donor = find_object_by_name(controller.last_event.metadata, donor_name)
         _teleport_object(controller, donor, target_position)
+        target = find_object_by_name(controller.last_event.metadata, target_name)
         event = _teleport_object(controller, target, donor_position)
-        target_error = _position_error(event, target_id, donor_position)
-        donor_error = _position_error(event, donor_id, target_position)
+        target_error = _position_error(event, target_name, donor_position)
+        donor_error = _position_error(event, donor_name, target_position)
         method = "TeleportObject"
     if target_error > tolerance or donor_error > tolerance:
         raise SpatialInterventionError(
